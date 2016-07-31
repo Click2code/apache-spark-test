@@ -366,6 +366,27 @@ The following asynchronous methods are available:
 - foreachAsync
 - foreachPartitionAsync
 
+# Spark SQL
+..
+
+
+
+## RDD vs DataFrame
+Both are Resilient, Distributed and Dataset, but a DataFrame also has information about the structure. In an RDD
+we have no idea what the semantic information about the data is.
+
+# Parquet
+[Parquet][parquet] is an efficient _columnar_ storage format that is used by Spark SQL to improve the analysis of any
+processing pipeline for structured data. It wins over JSON. It has compact binary encoding with intelligent compression.
+
+Parquet uses a columnar storage format which means that each column is stored separately with an index that allows skipping
+of unread columns.
+
+Parquet has support for partitioning eg. partioning data (files) by year automatically!
+
+Data skipping for statistics, column, min, max, etc.
+
+
 
 # Extensions for Apache Spark
 
@@ -374,8 +395,126 @@ Note: Only compatible with Spark 1.x
 [Spark XML][sparkxml] is a library for parsing and querying XML data with Apache Spark, for Spark SQL and DataFrames.
 
 ## CSV Data Source for Apache Spark
-Note: Only compatible with Spark 1.x
 [Spark CSV][sparkcsv] is a library for parsing and querying CSV data with Apache Spark, for Spark SQL and DataFrames.
+
+To add this feature to the shell, launch it with the following option:
+
+```bash
+bin/spark-shell --master spark://localhost:7077 --packages com.databricks:spark-csv_2.11:1.4.0 --verbose
+```
+
+Lets try it out!
+
+First download a CSV file:
+
+```bash
+wget -O /tmp/cars.csv https://github.com/databricks/spark-csv/raw/master/src/test/resources/cars.csv
+```
+
+The file contains:
+
+```csv
+year,make,model,comment,blank
+"2012","Tesla","S","No comment",
+
+1997,Ford,E350,"Go get one now they are going fast",
+2015,Chevy,Volt
+```
+
+Now lets read the data using Spark SQL:
+
+```scala
+scala> :paste
+// Entering paste mode (ctrl-D to finish)
+
+val df = spark.read
+    .format("com.databricks.spark.csv")
+    .option("header", "true") // Use first line of all files as header
+    .option("inferSchema", "true") // Automatically infer data types
+    .load("/tmp/cars.csv")
+```
+
+Lets write out the data:
+
+```scala
+scala> :paste
+// Entering paste mode (ctrl-D to finish)
+
+val selectedData = df.select("year", "model")
+selectedData.write
+    .format("com.databricks.spark.csv")
+    .option("header", "true")
+    .save("/tmp/newcars.csv")
+```
+
+The contents should be:
+
+```csv
+year,model
+2012,S
+1997,E350
+2015,Volt
+```
+
+It should also be able to gzip the csv:
+
+```scala
+scala> :paste
+// Entering paste mode (ctrl-D to finish)
+
+selectedData.write
+    .format("com.databricks.spark.csv")
+    .option("header", "true")
+    .option("codec", "org.apache.hadoop.io.compress.GzipCodec")
+    .save("/tmp/newcars.csv.gz")
+```
+
+It can of course write the whole cars CSV to a parquet table:
+
+```scala
+df.write
+  .format("parquet")
+  .saveAsTable("cars")
+```
+
+Which can be loaded:
+
+```scala
+val cars = spark.table("cars")
+cars.select("year", "model").show
+
+// or shorter
+spark
+	.table("cars")
+	.select("year", "model")
+	.show
+```
+
+It can show the schema:
+
+```scala
+scala> cars.printSchema
+root
+ |-- year: integer (nullable = true)
+ |-- make: string (nullable = true)
+ |-- model: string (nullable = true)
+ |-- comment: string (nullable = true)
+ |-- blank: string (nullable = true)
+```
+
+It can also show the execution plan:
+
+```scala
+cars.select("year").explain
+== Physical Plan ==
+*Project [year#705]
++- *BatchedScan parquet default.cars[year#705] Format: ParquetFormat, ReadSchema: struct<year:int>
+```
+
+# Pandas
+[Pandas][pandas] ia a Python library providing high-performance, easy-to-use data structures and data analysis tools.
+
+TBC
 
 # Books
 - [Jacek Laskowski - Mastering Apache Spark (Free)](https://www.gitbook.com/book/jaceklaskowski/mastering-apache-spark/)
@@ -384,10 +523,14 @@ Note: Only compatible with Spark 1.x
 - [Matei Zaharia et al. - Resilient Distributed Datasets: A Fault-Tolerant Abstraction for
 In-Memory Cluster Computing][rddpaper]
 
-# Video Resources
+# Online resources
+- [Spark packages - A community index of third-party packages for Apache Spark][spackages]
 
-* [Apache Spark - How to install](https://www.youtube.com/watch?v=L5QWO8QBG5c)
-* [Intro to Apache Spark - A Brain Friendly Tutorial](https://www.youtube.com/watch?v=rvDpBTV89AM)
+# Video Resources
+- [Matei Zaharia - Keynote: Spark 2.0](https://www.youtube.com/watch?v=L029ZNBG7bk)
+- [Brian Clapper - RDDs, DataFrames and Datasets in Apache Spark - NE Scala 2016](https://www.youtube.com/watch?v=pZQsDloGB4w)
+- [Michael Armbrust - Structuring Spark: DataFrames, Datasets, and Streaming](https://www.youtube.com/watch?v=i7l3JQRx7Qw)
+- [Michael Armbrust - Spark Dataframes: Simple and Fast Analysis of Structured Data](https://www.youtube.com/watch?v=A7Ef_ZB884g)
 
 [spark]: http://spark.apache.org/
 [standalone-mode]: http://spark.apache.org/docs/latest/spark-standalone.html
@@ -402,3 +545,9 @@ In-Memory Cluster Computing][rddpaper]
 [databricks]: https://databricks.com/
 [sparkxml]: https://github.com/databricks/spark-xml
 [sparkcsv]: https://github.com/databricks/spark-csv
+[parquet]: https://parquet.apache.org/
+
+[spackages]: https://spark-packages.org/
+
+[pandas]: http://pandas.pydata.org/
+[ggplot]: http://ggplot2.org/
