@@ -1,4 +1,4 @@
-name := "helloworld"
+name := "jobs"
 
 organization := "com.github.dnvriend"
 

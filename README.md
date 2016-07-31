@@ -62,7 +62,9 @@ $SPARK_HOME/sbin/stop-slave.sh
 
 The script will use the `SPARK_WORKER_INSTANCES` if found, and stop all the workers.
 
-# Launching the interactive shell
+# Hands-on with Spark
+
+## Launching the interactive shell
 Spark can run interactively through a modified version of the Scala shell (REPL). This is a great way to learn the API. To launch the shell execute the following command, which will connect to the master running on `localhost`:
 
 ```bash
@@ -70,6 +72,8 @@ $SPARK_HOME/bin/spark-shell --master spark://localhost:7077
 ```
 
 The [--master](http://spark.apache.org/docs/latest/submitting-applications.html#master-urls) option specifies the master URL for a distributed cluster, or local to run locally with one thread, or local[N] to run locally with N threads. You should start by using local for testing. For a full list of options, run Spark shell with the --help option.
+
+## Spark Context
 
 In the Spark shell you get an initialized [org.apache.spark.SparkContext][sparkcontext] with the value `sc`:
 
@@ -85,6 +89,7 @@ scala> spark
 res2: org.apache.spark.sql.SparkSession = org.apache.spark.sql.SparkSession@6aa27145
 ```
 
+## Counting
 You should now be able to execute the following command, which should return 1000:
 
 ```scala
@@ -92,6 +97,7 @@ scala> sc.parallelize(1 to 1000).count()
 res0: Long = 1000
 ```
 
+## Distributed Pi Calculation
 To calculate Pi, we can create the following application:
 
 ```scala
@@ -116,6 +122,86 @@ count: Int = 392687658
 ```
 
 Note: calculating Pi is faster with less slices like eg: 2.
+
+## Processing a file
+To process a file, we first need to get one. Let's download the Spark `readme.md` file and put it into `/tmp`
+
+```bash
+wget -O /tmp/readme.md https://raw.githubusercontent.com/apache/spark/master/README.md
+```
+
+Spark’s primary abstraction is a distributed collection of items called a [Resilient Distributed Dataset (RDD)][rdd].
+RDDs can be created from various sources, like for example the `Range` from the _Counting_ example above. We will create
+an RDD from a text file, the `/tmp/readme.md`:
+
+```scala
+scala> val textFile = sc.textFile("/tmp/readme.md")
+textFile: org.apache.spark.rdd.RDD[String] = /tmp/readme.md MapPartitionsRDD[1] at textFile
+```
+
+RDDs have actions, which return values, and transformations, which return pointers to new RDDs. Let’s start with a few actions:
+
+```scala
+scala> textFile.count() // Number of items in this RDD
+res0: Long = 99
+
+scala> textFile.first() // First item in this RDD
+res1: String = # Apache Spark
+```
+
+Now let’s use a transformation. We will use the filter transformation to return a new RDD with a subset of the items in the file.
+
+```scala
+scala> val linesWithSpark = textFile.filter(line => line.contains("Spark"))
+linesWithSpark: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[2] at filter at <console>:26
+```
+
+We can chain together transformations and actions:
+
+```scala
+scala> textFile.filter(line => line.contains("Spark")).count() // How many lines contain "Spark"?
+res2: Long = 19
+```
+
+RDD actions and transformations can be used for more complex computations. Let’s say we want to find the line with the most words:
+
+```scala
+scala> textFile.map(line => line.split(" ").size).reduce((a, b) => if (a > b) a else b) // line with most words
+res3: Int = 22
+```
+
+One common data flow pattern is MapReduce, as popularized by Hadoop. Spark can implement MapReduce flows easily:
+
+```scala
+scala> val wordCounts = textFile.flatMap(line => line.split(" ")).map(word => (word, 1)).reduceByKey((a, b) => a + b)
+wordCounts: org.apache.spark.rdd.RDD[(String, Int)] = ShuffledRDD[7] at reduceByKey at <console>:26
+```
+
+Here, we combined the flatMap, map, and reduceByKey transformations to compute the per-word counts in the file as an RDD
+of (String, Int) pairs. To collect the word counts in our shell, we can use the collect action:
+
+```scala
+scala> wordCounts.collect()
+res4: Array[(String, Int)] = Array((package,1), (this,1), ...)
+```
+
+## Caching
+Spark also supports pulling data sets into a cluster-wide in-memory cache. This is very useful when data is accessed repeatedly,
+such as when querying a small “hot” dataset or when running an iterative algorithm like PageRank. As a simple example, let’s
+mark our linesWithSpark dataset to be cached:
+
+```scala
+scala> linesWithSpark.cache()
+res5: linesWithSpark.type = MapPartitionsRDD[2] at filter at <console>:26
+
+scala> linesWithSpark.count()
+res5: Long = 19
+
+scala> linesWithSpark.count()
+res6: Long = 19
+```
+
+It may seem silly to use Spark to explore and cache a 100-line text file. The interesting part is that these same functions can be used on very large data sets, even when they are striped across tens or hundreds of nodes.
 
 ## Spark Web UI
 The Web UI (aka webUI or Spark UI after SparkUI) is the web interface of a Spark application to inspect job executions in the SparkContext using a browser.
