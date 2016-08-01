@@ -520,14 +520,6 @@ Download the [zeppelin-bin-all](http://www.apache.org/dyn/closer.cgi/zeppelin/ze
 
 - [Zeppelin - Spark Interpreter Settings](https://zeppelin.apache.org/docs/latest/interpreter/spark.html)
 
-## Project Jupyter
-[Project Jupyter][jupyter] is a web-based notebook that allows you to create and share documents that contain live code, equations, visualizations and explanatory text. Uses include: data cleaning and transformation, numerical simulation, statistical modeling, machine learning and much more.
-
-Jupyter is a Python based notebook.
-
-## Spark notebook
-[Spark Notebook][sparknotebook] is the open source notebook aimed at enterprise environments, providing Data Scientist and Data Engineers with an interactive web-based editor that can combine Scala code, SQL queries, Markup and JavaScript in a collaborative manner to explore, analyse and learn from massive data sets.
-
 v0.6.1 should be Spark 2.0 compatible. v0.6.0 is Spark 1.6.1 compatible.
 
 Building zeppelin:
@@ -545,6 +537,14 @@ export MASTER=spark://localhost:7077
 ```
 
 6. Launch the zeppelin daemon: `$ZEPPELIN_HOME/bin/zeppelin-daemon.sh start`
+
+## Project Jupyter
+[Project Jupyter][jupyter] is a web-based notebook that allows you to create and share documents that contain live code, equations, visualizations and explanatory text. Uses include: data cleaning and transformation, numerical simulation, statistical modeling, machine learning and much more.
+
+Jupyter is a Python based notebook.
+
+## Spark notebook
+[Spark Notebook][sparknotebook] is the open source notebook aimed at enterprise environments, providing Data Scientist and Data Engineers with an interactive web-based editor that can combine Scala code, SQL queries, Markup and JavaScript in a collaborative manner to explore, analyse and learn from massive data sets.
 
 # Pandas
 [Pandas][pandas] ia a Python library providing high-performance, easy-to-use data structures and data analysis tools.
