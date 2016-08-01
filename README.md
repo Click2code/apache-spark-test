@@ -532,8 +532,9 @@ Building zeppelin:
 
 ```bash
 export ZEPPELIN_PORT=8001
-export SPARK_HOME=/Users/dennis/projects/spark-2.0.0-bin-hadoop2.7
 export MASTER=spark://localhost:7077
+export SPARK_HOME=/Users/dennis/projects/spark-2.0.0-bin-hadoop2.7
+export SPARK_SUBMIT_OPTIONS="--packages com.databricks:spark-csv_2.11:1.4.0"
 ```
 
 6. Launch the zeppelin daemon: `$ZEPPELIN_HOME/bin/zeppelin-daemon.sh start`
