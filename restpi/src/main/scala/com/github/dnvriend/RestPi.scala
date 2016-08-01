@@ -39,11 +39,12 @@ object RestPi extends App with Directives with SprayJsonSupport with DefaultJson
     .setMaster(s"spark://localhost:7077")
   val sc = new SparkContext(conf)
 
-  final case class Pi(pi: Long)
+  final case class Pi(pi: Double)
 
   implicit val piJsonFormat = jsonFormat1(Pi)
 
-  def calculatePi(num: Long = 1000000, slices: Int = 10): Future[Long] = Future(CalculatePi(sc, num, slices))
+  def calculatePi(num: Long = 1000000, slices: Int = 2): Future[Double] =
+    Future(CalculatePi(sc, num, slices)).map(count => slices.toDouble * count / (num - 1))
 
   val route: Route =
     pathEndOrSingleSlash {

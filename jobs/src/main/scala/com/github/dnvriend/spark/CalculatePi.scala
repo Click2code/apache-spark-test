@@ -22,7 +22,6 @@ import scala.math._
 
 object CalculatePi {
   def apply(sc: SparkContext, num: Long = 10000000L, slices: Int = 2): Long = {
-    val slices = 50
     val n = math.min(num * slices, Int.MaxValue).toInt // avoid overflow
     sc.parallelize(1 until n, slices).map { i =>
       val x = random * 2 - 1

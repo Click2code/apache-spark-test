@@ -34,6 +34,8 @@ object HelloWorld extends App {
   implicit val ec: ExecutionContext = system.dispatcher
   implicit val log: LoggingAdapter = Logging(system, this.getClass)
 
+  val n = 10000000
+
   // The first thing a Spark program must do is to create a SparkContext object, which tells Spark how to access a cluster.
   // To create a SparkContext you first need to build a SparkConf object that contains information about your application.
   // Only one SparkContext may be active per JVM. You must stop() the active SparkContext before creating a new one.
@@ -43,9 +45,10 @@ object HelloWorld extends App {
   val sc = new SparkContext(conf)
 
   for {
-    pi <- Future(CalculatePi(sc))
+    count <- Future(CalculatePi(sc, n))
     _ <- system.terminate()
   } yield {
+    val pi = 2.0 * count / (n - 1)
     println(s"Hello World, Pi = $pi")
     sc.stop()
   }
