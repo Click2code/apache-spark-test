@@ -367,13 +367,23 @@ The following asynchronous methods are available:
 - foreachPartitionAsync
 
 # Spark SQL
-..
+[Spark SQL][sparksql] is a Spark module for structured data processing. Spark SQL knows about the structure of your data because it can infer the structure from the data source it uses, or because the structure has been given by the programmer by means of the Spark SQL API. In any case, because Spark SQL knows about the structure and the operations we wish to perform on the data, Spark SQL can perform extra optimizations. There are several ways to interact with Spark SQL including SQL and the Dataset API. When computing a result the same execution engine is used, independent whether the DataFrame of DataSet API is being used. 
+
+## Datasets and DataFrames
+A Dataset is a distributed collection of data. Dataset is a new interface added in Spark 1.6 that provides the benefits of RDDs (strong typing, ability to use powerful lambda functions) with the benefits of Spark SQL’s optimized execution engine. A Dataset can be constructed from JVM objects and then manipulated using functional transformations (map, flatMap, filter, etc.).
+
+A DataFrame _is a_ Dataset organized into named columns. It is conceptually equivalent to a table in a relational database, but with richer optimizations under the hood. DataFrames can be constructed from a wide array of sources such as: 
+
+- structured data files, 
+- tables in Hive, 
+- external databases, 
+- existing RDDs.
+
+In Scala a DataFrame is represented by a Dataset of Rows. A DataFrame is simply a type alias of Dataset[Row].
+
+The main entry point for SparkSQL is the `org.apache.spark.sql.SparkSession` class, which is available in both the SparkShell and Zeppelin notebook as the `spark` value. The `org.apache.spark.SparkContext` is available as the `sc` value, but this is only used for creating RDDs. Read the [SparkSQL Programming Guide][sparksql] on how to create a SparkSession programmatically.
 
 
-
-## RDD vs DataFrame
-Both are Resilient, Distributed and Dataset, but a DataFrame also has information about the structure. In an RDD
-we have no idea what the semantic information about the data is.
 
 # Parquet
 [Parquet][parquet] is an efficient _columnar_ storage format that is used by Spark SQL to improve the analysis of any
@@ -534,7 +544,7 @@ Building zeppelin:
 export ZEPPELIN_PORT=8001
 export MASTER=spark://localhost:7077
 export SPARK_HOME=/Users/dennis/projects/spark-2.0.0-bin-hadoop2.7
-export SPARK_SUBMIT_OPTIONS="--packages com.databricks:spark-csv_2.11:1.4.0"
+export SPARK_SUBMIT_OPTIONS="--packages com.databricks:spark-csv_2.11:1.4.0,org.postgresql:postgresql:9.4.1209 --driver-class-path /Users/dennis/.ivy2/cache/org.postgresql/postgresql/bundles/postgresql-9.4.1209.jar"
 ```
 
 6. Launch the zeppelin daemon: `$ZEPPELIN_HOME/bin/zeppelin-daemon.sh start`
