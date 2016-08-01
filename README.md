@@ -528,7 +528,23 @@ Jupyter is a Python based notebook.
 ## Spark notebook
 [Spark Notebook][sparknotebook] is the open source notebook aimed at enterprise environments, providing Data Scientist and Data Engineers with an interactive web-based editor that can combine Scala code, SQL queries, Markup and JavaScript in a collaborative manner to explore, analyse and learn from massive data sets.
 
-v0.6.1 should be Spark 2.0 compatible. v0.6.0 is Spark 1.6.1 compatible
+v0.6.1 should be Spark 2.0 compatible. v0.6.0 is Spark 1.6.1 compatible.
+
+Building zeppelin:
+
+1. clone git repo: git@github.com:apache/zeppelin.git
+2. `mvn package -DskipTests -Pspark-2.0 -Phadoop-2.4 -Pyarn -Ppyspark -Psparkr -Pscala-2.11 -Pbuild-distr`
+3. The .tar.gz should be in `$ZEPPELIN_PROJECT_DIR/zeppelin-distribution/target`
+4. in zeppelin-0.7.0-SNAPSHOT/conf do: `cp zeppelin-env.sh.template zeppelin-env.sh`
+5. set the following settings:
+
+```bash
+export ZEPPELIN_PORT=8001
+export SPARK_HOME=/Users/dennis/projects/spark-2.0.0-bin-hadoop2.7
+export MASTER=spark://localhost:7077
+```
+
+6. Launch the zeppelin daemon: `$ZEPPELIN_HOME/bin/zeppelin-daemon.sh start`
 
 # Pandas
 [Pandas][pandas] ia a Python library providing high-performance, easy-to-use data structures and data analysis tools.
