@@ -20,14 +20,12 @@ import java.nio.file.Paths
 import java.nio.file.StandardOpenOption._
 
 import akka.actor.ActorSystem
-import akka.stream.{ ActorMaterializer, Materializer }
-import akka.stream.scaladsl.{ FileIO, Source }
+import akka.stream.scaladsl.{FileIO, Source}
+import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.ByteString
-import spray.json.DefaultJsonProtocol
+import spray.json.{DefaultJsonProtocol, _}
 
-import scala.concurrent.{ Await, ExecutionContext }
-import scala.concurrent.duration._
-import spray.json._
+import scala.concurrent.ExecutionContext
 
 object CreateZipcodes extends App with DefaultJsonProtocol {
   implicit val system: ActorSystem = ActorSystem()
@@ -55,8 +53,6 @@ object CreateZipcodes extends App with DefaultJsonProtocol {
       println(done)
       system.terminate
     }
-
-  Await.ready(f, 10.minutes)
 
   sys.addShutdownHook {
     system.terminate()
