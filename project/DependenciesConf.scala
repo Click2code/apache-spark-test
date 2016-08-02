@@ -15,6 +15,7 @@ object DependenciesConf {
         "org.apache.spark" %% "spark-streaming" % "2.0.0",
         "com.typesafe.akka" %% "akka-actor" % AkkaVersion,
         "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
+        "com.typesafe.akka" %% "akka-http-spray-json-experimental" % AkkaVersion,
         "com.typesafe.akka" %% "akka-slf4j" % AkkaVersion,
         "ch.qos.logback" % "logback-classic" % "1.1.7",
         "com.typesafe.akka" %% "akka-stream-testkit" % AkkaVersion % Test,

@@ -10,6 +10,9 @@ Spark is often called cluster computing engine or simply execution engine.
 
 In contrast to Hadoop’s two-stage disk-based MapReduce processing engine, Spark’s multi-stage in-memory computing engine allows for running most computations in memory, and hence very often provides better performance (there are reports about being up to 100 times faster for certain applications, e.g. iterative algorithms or interactive data mining.
 
+## Glossary
+The [Apache Spark documentation contains the glossary](http://spark.apache.org/docs/latest/cluster-overview.html#glossary).
+
 # Downloading Apache Spark
 [Downloaded Spark][spark-download], since we won’t be using HDFS, you can download a package for any version of Hadoop.
 
@@ -396,13 +399,17 @@ Parquet has support for partitioning eg. partioning data (files) by year automat
 
 Data skipping for statistics, column, min, max, etc.
 
-
-
 # Extensions for Apache Spark
 
 ## XML Data Source for Apache Spark
 Note: Only compatible with Spark 1.x
 [Spark XML][sparkxml] is a library for parsing and querying XML data with Apache Spark, for Spark SQL and DataFrames.
+
+Download [books.xml](https://raw.githubusercontent.com/databricks/spark-xml/master/src/test/resources/books.xml) from:
+
+```bash
+wget -O /tmp/books.xml https://raw.githubusercontent.com/databricks/spark-xml/master/src/test/resources/books.xml
+```
 
 ## CSV Data Source for Apache Spark
 [Spark CSV][sparkcsv] is a library for parsing and querying CSV data with Apache Spark, for Spark SQL and DataFrames.
