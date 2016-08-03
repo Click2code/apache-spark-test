@@ -19,13 +19,13 @@ package com.github.dnvriend
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption._
 
-import akka.actor.{ActorSystem, Terminated}
-import akka.stream.scaladsl.{FileIO, Source}
-import akka.stream.{ActorMaterializer, Materializer}
+import akka.actor.{ ActorSystem, Terminated }
+import akka.stream.scaladsl.{ FileIO, Source }
+import akka.stream.{ ActorMaterializer, Materializer }
 import akka.util.ByteString
-import spray.json.{DefaultJsonProtocol, _}
+import spray.json.{ DefaultJsonProtocol, _ }
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 object CreateZipcodes extends App with DefaultJsonProtocol {
   implicit val system: ActorSystem = ActorSystem()
@@ -54,9 +54,10 @@ object CreateZipcodes extends App with DefaultJsonProtocol {
     .flatMap { done =>
       println(done)
       terminate
-    }.recoverWith { case cause: Throwable =>
-      cause.printStackTrace()
-      terminate
+    }.recoverWith {
+      case cause: Throwable =>
+        cause.printStackTrace()
+        terminate
     }
 
   def terminate: Future[Terminated] =
