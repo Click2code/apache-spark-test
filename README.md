@@ -1,6 +1,8 @@
 # Apache Spark Test
 A small study project on how to create and run applications with [Apache Spark][spark]. Its my personal study project and is mostly a copy/paste of a lot of resources available on the Internet to get the concepts on one page.
 
+We will be using the Structured Query Language (SQL), for a tutorial see the free [SQL tutorial by TutorialsPoint](http://www.tutorialspoint.com/sql/index.htm).
+
 # Introduction
 Apache Spark is an Open Source distributed general-purpose cluster computing framework with in-memory data processing engine that can do ETL, analytics, machine learning and graph processing on large volumes of data at rest (batch processing) or in motion (streaming processing) with rich concise high-level APIs for the programming languages: Scala, Python, Java, R, and SQL.
 
@@ -188,9 +190,9 @@ scala> wordCounts.collect()
 res4: Array[(String, Int)] = Array((package,1), (this,1), ...)
 ```
 
-## Caching
-Spark also supports pulling data sets into a cluster-wide in-memory cache. This is very useful when data is accessed repeatedly,
-such as when querying a small “hot” dataset or when running an iterative algorithm like PageRank. As a simple example, let’s
+## Persisting / Caching
+Spark also supports pulling datasets into a cluster-wide in-memory cache. This is very useful when data is accessed repeatedly,
+such as when querying a small 'hot' dataset or when running an iterative algorithm like PageRank. As a simple example, let’s
 mark our linesWithSpark dataset to be cached:
 
 ```scala
@@ -205,6 +207,15 @@ res6: Long = 19
 ```
 
 It may seem silly to use Spark to explore and cache a 100-line text file. The interesting part is that these same functions can be used on very large data sets, even when they are striped across tens or hundreds of nodes.
+
+The method `cache` is in fact an alias for the method `persist` which will persist the Dataset with a default storage
+level of `MEMORY_AND_DISK`, effectively caching the Dataset in memory.
+
+If you only wish to persist the Dataset in memory, you'll need to use the method `persist` with StorageLevel
+`MEMORY_ONLY`. Please see `org.apache.spark.storage.StorageLevel` for more information.
+
+## Unpersisting / Uncaching
+To remove all blocks from memory and disk for a Dataset use the method `unpersist()` on the method.
 
 ## Spark Web UI
 The Web UI (aka webUI or Spark UI after SparkUI) is the web interface of a Spark application to inspect job executions in the SparkContext using a browser.
@@ -415,7 +426,7 @@ val addressRDD = spark.sparkContext
 val address = spark.createDataFrame[Address](addressRDD).as[Address]
 
 //
-// and event shorter:
+// and even shorter:
 //
 final case class Address(id: Int, street: String)
 val address = spark.createDataFrame[Address](Seq(Address(1,"First Street"), Address(2,"Second Street"))).as[Address]
@@ -570,9 +581,328 @@ val address = spark.read.table("address")
 val people = spark.read.table("people")
 ```
 
-## Filtering a dataset
+# Operating on multiple Datasets
+We have the following dataset:
 
 ```scala
+final case class Zip(value: String)
+val zips1 = spark.createDataset(Seq(
+    Zip("1000AA-001"),
+    Zip("1000AA-002"),
+    Zip("1000AA-003"),
+    Zip("1000AA-004")))
+
+val zips2 = spark.createDataset(Seq(Zip("1000AA-001")))
+
+zips1.createOrReplaceTempView("zips1")
+zips2.createOrReplaceTempView("zips2")
+```
+
+## UNION: Append rows of one dataset to the other dataset
+Returns a new Dataset containing union of rows in this Dataset and another Dataset.
+
+```scala
+zips1.union(zips2).show
+
+//or
+
+spark.sql("FROM zips1 UNION ALL FROM zips2").show
+```
+
++----------+
+|     value|
++----------+
+|1000AA-001|
+|1000AA-002|
+|1000AA-003|
+|1000AA-004|
+|1000AA-001|
++----------+
+
+## INTERSECT: Only matching rows
+Returns a new Dataset containing rows only in both this Dataset and another Dataset.
+
+```scala
+zips1.intersect(zips2).show
+
+// or
+
+spark.sql("FROM zips1 INTERSECT FROM zips2").show
+
++----------+
+|     value|
++----------+
+|1000AA-001|
++----------+
+```
+
+## EXCEPT: Rows in this dataset but NOT in other dataset
+Returns a new Dataset containing rows in this Dataset but not in another Dataset.
+
+```scala
+zips1.except(zips2).show
+
+// or
+
+spark.sql("FROM zips1 EXCEPT FROM zips2").show
+
++----------+
+|     value|
++----------+
+|1000AA-002|
+|1000AA-004|
+|1000AA-003|
++----------+
+```
+
+## ROLLUP and CUBE: subtotals and grand totals used with GROUP BY
+Example taken from [Database Journal -  Using the ROLLUP, CUBE, and GROUPING SETS Operators](http://www.databasejournal.com/features/mssql/using-the-rollup-cube-and-grouping-sets-operators.html).
+
+The `ROLLUP` and `CUBE` operations on Dataset are used with the `GROUP BY` clause and allow you to create __subtotals__,
+__grand totals__ and ___superset of subtotals__.
+
+What do the `ROLLUP` and `CUBE` do?  They allow you to create subtotals and grand totals a number of different ways.
+
+The ROLLUP operator is used with the GROUP BY clause. It is used to create _subtotals_ and _grand totals_ for a set of columns.
+The summarized amounts are created based on the columns passed to the ROLLUP operator.
+
+The CUBE operators, like the ROLLUP operator produces _subtotals_ and _grand totals_ as well.  But unlike the ROLLUP operator
+it produces subtotals and grand totals _for every permutation of the columns_ provided to the CUBE operator.
+
+Lets look at an example:
+
+```scala
+final case class PurchaseItem(
+      PurchaseID: Int,
+      Supplier: String,
+      PurchaseType: String,
+      PurchaseAmt: Double,
+      PurchaseDate: java.sql.Date
+    )
+
+// implicit convert the String formatted date to java.sql.Date
+// as I just copied the data from the website
+implicit def strToSqlDate(str: String): java.sql.Date =
+ new java.sql.Date(new java.text.SimpleDateFormat("yyyy-MM-dd").parse(str).getTime)
+
+// create the Dataset
+val items = spark.createDataset(Seq(
+    PurchaseItem (1, "McLendon's","Hardware",2121.09,"2014-01-12"),
+     PurchaseItem (2, "Bond","Electrical",12347.87,"2014-01-18"),
+     PurchaseItem (3, "Craftsman","Hardware",999.99,"2014-01-22"),
+     PurchaseItem (4, "Stanley","Hardware",6532.09,"2014-01-31"),
+     PurchaseItem (5, "RubberMaid","Kitchenware",3421.10,"2014-02-03"),
+     PurchaseItem (6, "RubberMaid","KitchenWare",1290.90,"2014-02-07"),
+     PurchaseItem (7, "Glidden","Paint",12987.01,"2014-02-10"),
+     PurchaseItem (8, "Dunn's","Lumber",43235.67,"2014-02-21"),
+     PurchaseItem (9, "Maytag","Appliances",89320.19,"2014-03-10"),
+     PurchaseItem (10, "Amana","Appliances",53821.19,"2014-03-12"),
+     PurchaseItem (11, "Lumber Surplus","Lumber",3245.59,"2014-03-14"),
+     PurchaseItem (12, "Global Source","Outdoor",3331.59,"2014-03-19"),
+     PurchaseItem (13, "Scott's","Garden",2321.01,"2014-03-21"),
+     PurchaseItem (14, "Platt","Electrical",3456.01,"2014-04-03"),
+     PurchaseItem (15, "Platt","Electrical",1253.87,"2014-04-21"),
+     PurchaseItem (16, "RubberMaid","Kitchenware",3332.89,"2014-04-20"),
+     PurchaseItem (17, "Cresent","Lighting",345.11,"2014-04-22"),
+     PurchaseItem (18, "Snap-on","Hardware",2347.09,"2014-05-03"),
+     PurchaseItem (19, "Dunn's","Lumber",1243.78,"2014-05-08"),
+     PurchaseItem (20, "Maytag","Appliances",89876.90,"2014-05-10"),
+     PurchaseItem (21, "Parker","Paint",1231.22,"2014-05-10"),
+     PurchaseItem (22, "Scotts's","Garden",3246.98,"2014-05-12"),
+     PurchaseItem (23, "Jasper","Outdoor",2325.98,"2014-05-14"),
+     PurchaseItem (24, "Global Source","Outdoor",8786.99,"2014-05-21"),
+     PurchaseItem (25, "Craftsman","Hardware",12341.09,"2014-05-22")
+    ))
+
+// create a temp view
+items.createOrReplaceTempView("items")
+```
+
+The ROLLUP operator allows Spark to create _subtotals_ and _grand totals_, while it groups data using the GROUP BY clause.
+Lets use the ROLLUP operator to generator a grand total by PurchaseType:
+
+Lets first look at the GROUP BY __without__ the ROLLUP:
+
+```scala
+spark.sql(
+"""
+SELECT coalesce (PurchaseType,'GrandTotal') AS PurchaseType
+     , sum(PurchaseAmt) as SummorizedPurchaseAmt
+FROM items
+GROUP BY PurchaseType
+ORDER BY SummorizedPurchaseAmt
+"""
+).show(25)
+
+// note: the `COALESCE` function returns the first non-null expr in the expression list, so in this case
+// if PurchaseType is `null` then the function will return 'GrandTotal' else it will return the value
+// of PurchaseType
+
++------------+---------------------+
+|PurchaseType|SummorizedPurchaseAmt|
++------------+---------------------+
+|    Lighting|               345.11|
+| KitchenWare|               1290.9|
+|      Garden|              5567.99|
+| Kitchenware|              6753.99|
+|       Paint|             14218.23|
+|     Outdoor|             14444.56|
+|  Electrical|             17057.75|
+|    Hardware|             24341.35|
+|      Lumber|    47725.03999999999|
+|  Appliances|            233018.28|
++------------+---------------------+
+```
+
+It looks like a normal GROUP BY with a SUM of the amount, nothing special here. Note, because we are not using
+ROLLUP yet, the `GrandTotal` result will not be shown, also the `COALESCE` function does not have a lot of work
+as `PurchaseType` will never be _null_.  Without the coalesce function the PurchaceType column value would have
+been 'null' for the grand total row.
+
+Now the GROUP BY with the ROLLUP:
+
+```scala
+spark.sql(
+"""
+SELECT coalesce (PurchaseType,'GrandTotal') AS PurchaseType
+     , sum(PurchaseAmt) as SummorizedPurchaseAmt
+FROM items
+GROUP BY ROLLUP(PurchaseType)
+ORDER BY SummorizedPurchaseAmt
+"""
+).show(25)
+
++------------+---------------------+
+|PurchaseType|SummorizedPurchaseAmt|
++------------+---------------------+
+|    Lighting|               345.11|
+| KitchenWare|               1290.9|
+|      Garden|              5567.99|
+| Kitchenware|              6753.99|
+|       Paint|             14218.23|
+|     Outdoor|             14444.56|
+|  Electrical|             17057.75|
+|    Hardware|             24341.35|
+|      Lumber|    47725.03999999999|
+|  Appliances|            233018.28|
+|  GrandTotal|             364763.2|
++------------+---------------------+
+```
+
+The `GROUP BY ROLLUP` added a new record `GrandTotal` which is the sum of all the subtotals.
+
+__Subtotals by Month and a GrandTotal:__
+
+Suppose we want to calculate the subtotals of ProductTypes by month,
+with a monthly total amount for all the products sold in the month, we could express
+it as follows:
+
+```scala
+spark.sql(
+"""
+SELECT coalesce(month(PurchaseDate), 99) PurchaseMonth
+     , CASE WHEN month(PurchaseDate) is null then 'Grand Total'
+            ELSE coalesce (PurchaseType,'Monthly Total') end AS PurchaseType
+     , round(Sum(PurchaseAmt), 2) as SummorizedPurchaseAmt
+FROM items
+GROUP BY ROLLUP(month(PurchaseDate), PurchaseType)
+ORDER BY PurchaseMonth, SummorizedPurchaseAmt
+"""
+).show(100)
+
++-------------+-------------+---------------------+
+|PurchaseMonth| PurchaseType|SummorizedPurchaseAmt|
++-------------+-------------+---------------------+
+|            1|     Hardware|              9653.17|
+|            1|   Electrical|             12347.87|
+|            1|Monthly Total|             22001.04|
+|            2|  KitchenWare|               1290.9|
+|            2|  Kitchenware|               3421.1|
+|            2|        Paint|             12987.01|
+|            2|       Lumber|             43235.67|
+|            2|Monthly Total|             60934.68|
+|            3|       Garden|              2321.01|
+|            3|       Lumber|              3245.59|
+|            3|      Outdoor|              3331.59|
+|            3|   Appliances|            143141.38|
+|            3|Monthly Total|            152039.57|
+|            4|     Lighting|               345.11|
+|            4|  Kitchenware|              3332.89|
+|            4|   Electrical|              4709.88|
+|            4|Monthly Total|              8387.88|
+|            5|        Paint|              1231.22|
+|            5|       Lumber|              1243.78|
+|            5|       Garden|              3246.98|
+|            5|      Outdoor|             11112.97|
+|            5|     Hardware|             14688.18|
+|            5|   Appliances|              89876.9|
+|            5|Monthly Total|            121400.03|
+|           99|  Grand Total|             364763.2|
++-------------+-------------+---------------------+
+```
+
+Here we have included two columns in the ROLLUP clause. The first column was the month of the purchase,
+and the second column is PurchaseType. This allowed us to create the subtotals by ProductType by month,
+as well as Monthly Total amount at the end of every month. Additionally this code creates a Grant Total amount of all
+product sales at the end.
+
+__CUBE:__
+Suppose we want to calculate the subtotals for each PurchaseType per month, followed by the GrandTotal for each PurchaseType,
+followed by the GrandTotal per month for all purchases, followed by a Grand Total overall, we can express that as follows:
+
+```scala
+spark.sql(
+"""
+SELECT month(PurchaseDate) PurchaseMonth
+     , CASE WHEN month(PurchaseDate) is null
+        THEN coalesce (concat('Grand Total for ', PurchaseType),'Grand Total')
+        ELSE coalesce (PurchaseType,'Monthly SubTotal') end AS PurchaseType
+     , round(Sum(PurchaseAmt), 2) as SummorizedPurchaseAmt
+FROM items
+GROUP BY CUBE(month(PurchaseDate), PurchaseType)
+ORDER BY PurchaseType, PurchaseMonth
+"""
+).show(100, false)
+
++-------------+---------------------------+---------------------+
+|PurchaseMonth|PurchaseType               |SummorizedPurchaseAmt|
++-------------+---------------------------+---------------------+
+|3            |Appliances                 |143141.38            |
+|5            |Appliances                 |89876.9              |
+|1            |Electrical                 |12347.87             |
+|4            |Electrical                 |4709.88              |
+|3            |Garden                     |2321.01              |
+|5            |Garden                     |3246.98              |
+|null         |Grand Total                |364763.2             |
+|null         |Grand Total for Appliances |233018.28            |
+|null         |Grand Total for Electrical |17057.75             |
+|null         |Grand Total for Garden     |5567.99              |
+|null         |Grand Total for Hardware   |24341.35             |
+|null         |Grand Total for KitchenWare|1290.9               |
+|null         |Grand Total for Kitchenware|6753.99              |
+|null         |Grand Total for Lighting   |345.11               |
+|null         |Grand Total for Lumber     |47725.04             |
+|null         |Grand Total for Outdoor    |14444.56             |
+|null         |Grand Total for Paint      |14218.23             |
+|1            |Hardware                   |9653.17              |
+|5            |Hardware                   |14688.18             |
+|2            |KitchenWare                |1290.9               |
+|2            |Kitchenware                |3421.1               |
+|4            |Kitchenware                |3332.89              |
+|4            |Lighting                   |345.11               |
+|2            |Lumber                     |43235.67             |
+|3            |Lumber                     |3245.59              |
+|5            |Lumber                     |1243.78              |
+|1            |Monthly SubTotal           |22001.04             |
+|2            |Monthly SubTotal           |60934.68             |
+|3            |Monthly SubTotal           |152039.57            |
+|4            |Monthly SubTotal           |8387.88              |
+|5            |Monthly SubTotal           |121400.03            |
+|3            |Outdoor                    |3331.59              |
+|5            |Outdoor                    |11112.97             |
+|2            |Paint                      |12987.01             |
+|5            |Paint                      |1231.22              |
++-------------+---------------------------+---------------------+
 ```
 
 # Parquet
