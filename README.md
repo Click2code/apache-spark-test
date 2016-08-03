@@ -607,7 +607,6 @@ zips1.union(zips2).show
 //or
 
 spark.sql("FROM zips1 UNION ALL FROM zips2").show
-```
 
 +----------+
 |     value|
@@ -618,6 +617,7 @@ spark.sql("FROM zips1 UNION ALL FROM zips2").show
 |1000AA-004|
 |1000AA-001|
 +----------+
+```
 
 ## INTERSECT: Only matching rows
 Returns a new Dataset containing rows only in both this Dataset and another Dataset.
