@@ -449,38 +449,38 @@ __Performance tip__: You should _cache_ RDDs you work with when you want to exec
 
 The following are a subset of actions that is available on `org.apache.spark.rdd.RDD` (there are a lot more):
 
-- aggregate: aggregate the elements of each partition, and then the results for all the partitions, using given combine functions and a neutral "zero value". This function can return a different result type, U, than the type of this RDD, T. Thus, we need one operation for merging a T into an U and one operation for merging two U's, as in scala.TraversableOnce. Both of these functions are allowed to modify and return their first argument instead of creating a new U to avoid memory allocation.
-- collect: Return an array that contains all of the elements in this RDD. __Note:__ this method should only be used if the resulting array is expected to be small, as all the data is loaded into the driver's memory.
-- count(): Return the number of elements in the RDD.
-- countApprox(timeout: Long): Approximate version of count() that returns a potentially incomplete result within a timeout, even if not all tasks have finished.
-- countByValue: Return the count of each unique value in this RDD as a local map of (value, count) pairs. Note that this method should only be used if the resulting map is expected to be small, as the whole thing is loaded into the driver's memory.
-- first: Return the first element in this RDD.
-- fold: Aggregate the elements of each partition, and then the results for all the partitions, using a given associative function and a neutral "zero value". The function `op(t1, t2)` is allowed to modify t1 and return it as its result value to avoid object allocation; however, it should not modify t2. This behaves somewhat differently from fold operations implemented for non-distributed collections in functional languages like Scala. This fold operation may be applied to partitions individually, and then fold those results into the final result, rather than apply the fold to each element sequentially in some defined ordering. For functions that are not commutative, the result may differ from that of a fold applied to a non-distributed collection.
-- foreach: Applies a function f to all elements of this RDD.
-- foreachPartition: Applies a function f to each partition of this RDD.
-- max: Returns the max of this RDD as defined by the implicit Ordering[T]
-- min: Returns the min of this RDD as defined by the implicit Ordering[T]
-- reduce: Reduces the elements of this RDD using the specified commutative and associative binary operator.
-- take: Take the first num elements of the RDD. It works by first scanning one partition, and use the results from that partition to estimate the number of additional partitions needed to satisfy the limit.           * @note this method should only be used if the resulting array is expected to be small, as all the data is loaded into the driver's memory.
-- takeOrdered: Returns the first k (smallest) elements from this RDD as defined by the specified implicit Ordering[T] and maintains the ordering. This does the opposite of `top`.
-- takeSample: Return a fixed-size sampled subset of this RDD in an array. __Note__ this method should only be used if the resulting array is expected to be small, as all the data is loaded into the driver's memory.
-- toLocalIterator: * Return an iterator that contains all of the elements in this RDD. The iterator will consume as much memory as the largest partition in this RDD. Note: this results in multiple Spark jobs, and if the input RDD is the result of a wide transformation (e.g. join with different partitioners), to avoid recomputing the input RDD should be cached first.
-- top: Returns the top k (largest) elements from this RDD as defined by the specified implicit Ordering[T] and maintains the ordering. This does the opposite of `takeOrdered`.
-- treeAggregate: Aggregates the elements of this RDD in a multi-level tree pattern.
-- treeReduce: Reduces the elements of this RDD in a multi-level tree pattern.
-- saveAsTextFile: Save this RDD as a text file, using string representations of elements.
-- saveAsTextFile(CompressionCodec): Save this RDD as a compressed text file, using string representations of elements.
-- saveAsObjectFile: Save this RDD as a SequenceFile of serialized objects.
+- __aggregate:__ aggregate the elements of each partition, and then the results for all the partitions, using given combine functions and a neutral "zero value". This function can return a different result type, U, than the type of this RDD, T. Thus, we need one operation for merging a T into an U and one operation for merging two U's, as in scala.TraversableOnce. Both of these functions are allowed to modify and return their first argument instead of creating a new U to avoid memory allocation.
+- __collect:__ Return an array that contains all of the elements in this RDD. __Note:__ this method should only be used if the resulting array is expected to be small, as all the data is loaded into the driver's memory.
+- __count():__ Return the number of elements in the RDD.
+- __countApprox(timeout: Long):__ Approximate version of count() that returns a potentially incomplete result within a timeout, even if not all tasks have finished.
+- __countByValue:__ Return the count of each unique value in this RDD as a local map of (value, count) pairs. Note that this method should only be used if the resulting map is expected to be small, as the whole thing is loaded into the driver's memory.
+- __first:__ Return the first element in this RDD.
+- __fold:__ Aggregate the elements of each partition, and then the results for all the partitions, using a given associative function and a neutral "zero value". The function `op(t1, t2)` is allowed to modify t1 and return it as its result value to avoid object allocation; however, it should not modify t2. This behaves somewhat differently from fold operations implemented for non-distributed collections in functional languages like Scala. This fold operation may be applied to partitions individually, and then fold those results into the final result, rather than apply the fold to each element sequentially in some defined ordering. For functions that are not commutative, the result may differ from that of a fold applied to a non-distributed collection.
+- __foreach:__ Applies a function f to all elements of this RDD.
+- __foreachPartition:__ Applies a function f to each partition of this RDD.
+- __max:__ Returns the max of this RDD as defined by the implicit Ordering[T]
+- __min:__ Returns the min of this RDD as defined by the implicit Ordering[T]
+- __reduce:__ Reduces the elements of this RDD using the specified commutative and associative binary operator.
+- __take:__ Take the first num elements of the RDD. It works by first scanning one partition, and use the results from that partition to estimate the number of additional partitions needed to satisfy the limit.           * @note this method should only be used if the resulting array is expected to be small, as all the data is loaded into the driver's memory.
+- __takeOrdered:__ Returns the first k (smallest) elements from this RDD as defined by the specified implicit Ordering[T] and maintains the ordering. This does the opposite of `top`.
+- __takeSample:__ Return a fixed-size sampled subset of this RDD in an array. __Note__ this method should only be used if the resulting array is expected to be small, as all the data is loaded into the driver's memory.
+- __toLocalIterator:__ Return an iterator that contains all of the elements in this RDD. The iterator will consume as much memory as the largest partition in this RDD. Note: this results in multiple Spark jobs, and if the input RDD is the result of a wide transformation (e.g. join with different partitioners), to avoid recomputing the input RDD should be cached first.
+- __top:__ Returns the top k (largest) elements from this RDD as defined by the specified implicit Ordering[T] and maintains the ordering. This does the opposite of `takeOrdered`.
+- __treeAggregate:__ Aggregates the elements of this RDD in a multi-level tree pattern.
+- __treeReduce:__ Reduces the elements of this RDD in a multi-level tree pattern.
+- __saveAsTextFile:__ Save this RDD as a text file, using string representations of elements.
+- __saveAsTextFile(CompressionCodec):__ Save this RDD as a compressed text file, using string representations of elements.
+- __saveAsObjectFile:__ Save this RDD as a SequenceFile of serialized objects.
 
 # AsyncRDDActions
 AsyncRDDActions are RDD operations that produce non-RDD values in an asynchronous manner. These operations releases the calling thread and return a type that inherits from `scala.concurrent.Future[T]`.
 
 The following asynchronous methods are available:
-- countAsync
-- collectAsync
-- takeAsync
-- foreachAsync
-- foreachPartitionAsync
+- __countAsync:__
+- __collectAsync:__
+- __takeAsync:__
+- __foreachAsync:__
+- __foreachPartitionAsync:__
 
 # Spark SQL
 [Spark SQL][sparksql] is a Spark module for structured data processing. Spark SQL knows about the structure of your data because it can infer the structure from the data source it uses, or because the structure has been given by the programmer by means of the Spark SQL API. In any case, because Spark SQL knows about the structure and the operations we wish to perform on the data, Spark SQL can perform extra optimizations. There are several ways to interact with Spark SQL including SQL and the Dataset API. When computing a result the same execution engine is used, independent whether the DataFrame of DataSet API is being used. 
