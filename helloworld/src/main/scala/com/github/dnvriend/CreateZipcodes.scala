@@ -19,6 +19,7 @@ package com.github.dnvriend
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption._
 
+import akka.NotUsed
 import akka.actor.{ ActorSystem, Terminated }
 import akka.stream.scaladsl.{ FileIO, Source }
 import akka.stream.{ ActorMaterializer, Materializer }
@@ -40,16 +41,27 @@ object CreateZipcodes extends App with DefaultJsonProtocol {
 
   implicit val zipcodeJsonFormat = jsonFormat1(Zipcode)
 
-  Source(1000 to 9999).flatMapConcat { district =>
-    Source('A' to 'Z').flatMapConcat { l1 =>
-      Source('A' to 'Z').flatMapConcat { l2 =>
-        Source(1 to 399).map(num => f"$district$l1$l2-$num%03d")
+  val numZips = 50000000
+
+  def zips(range: Range): Source[ByteString, NotUsed] =
+    Source(range).flatMapConcat { district =>
+      Source('A' to 'Z').flatMapConcat { l1 =>
+        Source('A' to 'Z').flatMapConcat { l2 =>
+          Source(1 to 399).map(num => f"$district$l1$l2-$num%03d")
+        }
       }
-    }
-  }.map(Zipcode)
-    .map(_.toJson.compactPrint)
-    .map(json => ByteString(json + "\n"))
-    .take(5000000)
+    }.map(Zipcode).map(_.toJson.compactPrint).map(json => ByteString(json + "\n"))
+
+  zips(1000 until 2000)
+    .merge(zips(2000 until 3000))
+    .merge(zips(3000 until 4000))
+    .merge(zips(4000 until 5000))
+    .merge(zips(5000 until 6000))
+    .merge(zips(6000 until 7000))
+    .merge(zips(7000 until 8000))
+    .merge(zips(8000 until 9000))
+    .take(numZips)
+    .via(LogProgress.flow(each = 250000))
     .runWith(FileIO.toPath(Paths.get("/tmp/zips.json"), Set(WRITE, TRUNCATE_EXISTING, CREATE)))
     .flatMap { done =>
       println(done)

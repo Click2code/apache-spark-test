@@ -499,6 +499,11 @@ val address = spark.read.table("address")
 val people = spark.read.table("people")
 ```
 
+## Filtering a dataset
+
+```scala
+```
+
 # Parquet
 [Parquet][parquet] is an efficient _columnar_ storage format that is used by Spark SQL to improve the analysis of any
 processing pipeline for structured data. It wins over JSON. It has compact binary encoding with intelligent compression.
