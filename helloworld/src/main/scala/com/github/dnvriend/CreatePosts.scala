@@ -22,13 +22,13 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 import akka.Done
-import akka.actor.{ActorSystem, Terminated}
-import akka.stream.scaladsl.{FileIO, Source}
-import akka.stream.{ActorMaterializer, Materializer}
+import akka.actor.{ ActorSystem, Terminated }
+import akka.stream.scaladsl.{ FileIO, Source }
+import akka.stream.{ ActorMaterializer, Materializer }
 import akka.util.ByteString
 import spray.json.DefaultJsonProtocol
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Random
 import spray.json._
 
@@ -69,10 +69,10 @@ object CreatePosts extends App with DefaultJsonProtocol {
   val lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam fringilla magna et pharetra vestibulum."
   val title = " Ut id placerat sapien. Aliquam vel metus orci."
   Source.fromIterator(() => Iterator from 0).map { id =>
-    Post(rng, now, rng, List.fill(rng)(lorem).mkString("\n"), rng, now, rng, s"$rng - $title", title, rng, rng, rng, id)
+    Post(rng, now, rng, List.fill(Random.nextInt(5))(lorem).mkString("\n"), rng, now, rng, s"$rng - $title", title, rng, rng, rng, id)
   }.map(_.toJson.compactPrint)
     .map(json => ByteString(json + "\n"))
-    .take(5000)
+    .take(1000000)
     .via(LogProgress.flow())
     .runWith(FileIO.toPath(Paths.get("/tmp/posts.json"), Set(WRITE, TRUNCATE_EXISTING, CREATE)))
     .flatMap { done =>
