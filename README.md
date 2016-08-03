@@ -424,16 +424,16 @@ Saving partitions results in part-files instead of one single file (unless there
 # Types of RDDs
 The following are examples of RDDs:
 
-- org.apache.spark.rdd.JdbcRDD: an RDD that executes a SQL query on a JDBC connection and reads results.
-- org.apache.spark.rdd.ParallelCollectionRDD: slice a collection into numSlices sub-collections. One extra thing we do here is to treat Range collections specially, encoding the slices as other Ranges to minimize memory cost. This makes it efficient to run Spark over RDDs representing large sets of numbers. And if the collection is an inclusive Range, we use inclusive range for the last slice.
-- org.apache.spark.rdd.CoGroupedRDD: an RDD that cogroups its parents. For each key k in parent RDDs, the resulting RDD contains a tuple with the list of values for that key. Should not be instantiated directly but instead use `RDD.cogroup(...)`
-- org.apache.spark.rdd.HadoopRDD: an RDD that provides core functionality for reading data stored in HDFS using the older MapReduce API. The most notable use case is the return RDD of SparkContext.textFile.
-- org.apache.spark.rdd.MapPartitionsRDD: an RDD that applies the provided function to every partition of the parent RDD; a result of calling operations like map, flatMap, filter, mapPartitions, etc.
-- org.apache.spark.rdd.CoalescedRDD: Represents a coalesced RDD that has fewer partitions than its parent RDD; a result of calling operations like repartition and coalesce
-- org.apache.spark.rdd.ShuffledRDD: the resulting RDD from a shuffle (e.g. repartitioning of data); a result of shuffling, e.g. after repartition and coalesce
-- org.apache.spark.rdd.PipedRDD: an RDD that pipes the contents of each parent partition through an external command (printing them one per line) and returns the output as a collection of strings; an RDD created by piping elements to a forked external process.
-- PairRDD (implicit conversion by org.apache.spark.rdd.PairRDDFunctions): that is an RDD of key-value pairs that is a result of groupByKey and join operations.
-- DoubleRDD (implicit conversion as org.apache.spark.rdd.DoubleRDDFunctions) that is an RDD of Double type.
+- __org.apache.spark.rdd.JdbcRDD:__ an RDD that executes a SQL query on a JDBC connection and reads results.
+- __org.apache.spark.rdd.ParallelCollectionRDD:__ slice a collection into numSlices sub-collections. One extra thing we do here is to treat Range collections specially, encoding the slices as other Ranges to minimize memory cost. This makes it efficient to run Spark over RDDs representing large sets of numbers. And if the collection is an inclusive Range, we use inclusive range for the last slice.
+- __org.apache.spark.rdd.CoGroupedRDD:__ an RDD that cogroups its parents. For each key k in parent RDDs, the resulting RDD contains a tuple with the list of values for that key. Should not be instantiated directly but instead use `RDD.cogroup(...)`
+- __org.apache.spark.rdd.HadoopRDD:__ an RDD that provides core functionality for reading data stored in HDFS using the older MapReduce API. The most notable use case is the return RDD of SparkContext.textFile.
+- __org.apache.spark.rdd.MapPartitionsRDD:__ an RDD that applies the provided function to every partition of the parent RDD; a result of calling operations like map, flatMap, filter, mapPartitions, etc.
+- __org.apache.spark.rdd.CoalescedRDD:__ Represents a coalesced RDD that has fewer partitions than its parent RDD; a result of calling operations like repartition and coalesce
+- __org.apache.spark.rdd.ShuffledRDD:__ the resulting RDD from a shuffle (e.g. repartitioning of data); a result of shuffling, e.g. after repartition and coalesce
+- __org.apache.spark.rdd.PipedRDD:__ an RDD that pipes the contents of each parent partition through an external command (printing them one per line) and returns the output as a collection of strings; an RDD created by piping elements to a forked external process.
+- __PairRDD__ (implicit conversion by org.apache.spark.rdd.PairRDDFunctions): that is an RDD of key-value pairs that is a result of groupByKey and join operations.
+- __DoubleRDD__ (implicit conversion as org.apache.spark.rdd.DoubleRDDFunctions) that is an RDD of Double type.
 - SequenceFileRDD (implicit conversion as org.apache.spark.rdd.SequenceFileRDDFunctions) that is an RDD that can be saved as a SequenceFile.
 
 # Actions
