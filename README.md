@@ -404,6 +404,27 @@ val schema = StructType(Array(
   ))
 
 val addressDF = spark.createDataFrame(addressRDD, schema)
+
+//
+// alternatively, and shorter:
+//
+final case class Address(id: Int, street: String)
+val addressRDD = spark.sparkContext
+    .makeRDD(Seq(Address(1,"First Street"), Address(2,"Second Street")))
+
+val address = spark.createDataFrame[Address](addressRDD).as[Address]
+
+//
+// and event shorter:
+//
+final case class Address(id: Int, street: String)
+val address = spark.createDataFrame[Address](Seq(Address(1,"First Street"), Address(2,"Second Street"))).as[Address]
+
+//
+// or..
+//
+final case class Address(id: Int, street: String)
+val address = spark.createDataset(Seq(Address(1,"First Street"), Address(2,"Second Street")))
 ```
 
 __People:__
@@ -421,6 +442,28 @@ val peopleSchema = StructType(Array(
 
 final case class Person(id: Int, name: String, address_fk: Int)
 val people = spark.createDataFrame(peopleRDD, peopleSchema).as[Person]
+
+//
+// alternatively, and shorter:
+//
+final case class Person(id: Int, name: String, address_fk: Int)
+
+val peopleRDD = spark.sparkContext
+    .makeRDD(Seq(Person(1,"Mad Max",2), Person(2,"Gilbert Ward Kane",1)))
+
+val people = spark.createDataFrame[Person](peopleRDD).as[Person]
+
+//
+// or even shorter still:
+//
+final case class Person(id: Int, name: String, address_fk: Int)
+val people = spark.createDataFrame[Person](Seq(Person(1,"Mad Max",2), Person(2,"Gilbert Ward Kane",1))).as[Person]
+
+//
+// or..
+//
+final case class Person(id: Int, name: String, address_fk: Int)
+val people = spark.createDataset(Seq(Person(1,"Mad Max",2), Person(2,"Gilbert Ward Kane",1)))
 ```
 
 ## Creating a Dataset from a DataFrame
@@ -478,12 +521,40 @@ people.select('name).write.mode("overwrite").text("/tmp/people.text")
 
 ## Saving to persistent tables
 Saving to Persistent Tables means materializing the contents of the DataFrame and create a pointer to
-the data in the Hive metastore. These persistent tables will still exist even after your Spark program has
-restarted, as long as you maintain your connection to the same metastore.
+the data in the Hive metastore. This means that the data is saved to a Hive table and the table is
+registered in the Hive metastore, which means that the table is managed by Hive. Which also
+means that you __SHOULD NOT__ remove the tables by hand by eg. `rm -rf` the directories from `spark-warehouse`!
+
+Persistent tables exist even after the Spark program has restarted, as long as you maintain your connection to the same metastore.
 
 ```scala
 address.write.mode("overwrite").saveAsTable("address")
 people.write.mode("overwrite").saveAsTable("people")
+```
+
+## Saving to an existing table with InsertInto
+The `insertInto` method saves data into a table that is managed by Hive, which means that the table
+must __already exists__, and has the same schema as the DataFrame you wish to save:
+
+```scala
+// create a table and save it in Hive
+final case class PersonWithStreet(id: Int, name: String, street: String)
+val personWithStreet = spark.createDataset(Seq.empty[PersonWithStreet])
+personWithStreet.write.mode("overwrite").saveAsTable("PersonWithStreet")
+
+// create a result that has the same schema as `PersonWithStreet`
+val join = spark.sql("SELECT p.id, p.name, a.street FROM people p join address a on p.address_fk = a.id order by p.id")
+// insert the join data into the `PersonWithStreet` table
+join.write.insertInto("PersonWithStreet")
+
+// show the contents of the `PersonWithStreet` table
+spark.table("PersonWithStreet").show
++---+-----------------+-------------+
+| id|             name|       street|
++---+-----------------+-------------+
+|  2|Gilbert Ward Kane| First Street|
+|  1|          Mad Max|Second Street|
++---+-----------------+-------------+
 ```
 
 ## Loading Persistent tables
@@ -721,8 +792,9 @@ TBC
 - [Jacek Laskowski - Mastering Apache Spark (Free)](https://www.gitbook.com/book/jaceklaskowski/mastering-apache-spark/)
 
 # Papers
-- [Matei Zaharia et al. - Resilient Distributed Datasets: A Fault-Tolerant Abstraction for
-In-Memory Cluster Computing][rddpaper]
+- [Matei Zaharia et al. - Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing][rddpaper]
+- [Michael Armbrust et al. - Spark SQL: Relational Data Processing in Spark][sqlpaper]
+- [Matei Zaharia et al. - Discretized Streams: An Efficient and Fault-Tolerant Model for Stream Processing on Large Clusters][streamingpaper]
 
 # Online resources
 - [Spark packages - A community index of third-party packages for Apache Spark][spackages]
@@ -743,7 +815,6 @@ In-Memory Cluster Computing][rddpaper]
 [sqlcontext]: https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SQLContext
 [sparksql]: http://spark.apache.org/docs/latest/sql-programming-guide.html
 [rdd]: http://spark.apache.org/docs/latest/programming-guide.html#resilient-distributed-datasets-rdds
-[rddpaper]: https://people.eecs.berkeley.edu/~matei/papers/2012/nsdi_spark.pdf
 [jdbcrdd]: http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.JdbcRDD
 
 [databricks]: https://databricks.com/
@@ -760,3 +831,7 @@ In-Memory Cluster Computing][rddpaper]
 [zeppelin]: https://zeppelin.apache.org/
 [sparknotebook]: https://github.com/andypetrella/spark-notebook
 [sparknotebookio]: http://spark-notebook.io/
+
+[rddpaper]: https://people.eecs.berkeley.edu/~matei/papers/2012/nsdi_spark.pdf
+[sqlpaper]: https://people.csail.mit.edu/matei/papers/2015/sigmod_spark_sql.pdf
+[streamingpaper]: https://people.eecs.berkeley.edu/~haoyuan/papers/2012_hotcloud_spark_streaming.pdf
