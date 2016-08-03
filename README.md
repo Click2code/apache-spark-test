@@ -206,119 +206,6 @@ res6: Long = 19
 
 It may seem silly to use Spark to explore and cache a 100-line text file. The interesting part is that these same functions can be used on very large data sets, even when they are striped across tens or hundreds of nodes.
 
-## Creating a DataFrame from an RDD
-
-__Address:__
-```scala
-import org.apache.spark.sql._
-import org.apache.spark.sql.types._
-
-val addressRDD = spark.sparkContext
-    .makeRDD(Seq("1,First Street", "2,Second Street"))
-    .map(_.split(","))
-    .map(xs => Row(xs(0).toInt, xs(1).trim))
-
-val schema = StructType(Array(
-    StructField("id", IntegerType, nullable = false),
-    StructField("street", StringType, nullable = false)
-  ))
-
-val addressDF = spark.createDataFrame(addressRDD, schema)
-```
-
-__People:__
-```scala
-val peopleRDD = spark.sparkContext
-    .makeRDD(Seq("1,Mad Max,2", "2,Gilbert Ward Kane,1"))
-    .map(_.split(","))
-    .map(xs => Row(xs(0).toInt, xs(1).trim, xs(2).toInt))
-
-val peopleSchema = StructType(Array(
-    StructField("id", IntegerType, nullable = false),
-    StructField("name", StringType, nullable = false),
-    StructField("address_fk", IntegerType, nullable = false)
-  ))
-
-final case class Person(id: Int, name: String, address_fk: Int)
-val people = spark.createDataFrame(peopleRDD, peopleSchema).as[Person]
-```
-
-## Creating a Dataset from a DataFrame
-
-```scala
-// create a dataset
-final case class Address(id: Int, street: String)
-val address = addressDF.as[Address]
-```
-
-## Creating a temp view
-
-```scala
-address.createOrReplaceTempView("address")
-people.createOrReplaceTempView("people")
-```
-
-## Joining two views
-
-```scala
-spark.sql("SELECT p.id, p.name, a.street FROM people p join address a on p.address_fk = a.id order by p.id").show
-
-+---+-----------------+-------------+
-| id|             name|       street|
-+---+-----------------+-------------+
-|  1|          Mad Max|Second Street|
-|  2|Gilbert Ward Kane| First Street|
-+---+-----------------+-------------+
-```
-
-## Save a DataFrame or DataSet
-Spark allows you to save your DataFrame or Dataset in a number of formats:
-
-```scala
-// save as parquet
-address.write.mode("overwrite").parquet("/tmp/address.parquet")
-people.write.mode("overwrite").parquet("/tmp/people.parquet")
-
-// orc
-address.write.mode("overwrite").orc("/tmp/address.orc")
-people.write.mode("overwrite").orc("/tmp/people.orc")
-
-// save as json
-address.write.mode("overwrite").json("/tmp/address.json")
-people.write.mode("overwrite").json("/tmp/people.json")
-
-// save as csv
-address.write.mode("overwrite").csv("/tmp/address.csv")
-people.write.mode("overwrite").csv("/tmp/people.csv")
-
-// save as text (only one column can be saved)
-address.select('street).write.mode("overwrite").text("/tmp/address.text")
-people.select('name).write.mode("overwrite").text("/tmp/people.text")
-```
-
-## Saving to persistent tables
-Saving to Persistent Tables means materializing the contents of the DataFrame and create a pointer to
-the data in the Hive metastore. These persistent tables will still exist even after your Spark program has
-restarted, as long as you maintain your connection to the same metastore.
-
-```scala
-address.write.mode("overwrite").saveAsTable("address")
-people.write.mode("overwrite").saveAsTable("people")
-```
-
-## Loading Persistent tables
-A DataFrame for a persistent table can be created by calling the table method on a SparkSession `spark` with the name of the table:
-
-```scala
-val address = spark.table("address")
-val people = spark.table("people")
-
-// or
-
-val address = spark.read.table("address")
-val people = spark.read.table("people")
-```
-
 ## Spark Web UI
 The Web UI (aka webUI or Spark UI after SparkUI) is the web interface of a Spark application to inspect job executions in the SparkContext using a browser.
 Every SparkContext launches its own instance of Web UI which is available at http://[ipaddress]:4040 by default (the port can be changed using spark.ui.port setting).
@@ -498,6 +385,119 @@ A DataFrame _is a_ Dataset organized into named columns. It is conceptually equi
 In Scala a DataFrame is represented by a Dataset of Rows. A DataFrame is simply a type alias of Dataset[Row].
 
 The main entry point for SparkSQL is the `org.apache.spark.sql.SparkSession` class, which is available in both the SparkShell and Zeppelin notebook as the `spark` value. The `org.apache.spark.SparkContext` is available as the `sc` value, but this is only used for creating RDDs. Read the [SparkSQL Programming Guide][sparksql] on how to create a SparkSession programmatically.
+
+## Creating a DataFrame from an RDD
+
+__Address:__
+```scala
+import org.apache.spark.sql._
+import org.apache.spark.sql.types._
+
+val addressRDD = spark.sparkContext
+    .makeRDD(Seq("1,First Street", "2,Second Street"))
+    .map(_.split(","))
+    .map(xs => Row(xs(0).toInt, xs(1).trim))
+
+val schema = StructType(Array(
+    StructField("id", IntegerType, nullable = false),
+    StructField("street", StringType, nullable = false)
+  ))
+
+val addressDF = spark.createDataFrame(addressRDD, schema)
+```
+
+__People:__
+```scala
+val peopleRDD = spark.sparkContext
+    .makeRDD(Seq("1,Mad Max,2", "2,Gilbert Ward Kane,1"))
+    .map(_.split(","))
+    .map(xs => Row(xs(0).toInt, xs(1).trim, xs(2).toInt))
+
+val peopleSchema = StructType(Array(
+    StructField("id", IntegerType, nullable = false),
+    StructField("name", StringType, nullable = false),
+    StructField("address_fk", IntegerType, nullable = false)
+  ))
+
+final case class Person(id: Int, name: String, address_fk: Int)
+val people = spark.createDataFrame(peopleRDD, peopleSchema).as[Person]
+```
+
+## Creating a Dataset from a DataFrame
+
+```scala
+// create a dataset
+final case class Address(id: Int, street: String)
+val address = addressDF.as[Address]
+```
+
+## Creating a temp view
+
+```scala
+address.createOrReplaceTempView("address")
+people.createOrReplaceTempView("people")
+```
+
+## Joining two views
+
+```scala
+spark.sql("SELECT p.id, p.name, a.street FROM people p join address a on p.address_fk = a.id order by p.id").show
+
++---+-----------------+-------------+
+| id|             name|       street|
++---+-----------------+-------------+
+|  1|          Mad Max|Second Street|
+|  2|Gilbert Ward Kane| First Street|
++---+-----------------+-------------+
+```
+
+## Save a DataFrame or DataSet
+Spark allows you to save your DataFrame or Dataset in a number of formats:
+
+```scala
+// save as parquet
+address.write.mode("overwrite").parquet("/tmp/address.parquet")
+people.write.mode("overwrite").parquet("/tmp/people.parquet")
+
+// orc
+address.write.mode("overwrite").orc("/tmp/address.orc")
+people.write.mode("overwrite").orc("/tmp/people.orc")
+
+// save as json
+address.write.mode("overwrite").json("/tmp/address.json")
+people.write.mode("overwrite").json("/tmp/people.json")
+
+// save as csv
+address.write.mode("overwrite").csv("/tmp/address.csv")
+people.write.mode("overwrite").csv("/tmp/people.csv")
+
+// save as text (only one column can be saved)
+address.select('street).write.mode("overwrite").text("/tmp/address.text")
+people.select('name).write.mode("overwrite").text("/tmp/people.text")
+```
+
+## Saving to persistent tables
+Saving to Persistent Tables means materializing the contents of the DataFrame and create a pointer to
+the data in the Hive metastore. These persistent tables will still exist even after your Spark program has
+restarted, as long as you maintain your connection to the same metastore.
+
+```scala
+address.write.mode("overwrite").saveAsTable("address")
+people.write.mode("overwrite").saveAsTable("people")
+```
+
+## Loading Persistent tables
+A DataFrame for a persistent table can be created by calling the table method on a SparkSession `spark` with the name of the table:
+
+```scala
+val address = spark.table("address")
+val people = spark.table("people")
+
+// or
+
+val address = spark.read.table("address")
+val people = spark.read.table("people")
+```
 
 # Parquet
 [Parquet][parquet] is an efficient _columnar_ storage format that is used by Spark SQL to improve the analysis of any
