@@ -271,10 +271,53 @@ spark.sql("SELECT p.id, p.name, a.street FROM people p join address a on p.addre
 +---+-----------------+-------------+
 ```
 
-## Exportign result sets
-Spark allows you to export your DataFrame or Dataset in a number of formats:
+## Save a DataFrame or DataSet
+Spark allows you to save your DataFrame or Dataset in a number of formats:
 
+```scala
+// save as parquet
+address.write.mode("overwrite").parquet("/tmp/address.parquet")
+people.write.mode("overwrite").parquet("/tmp/people.parquet")
 
+// orc
+address.write.mode("overwrite").orc("/tmp/address.orc")
+people.write.mode("overwrite").orc("/tmp/people.orc")
+
+// save as json
+address.write.mode("overwrite").json("/tmp/address.json")
+people.write.mode("overwrite").json("/tmp/people.json")
+
+// save as csv
+address.write.mode("overwrite").csv("/tmp/address.csv")
+people.write.mode("overwrite").csv("/tmp/people.csv")
+
+// save as text (only one column can be saved)
+address.select('street).write.mode("overwrite").text("/tmp/address.text")
+people.select('name).write.mode("overwrite").text("/tmp/people.text")
+```
+
+## Saving to persistent tables
+Saving to Persistent Tables means materializing the contents of the DataFrame and create a pointer to
+the data in the Hive metastore. These persistent tables will still exist even after your Spark program has
+restarted, as long as you maintain your connection to the same metastore.
+
+```scala
+address.write.mode("overwrite").saveAsTable("address")
+people.write.mode("overwrite").saveAsTable("people")
+```
+
+## Loading Persistent tables
+A DataFrame for a persistent table can be created by calling the table method on a SparkSession `spark` with the name of the table:
+
+```scala
+val address = spark.table("address")
+val people = spark.table("people")
+
+// or
+
+val address = spark.read.table("address")
+val people = spark.read.table("people")
+```
 
 ## Spark Web UI
 The Web UI (aka webUI or Spark UI after SparkUI) is the web interface of a Spark application to inspect job executions in the SparkContext using a browser.
@@ -466,6 +509,12 @@ of unread columns.
 Parquet has support for partitioning eg. partioning data (files) by year automatically!
 
 Data skipping for statistics, column, min, max, etc.
+
+# ORC format
+The [Optimized Row Columnar (ORC)](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+ORC) file format provides
+a highly efficient way to store Hive data. It was designed to overcome limitations of the other Hive file formats.
+
+Using ORC files improves performance when Hive is reading, writing, and processing data.
 
 # Extensions for Apache Spark
 
@@ -673,6 +722,8 @@ In-Memory Cluster Computing][rddpaper]
 # Online resources
 - [Spark packages - A community index of third-party packages for Apache Spark][spackages]
 - [Introduction to data science with Apache Spark](http://hortonworks.com/blog/introduction-to-data-science-with-apache-spark/)
+- [Spark Expert - Loading database data using Spark 2.0 Data Sources API](http://www.sparkexpert.com/2016/08/01/loading-database-data-using-spark-2-0-data-sources-api/)
+- [Spark Expert - Save apache spark dataframe to database](http://www.sparkexpert.com/2015/04/17/save-apache-spark-dataframe-to-database/)
 
 # Video Resources
 - [Matei Zaharia - Keynote: Spark 2.0](https://www.youtube.com/watch?v=L029ZNBG7bk)

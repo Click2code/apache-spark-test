@@ -19,18 +19,22 @@ package com.github.dnvriend
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption._
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, Terminated}
 import akka.stream.scaladsl.{FileIO, Source}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.ByteString
 import spray.json.{DefaultJsonProtocol, _}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 object CreateZipcodes extends App with DefaultJsonProtocol {
   implicit val system: ActorSystem = ActorSystem()
   implicit val mat: Materializer = ActorMaterializer()
   implicit val ec: ExecutionContext = system.dispatcher
+
+  sys.addShutdownHook {
+    terminate
+  }
 
   final case class Zipcode(value: String)
 
@@ -49,10 +53,12 @@ object CreateZipcodes extends App with DefaultJsonProtocol {
     .runWith(FileIO.toPath(Paths.get("/tmp/zips.json"), Set(WRITE, TRUNCATE_EXISTING, CREATE)))
     .flatMap { done =>
       println(done)
-      system.terminate
+      terminate
+    }.recoverWith { case cause: Throwable =>
+      cause.printStackTrace()
+      terminate
     }
 
-  sys.addShutdownHook {
+  def terminate: Future[Terminated] =
     system.terminate()
-  }
 }
