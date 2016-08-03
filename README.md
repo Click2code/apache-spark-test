@@ -905,6 +905,60 @@ ORDER BY PurchaseType, PurchaseMonth
 +-------------+---------------------------+---------------------+
 ```
 
+# Functions available on Dataset
+Spark SQL provides a [lot of functions](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.functions$)
+that can be used on Datasets and are available in SQL queries:
+
+```scala
+// Calculates the SHA-1 digest of a binary column and returns the value as a 40 character hex string.
+spark.sql("SELECT sha1('Hello World!') sha1").show(false)
+
++----------------------------------------+
+|sha1                                    |
++----------------------------------------+
+|2ef7bde608ce5404e97d5f042f95f89f1c232871|
++----------------------------------------+
+
+// Formats numeric column x to a format like '#,###,###.##',
+// rounded to d decimal places, and returns the result as a string column.
+spark.sql("SELECT format_number(1025, 2) formatted").show(false)
+
++---------+
+|formatted|
++---------+
+|1,025.00 |
++---------+
+
+// reverse
+spark.sql("SELECT reverse('boat') result").show(false)
+
++------+
+|result|
++------+
+|taob  |
++------+
+
+// concat strings
+spark.sql("SELECT concat('Hello', ' ', 'World!') result").show(false)
+
++------------+
+|result      |
++------------+
+|Hello World!|
++------------+
+
+// Returns the current timestamp as a timestamp column.
+spark.sql("SELECT current_timestamp() result").show(false)
+
++-----------------------+
+|result                 |
++-----------------------+
+|2016-08-03 22:12:54.546|
++-----------------------+
+```
+
+And [many more functions](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.functions$).
+
 # Parquet
 [Parquet][parquet] is an efficient _columnar_ storage format that is used by Spark SQL to improve the analysis of any
 processing pipeline for structured data. It wins over JSON. It has compact binary encoding with intelligent compression.
@@ -1120,6 +1174,10 @@ TBC
 
 # Books
 - [Jacek Laskowski - Mastering Apache Spark (Free)](https://www.gitbook.com/book/jaceklaskowski/mastering-apache-spark/)
+
+# Spark documentation
+- [Spark Documentation](http://spark.apache.org/docs/latest/)
+- [Spark SQL - Overview of all the functions available for DataFrame](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.functions$)
 
 # Papers
 - [Matei Zaharia et al. - Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing][rddpaper]
