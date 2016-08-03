@@ -36,12 +36,10 @@ object CreateZipcodes extends App with DefaultJsonProtocol {
 
   implicit val zipcodeJsonFormat = jsonFormat1(Zipcode)
 
-  val f = Source(1000 to 9999).flatMapConcat { district =>
+  Source(1000 to 9999).flatMapConcat { district =>
     Source('A' to 'Z').flatMapConcat { l1 =>
       Source('A' to 'Z').flatMapConcat { l2 =>
-        Source(1 to 399).flatMapConcat { num =>
-          Source.single(f"$district$l1$l2-$num%03d")
-        }
+        Source(1 to 399).map(num => f"$district$l1$l2-$num%03d")
       }
     }
   }.map(Zipcode)

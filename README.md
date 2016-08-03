@@ -206,6 +206,76 @@ res6: Long = 19
 
 It may seem silly to use Spark to explore and cache a 100-line text file. The interesting part is that these same functions can be used on very large data sets, even when they are striped across tens or hundreds of nodes.
 
+## Creating a DataFrame from an RDD
+
+__Address:__
+```scala
+import org.apache.spark.sql._
+import org.apache.spark.sql.types._
+
+val addressRDD = spark.sparkContext
+    .makeRDD(Seq("1,First Street", "2,Second Street"))
+    .map(_.split(","))
+    .map(xs => Row(xs(0).toInt, xs(1).trim))
+
+val schema = StructType(Array(
+    StructField("id", IntegerType, nullable = false),
+    StructField("street", StringType, nullable = false)
+  ))
+
+val addressDF = spark.createDataFrame(addressRDD, schema)
+```
+
+__People:__
+```scala
+val peopleRDD = spark.sparkContext
+    .makeRDD(Seq("1,Mad Max,2", "2,Gilbert Ward Kane,1"))
+    .map(_.split(","))
+    .map(xs => Row(xs(0).toInt, xs(1).trim, xs(2).toInt))
+
+val peopleSchema = StructType(Array(
+    StructField("id", IntegerType, nullable = false),
+    StructField("name", StringType, nullable = false),
+    StructField("address_fk", IntegerType, nullable = false)
+  ))
+
+final case class Person(id: Int, name: String, address_fk: Int)
+val people = spark.createDataFrame(peopleRDD, peopleSchema).as[Person]
+```
+
+## Creating a Dataset from a DataFrame
+
+```scala
+// create a dataset
+final case class Address(id: Int, street: String)
+val address = addressDF.as[Address]
+```
+
+## Creating a temp view
+
+```scala
+address.createOrReplaceTempView("address")
+people.createOrReplaceTempView("people")
+```
+
+## Joining two views
+
+```scala
+spark.sql("SELECT p.id, p.name, a.street FROM people p join address a on p.address_fk = a.id order by p.id").show
+
++---+-----------------+-------------+
+| id|             name|       street|
++---+-----------------+-------------+
+|  1|          Mad Max|Second Street|
+|  2|Gilbert Ward Kane| First Street|
++---+-----------------+-------------+
+```
+
+## Exportign result sets
+Spark allows you to export your DataFrame or Dataset in a number of formats:
+
+
+
 ## Spark Web UI
 The Web UI (aka webUI or Spark UI after SparkUI) is the web interface of a Spark application to inspect job executions in the SparkContext using a browser.
 Every SparkContext launches its own instance of Web UI which is available at http://[ipaddress]:4040 by default (the port can be changed using spark.ui.port setting).
@@ -386,8 +456,6 @@ In Scala a DataFrame is represented by a Dataset of Rows. A DataFrame is simply 
 
 The main entry point for SparkSQL is the `org.apache.spark.sql.SparkSession` class, which is available in both the SparkShell and Zeppelin notebook as the `spark` value. The `org.apache.spark.SparkContext` is available as the `sc` value, but this is only used for creating RDDs. Read the [SparkSQL Programming Guide][sparksql] on how to create a SparkSession programmatically.
 
-
-
 # Parquet
 [Parquet][parquet] is an efficient _columnar_ storage format that is used by Spark SQL to improve the analysis of any
 processing pipeline for structured data. It wins over JSON. It has compact binary encoding with intelligent compression.
@@ -527,6 +595,32 @@ cars.select("year").explain
 *Project [year#705]
 +- *BatchedScan parquet default.cars[year#705] Format: ParquetFormat, ReadSchema: struct<year:int>
 ```
+
+# Configuration
+
+## Spark SQL
+To get all the [SparkSQL configuration options](http://spark.apache.org/docs/latest/configuration.html#spark-sql), execute the following query:
+
+```scala
+spark.sql("SET -v").show(numRows = 200, truncate = false)
+```
+
+which translates zo zeppelin:
+
+```
+%sql
+SET -v
+```
+
+## Hive Metastore Location
+To change the default location where the Hive Metastore saves its managed databases and tables:
+
+```
+spark.sql.warehouse.dir=file:${system:user.dir}/spark-warehouse
+```
+
+# SparkGeo
+[GeoJson](http://www.sparkgeo.com/blog/encoding-geojson-geometry/)
 
 # Notebook environments
 
