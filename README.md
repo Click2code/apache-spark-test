@@ -536,6 +536,9 @@ the data in the Hive metastore. This means that the data is saved to a Hive tabl
 registered in the Hive metastore, which means that the table is managed by Hive. Which also
 means that you __SHOULD NOT__ remove the tables by hand by eg. `rm -rf` the directories from `spark-warehouse`!
 
+The Hive Metastore is implemented using Derby. By default, spark will create a directory `metastore_db` that
+effectively is the model for the Hive database. Spark only has one Hive database named `default`.
+
 Persistent tables exist even after the Spark program has restarted, as long as you maintain your connection to the same metastore.
 
 ```scala
@@ -579,6 +582,89 @@ val people = spark.table("people")
 
 val address = spark.read.table("address")
 val people = spark.read.table("people")
+```
+
+## The Catalog
+The `org.apache.spark.sql.catalog.Catalog` is an interface through which the user may create, drop, alter or query underlying databases, tables, functions etc.
+
+The Catalog can be accessed by using an in scope `org.apache.spark.sql.SparkSession`, usually the value `spark`. The Catalog is accessible by using the
+property `catalog` on an in scope `SparkSession`. The Catalog can:
+
+```scala
+// store the catalog in a shorter variable (less typing)
+val cat = spark.catalog
+
+// show current database
+cat.currentDatabase
+res0: String = default
+
+// Returns a list of databases available across all sessions.
+cat.listDatabases.show(false)
+
++-------+---------------------+-------------------------+
+|name   |description          |locationUri              |
++-------+---------------------+-------------------------+
+|default|Default Hive database|file:/tmp/spark-warehouse|
++-------+---------------------+-------------------------+
+
+// return a list of tables in the current database
+cat.listTables.show
+
+// or
+
+// return a list of tables in the specified database
+cat.listTables("default").show
+
++--------+--------+-----------+---------+-----------+
+|    name|database|description|tableType|isTemporary|
++--------+--------+-----------+---------+-----------+
+|   posts| default|       null|  MANAGED|      false|
+|aangifte|    null|       null|TEMPORARY|       true|
++--------+--------+-----------+---------+-----------+
+
+// drop a temporary view
+cat.dropTempView("aangifte")
+
++-----+--------+-----------+---------+-----------+
+| name|database|description|tableType|isTemporary|
++-----+--------+-----------+---------+-----------+
+|posts| default|       null|  MANAGED|      false|
++-----+--------+-----------+---------+-----------+
+
+// list the columns
+cat.listColumns("posts").show
+
++----------------+-----------+--------+--------+-----------+--------+
+|            name|description|dataType|nullable|isPartition|isBucket|
++----------------+-----------+--------+--------+-----------+--------+
+|acceptedanswerid|       null|  bigint|    true|      false|   false|
+|     answercount|       null|  bigint|    true|      false|   false|
+|            body|       null|  string|    true|      false|   false|
+|    commentcount|       null|  bigint|    true|      false|   false|
+|    creationdate|       null|  string|    true|      false|   false|
+|              id|       null|  bigint|    true|      false|   false|
+|lastactivitydate|       null|  string|    true|      false|   false|
+|     owneruserid|       null|  bigint|    true|      false|   false|
+|      posttypeid|       null|  bigint|    true|      false|   false|
+|           score|       null|  bigint|    true|      false|   false|
+|            tags|       null|  string|    true|      false|   false|
+|           title|       null|  string|    true|      false|   false|
+|       viewcount|       null|  bigint|    true|      false|   false|
++----------------+-----------+--------+--------+-----------+--------+
+
+// set the current default database in this session
+cat.setCurrentDatabase("default")
+
+// dropping a table
+spark.sql("DROP TABLE IF EXISTS posts")
+
+// get a list of all the tables
+cat.listTables.show
+
++----+--------+-----------+---------+-----------+
+|name|database|description|tableType|isTemporary|
++----+--------+-----------+---------+-----------+
++----+--------+-----------+---------+-----------+
 ```
 
 # Operating on multiple Datasets
@@ -1154,7 +1240,7 @@ Building zeppelin:
 export ZEPPELIN_PORT=8001
 export MASTER=spark://localhost:7077
 export SPARK_HOME=/Users/dennis/projects/spark-2.0.0-bin-hadoop2.7
-export SPARK_SUBMIT_OPTIONS="--packages com.databricks:spark-csv_2.11:1.4.0,org.postgresql:postgresql:9.4.1209 --driver-class-path /Users/dennis/.ivy2/cache/org.postgresql/postgresql/bundles/postgresql-9.4.1209.jar"
+export SPARK_SUBMIT_OPTIONS="--packages com.databricks:spark-xml_2.11:0.3.3,com.databricks:spark-csv_2.11:1.4.0,org.postgresql:postgresql:9.4.1209 --driver-class-path /Users/dennis/.ivy2/cache/org.postgresql/postgresql/bundles/postgresql-9.4.1209.jar --conf spark.sql.warehouse.dir=file:/tmp/spark-warehouse"
 ```
 
 6. Launch the zeppelin daemon: `$ZEPPELIN_HOME/bin/zeppelin-daemon.sh start`
