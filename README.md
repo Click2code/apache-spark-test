@@ -386,7 +386,9 @@ The following asynchronous methods are available:
 ## Datasets and DataFrames
 A Dataset is a distributed collection of data. Dataset is a new interface added in Spark 1.6 that provides the benefits of RDDs (strong typing, ability to use powerful lambda functions) with the benefits of Spark SQL’s optimized execution engine. A Dataset can be constructed from JVM objects and then manipulated using functional transformations (map, flatMap, filter, etc.).
 
-A DataFrame _is a_ Dataset organized into named columns. It is conceptually equivalent to a table in a relational database, but with richer optimizations under the hood. DataFrames can be constructed from a wide array of sources such as: 
+A DataFrame _is a_ Dataset organized into named columns. It is conceptually equivalent to a table in a relational database, but with richer optimizations under the hood. DataFrames can be constructed from a wide array of sources such as:
+
+Please note that there is __no such thing__ as a DataFrame in Spark; a DataFrame is defined as a `Dataset[Row]`.
 
 - structured data files, 
 - tables in Hive, 
@@ -436,6 +438,25 @@ val address = spark.createDataFrame[Address](Seq(Address(1,"First Street"), Addr
 //
 final case class Address(id: Int, street: String)
 val address = spark.createDataset(Seq(Address(1,"First Street"), Address(2,"Second Street")))
+
+//
+// and yes, even shorter!
+//
+import spark.implicits._
+final case class Address(id: Int, street: String)
+val address = Seq(Address(1,"First Street"), Address(2,"Second Street")).toDS
+
+//
+// DataFrame with custom column names
+//
+import spark.implicits._
+final case class Address(id: Int, street: String)
+val address = Seq(Address(1,"First Street"), Address(2,"Second Street")).toDF("address_id", "address_name")
+
+//
+// Back to an RDD[Address]
+//
+address.rdd
 ```
 
 __People:__
@@ -1045,6 +1066,155 @@ spark.sql("SELECT current_timestamp() result").show(false)
 
 And [many more functions](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.functions$).
 
+## User Defined Functions (UDFs)
+User-Defined Functions (UDFs) is a feature of Spark SQL to define new Column-based functions that extend the already
+rich vocabulary of Spark SQL’s DSL that contains more than 50 functions to transform Datasets.
+
+UDFs are very handy because functions can be materialized anywhere in the cluster, so the function can be at the
+same physical location as the data, this makes operating on data using UDFs very efficient.
+
+You define a new UDF by defining a Scala function as an input parameter of udf function:
+
+```scala
+// lets create a DataFrame
+val df = Seq((0, "hello"), (1, "world")).toDF("id", "text")
+df.show
+
++---+-----+
+| id| text|
++---+-----+
+|  0|hello|
+|  1|world|
++---+-----+
+
+// define a plain old Scala Function
+val upper: String => String = _.toUpperCase + "- foo"
+
+// create a User Defined Function
+import org.apache.spark.sql.functions.udf
+val upperUDF = udf(upper)
+
+// apply the user defined function
+df.withColumn("upper", upperUDF('text)).show
+
++---+-----+----------+
+| id| text|     upper|
++---+-----+----------+
+|  0|hello|HELLO- foo|
+|  1|world|WORLD- foo|
++---+-----+----------+
+
+// the UDF can be used in a query
+// first register a temp view so that
+// we can reference the DataFrame
+df.createOrReplaceTempView("df")
+
+// register the UDF by name 'upperUDF'
+spark.udf.register("upperUDF", upper)
+
+// use the UDF in a SQL-Query
+spark.sql("SELECT *, upperUDF(text) FROM df").show
+
++---+-----+----------+
+| id| text| UDF(text)|
++---+-----+----------+
+|  0|hello|HELLO- foo|
+|  1|world|WORLD- foo|
++---+-----+----------+
+```
+
+## Repartition a DataFrame
+In Spark (1.6+) it is [possible](http://stackoverflow.com/questions/30995699/how-to-define-partitioning-of-a-spark-dataframe) to
+use partitioning by column for query and caching using the `repartition` method:
+
+```scala
+// based on the items Dataset above, lets first
+// take a look at how the Dataset has been partitioned:
+items.explain
+
+== Physical Plan ==
+LocalTableScan [PurchaseID#103, Supplier#104, PurchaseType#105, PurchaseAmt#106, PurchaseDate#107]
+
+// lets look at the query plan for a simple 'SELECT *':
+items.createOrReplaceTempView("items")
+spark.sql("SELECT * FROM items").explain
+
+== Physical Plan ==
+LocalTableScan [PurchaseID#103, Supplier#104, PurchaseType#105, PurchaseAmt#106, PurchaseDate#107]
+
+// Well, it isn't. In this case, partitioning it is far from optimal,
+// but as an example, lets repartition it anyway:
+val partItems = items.repartition($"PurchaseType")
+partItems.explain
+
+== Physical Plan ==
+Exchange hashpartitioning(PurchaseType#105, 200)
++- LocalTableScan [PurchaseID#103, Supplier#104, PurchaseType#105, PurchaseAmt#106, PurchaseDate#107]
+
+// lets look at the query plan for a simple 'SELECT *':
+partItems.createOrReplaceTempView("pitems")
+spark.sql("SELECT * FROM pitems").explain
+
+== Physical Plan ==
+Exchange hashpartitioning(PurchaseType#105, 200)
++- LocalTableScan [PurchaseID#103, Supplier#104, PurchaseType#105, PurchaseAmt#106, PurchaseDate#107]
+
+// lets cache it
+partItems.cache
+
+// lets look at the plan
+spark.sql("SELECT * FROM pitems").explain
+
+== Physical Plan ==
+InMemoryTableScan [PurchaseID#103, Supplier#104, PurchaseType#105, PurchaseAmt#106, PurchaseDate#107]
+:  +- InMemoryRelation [PurchaseID#103, Supplier#104, PurchaseType#105, PurchaseAmt#106, PurchaseDate#107], true, 10000, StorageLevel(disk, memory, deserialized, 1 replicas)
+:     :  +- Exchange hashpartitioning(PurchaseType#105, 200)
+:     :     +- LocalTableScan [PurchaseID#103, Supplier#104, PurchaseType#105, PurchaseAmt#106, PurchaseDate#107]
+
+// we can also repartition the dataset to a certain number of partitions:
+val tenParts = items.repartition(10)
+tenParts.explain
+
+== Physical Plan ==
+Exchange RoundRobinPartitioning(10)
++- LocalTableScan [PurchaseID#103, Supplier#104, PurchaseType#105, PurchaseAmt#106, PurchaseDate#107]
+
+// cache it
+tenParts.cache
+
+// lets examine the query plan:
+tenParts.select('*).explain
+
+== Physical Plan ==
+InMemoryTableScan [PurchaseID#103, Supplier#104, PurchaseType#105, PurchaseAmt#106, PurchaseDate#107]
+:  +- InMemoryRelation [PurchaseID#103, Supplier#104, PurchaseType#105, PurchaseAmt#106, PurchaseDate#107], true, 10000, StorageLevel(disk, memory, deserialized, 1 replicas)
+:     :  +- Exchange RoundRobinPartitioning(10)
+:     :     +- LocalTableScan [PurchaseID#103, Supplier#104, PurchaseType#105, PurchaseAmt#106, PurchaseDate#107]
+```
+
+## GroupByKey
+Should be [avoided](https://databricks.gitbooks.io/databricks-spark-knowledge-base/content/best_practices/prefer_reducebykey_over_groupbykey.html)
+Calling groupByKey - all the key-value pairs are shuffled around. This is a lot of unnessary data to being transferred over the network.
+
+## ReduceByKey
+ReduceByKey works much better on a large dataset. That's because Spark knows it can combine output with a common key on each partition
+before shuffling the data.
+
+## CombineByKey
+Can be used when you are combining elements but your return type differs from your input value type.
+
+## FoldByKey
+Merges the values for each key using an associative function and a neutral "zero value".
+
+## CountByKey
+..
+
+## countByValue
+..
+
+## collectAsMap
+..
+
 # Parquet
 [Parquet][parquet] is an efficient _columnar_ storage format that is used by Spark SQL to improve the analysis of any
 processing pipeline for structured data. It wins over JSON. It has compact binary encoding with intelligent compression.
@@ -1260,10 +1430,14 @@ TBC
 
 # Books
 - [Jacek Laskowski - Mastering Apache Spark (Free)](https://www.gitbook.com/book/jaceklaskowski/mastering-apache-spark/)
+- [Databricks Spark Knowledge Base (Free)](https://databricks.gitbooks.io/databricks-spark-knowledge-base/content/index.html)
 
 # Spark documentation
 - [Spark Documentation](http://spark.apache.org/docs/latest/)
 - [Spark SQL - Overview of all the functions available for DataFrame](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.functions$)
+
+# Spark Streaming
+- [Custom Receivers](http://spark.apache.org/docs/latest/streaming-custom-receivers.html)
 
 # Papers
 - [Matei Zaharia et al. - Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing][rddpaper]
@@ -1275,6 +1449,10 @@ TBC
 - [Introduction to data science with Apache Spark](http://hortonworks.com/blog/introduction-to-data-science-with-apache-spark/)
 - [Spark Expert - Loading database data using Spark 2.0 Data Sources API](http://www.sparkexpert.com/2016/08/01/loading-database-data-using-spark-2-0-data-sources-api/)
 - [Spark Expert - Save apache spark dataframe to database](http://www.sparkexpert.com/2015/04/17/save-apache-spark-dataframe-to-database/)
+- [Spark physical plan doubts (TungstenAggregate, TungstenExchange, ConvertToSafe )](https://community.hortonworks.com/questions/36266/spark-physical-plan-doubts-tungstenaggregate-tungs.html)
+- [How to define partitioning of a Spark DataFrame?](http://stackoverflow.com/questions/30995699/how-to-define-partitioning-of-a-spark-dataframe)
+- [SPARK-11410 - Add a DataFrame API that provides functionality similar to HiveQL's DISTRIBUTE BY](https://issues.apache.org/jira/browse/SPARK-11410)
+- [SPARK-4849 - Pass partitioning information (distribute by) to In-memory caching](https://issues.apache.org/jira/browse/SPARK-4849)
 
 # Video Resources
 - [Matei Zaharia - Keynote: Spark 2.0](https://www.youtube.com/watch?v=L029ZNBG7bk)
