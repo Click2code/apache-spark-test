@@ -12,6 +12,16 @@ Spark is often called cluster computing engine or simply execution engine.
 
 In contrast to Hadoop’s two-stage disk-based MapReduce processing engine, Spark’s multi-stage in-memory computing engine allows for running most computations in memory, and hence very often provides better performance (there are reports about being up to 100 times faster for certain applications, e.g. iterative algorithms or interactive data mining.
 
+After working with Spark for a short while, I can describe Spark as an interactive batch analytics engine which is optimized for processing a lot of data leveraging RDDs. Because of this, Spark is less suitable for a small amount of data that still needs analytics. For those jobs, a H2 database could be a better fit. Spark also has the same weakness as other data storage systems, it has no strategy implemented to support concurrent, asynchronous updates to the shared data, so the last write to the shared data wins.
+
+# Quick Reference
+- [org.apache.spark.sql](https://github.com/apache/spark/tree/master/sql/core/src/main/scala/org/apache/spark/sql)
+- [org.apache.spark.sql.functions](https://github.com/apache/spark/blob/master/sql/core/src/main/scala/org/apache/spark/sql/functions.scala)
+- [org.apache.spark.sql.Column](https://github.com/apache/spark/blob/master/sql/core/src/main/scala/org/apache/spark/sql/Column.scala)
+- [org.apache.spark.sql.Dataset](https://github.com/apache/spark/blob/master/sql/core/src/main/scala/org/apache/spark/sql/Dataset.scala)
+- [org.apache.spark.sql.SQLImplicits](https://github.com/apache/spark/blob/master/sql/core/src/main/scala/org/apache/spark/sql/SQLImplicits.scala)
+- [Spark Scala Examples](https://github.com/apache/spark/tree/master/examples/src/main/scala/org/apache/spark/examples)
+
 ## Glossary
 The [Apache Spark documentation contains the glossary](http://spark.apache.org/docs/latest/cluster-overview.html#glossary).
 
@@ -1127,6 +1137,190 @@ spark.sql("SELECT *, upperUDF(text) FROM df").show
 +---+-----+----------+
 ```
 
+## SQL
+Spark 2.0 can run all the [99 TPC-DS queries](http://www.tpc.org/tpcds/default.asp), which require many of the [SQL:2003](https://en.wikipedia.org/wiki/SQL:2003) features and has support for subqueries. Because SQL has been one of the primary interfaces Spark applications use, this extended SQL capabilities drastically reduce the porting effort of legacy applications over to Spark.
+
+Interactive analytics using [Structured Query Language (SQL)](https://en.wikipedia.org/wiki/SQL) has always been a preferred language for analysts because of its power to interact with the Dataset, but with the emergence of Big Data it was difficult to continue using SQL over RDBMS for interactive analytics. Spark provides a __highly optimized SQL engine__ on top of the Spark core framework and makes use of the power of RDDs (the power of the DAG; like eg: node crashes, RDDs + DAG can rebuild only that single RDD for the crashed node) to provide real time analytics on Big Data leveraging the DataFrame / Dataset API, Catalyst query optimizer all being supported by [Project Tungsten](https://databricks.com/blog/2015/04/28/project-tungsten-bringing-spark-closer-to-bare-metal.html).
+
+Spark supports the [Hive SQL syntax]()https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Select, except [some functionality](https://spark.apache.org/docs/latest/sql-programming-guide.html#unsupported-hive-functionality).
+
+Spark [supports the following SQL](http://docs.datastax.com/en/datastax_enterprise/5.0/datastax_enterprise/spark/sparkSqlSupportedSyntax.html):
+
+The following syntax defines a SELECT query.
+
+```sql
+SELECT [DISTINCT] [column names]|[wildcard]
+FROM [keyspace name.]table name
+[JOIN clause table name ON join condition]
+[WHERE condition]
+[GROUP BY column name]
+[HAVING conditions]
+[ORDER BY column names [ASC | DSC]]
+```
+
+A SELECT query using joins has the following syntax.
+
+```sql
+SELECT statement
+FROM statement
+[JOIN | INNER JOIN | LEFT JOIN | LEFT SEMI JOIN | LEFT OUTER JOIN | RIGHT JOIN | RIGHT OUTER JOIN | FULL JOIN | FULL OUTER JOIN]
+ON join condition
+```
+
+Several select clauses can be combined in a `UNION`, `INTERSECT`, or `EXCEPT` query.
+
+```sql
+SELECT statement 1
+[UNION | UNION ALL | UNION DISTINCT | INTERSECT | EXCEPT]
+SELECT statement 2
+```
+
+Note: Select queries run on new columns return '', or empty results, instead of None.
+
+The following syntax defines an INSERT query.
+
+```sql
+INSERT [OVERWRITE] INTO [keyspace name.]table name [(columns)]
+VALUES values
+```
+
+The following syntax defines a CACHE TABLE query.
+
+```sql
+CACHE TABLE table name [AS table alias]
+```
+
+You can remove a table from the cache using a UNCACHE TABLE query.
+
+```sql
+UNCACHE TABLE table name
+```
+
+The following keywords are reserved in Spark SQL:
+
+```sql
+ALL
+AND
+AS
+ASC
+APPROXIMATE
+AVG
+BETWEEN
+BY
+CACHE
+CAST
+COUNT
+DESC
+DISTINCT
+FALSE
+FIRST
+LAST
+FROM
+FULL
+GROUP
+HAVING
+IF
+IN
+INNER
+INSERT
+INTO
+IS
+JOIN
+LEFT
+LIMIT
+MAX
+MIN
+NOT
+NULL
+ON
+OR
+OVERWRITE
+LIKE
+RLIKE
+UPPER
+LOWER
+REGEXP
+ORDER
+OUTER
+RIGHT
+SELECT
+SEMI
+STRING
+SUM
+TABLE
+TIMESTAMP
+TRUE
+UNCACHE
+UNION
+WHERE
+INTERSECT
+EXCEPT
+SUBSTR
+SUBSTRING
+SQRT
+ABS
+```
+
+## GroupByKey
+Should be [avoided](https://databricks.gitbooks.io/databricks-spark-knowledge-base/content/best_practices/prefer_reducebykey_over_groupbykey.html)
+Calling groupByKey - all the key-value pairs are shuffled around. This is a lot of unnessary data to being transferred over the network.
+
+## ReduceByKey
+ReduceByKey works much better on a large dataset. That's because Spark knows it can combine output with a common key on each partition
+before shuffling the data.
+
+## CombineByKey
+Can be used when you are combining elements but your return type differs from your input value type.
+
+## FoldByKey
+Merges the values for each key using an associative function and a neutral "zero value".
+
+## CountByKey
+..
+
+## countByValue
+..
+
+## collectAsMap
+..
+
+## CLUSTER BY
+CLUSTER BY is a short-cut for both DISTRIBUTE BY and SORT BY.
+
+## DISTRIBUTE BY
+DISTRIBUTE BY distributes the rows among reducers by key
+
+## SORT BY
+SORT BY sort the data per reducer; which doesn't respect the total ordering
+
+## ORDER BY
+ORDER BY guarantees total order in the output
+
+## TPC
+Transaction Processing Performance Council (TPC) is a non-profit organization founded in 1988 to define transaction processing and database benchmarks and to disseminate objective, verifiable TPC performance data to the industry. TPC benchmarks are used in evaluating the performance of computer systems; the results are published on the TPC web site.
+
+## TPC-DS
+[TPC Benchmark DS (TPC-DS)](http://www.tpc.org/tpcds/default.asp): ‘The’ Benchmark Standard for decision support solutions including Big Data.
+
+TPC-DS is the de-facto industry standard benchmark for measuring the performance of decision support solutions including, but not limited to, Big Data systems.
+
+The current version is v2. It models several generally applicable aspects of a decision support system, including queries and data maintenance.
+
+Although the underlying business model of TPC-DS is a retail product supplier, the database schema, data population, queries, data maintenance model and implementation rules have been designed to be broadly representative of modern decision support systems.
+
+This benchmark illustrates decision support systems that:
+- Examine large volumes of data
+- Give answers to real-world business questions
+- Execute SQL queries of various operational requirements and complexities (e.g., ad-hoc, reporting, iterative OLAP, data mining)
+- Are characterized by high CPU and IO load
+- Are periodically synchronized with source OLTP databases through database maintenance functions
+- Run on 'Big Data' solutions, such as RDBMS as well as Hadoop/Spark based systems
+- TPC-DS Version 2 enables emerging technologies, such as Big Data systems, to execute the benchmark. The major changes in Version 2 are in the area of ACID (Atomicity, Consistency, Isolation and Durability), data maintenance, metric calculation and execution rules.
+
+In a nutshell, TPC-DS 2.0 is the first industry standard benchmark for measuring the end-to-end performance of SQL-based big data systems. Building upon the well-studied TPC-DS benchmark 1.0, Version 2.0 was specifically designed for SQL-based big data while retaining all key characteristics of a decision support benchmark. The richness and broad applicability of the schema, the ability to generate __100TB__ of realistic data on clustered systems, and the very large number of complex queries makes TPC-DS 2.0 the top candidate to show off performance of SQL-based big data solutions.
+
+## Accumulator API
+
 ## Repartition a DataFrame
 In Spark (1.6+) it is [possible](http://stackoverflow.com/questions/30995699/how-to-define-partitioning-of-a-spark-dataframe) to
 use partitioning by column for query and caching using the `repartition` method:
@@ -1196,45 +1390,26 @@ InMemoryTableScan [PurchaseID#103, Supplier#104, PurchaseType#105, PurchaseAmt#1
 :     :     +- LocalTableScan [PurchaseID#103, Supplier#104, PurchaseType#105, PurchaseAmt#106, PurchaseDate#107]
 ```
 
-## GroupByKey
-Should be [avoided](https://databricks.gitbooks.io/databricks-spark-knowledge-base/content/best_practices/prefer_reducebykey_over_groupbykey.html)
-Calling groupByKey - all the key-value pairs are shuffled around. This is a lot of unnessary data to being transferred over the network.
-
-## ReduceByKey
-ReduceByKey works much better on a large dataset. That's because Spark knows it can combine output with a common key on each partition
-before shuffling the data.
-
-## CombineByKey
-Can be used when you are combining elements but your return type differs from your input value type.
-
-## FoldByKey
-Merges the values for each key using an associative function and a neutral "zero value".
-
-## CountByKey
-..
-
-## countByValue
-..
-
-## collectAsMap
-..
-
 # Parquet
-[Parquet][parquet] is an efficient _columnar_ storage format that is used by Spark SQL to improve the analysis of any
-processing pipeline for structured data. It wins over JSON. It has compact binary encoding with intelligent compression.
+[Parquet][parquet] is an efficient _columnar_ storage format that is used by Spark SQL to improve the analysis of any processing pipeline for structured data. It wins over JSON. It has compact binary encoding with intelligent compression.
 
-Parquet uses a columnar storage format which means that each column is stored separately with an index that allows skipping
-of unread columns.
+Parquet uses a columnar storage format which means that each column is stored separately with an index that allows skipping of unread columns.
 
 Parquet has support for partitioning eg. partioning data (files) by year automatically!
 
 Data skipping for statistics, column, min, max, etc.
 
 # ORC format
-The [Optimized Row Columnar (ORC)](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+ORC) file format provides
-a highly efficient way to store Hive data. It was designed to overcome limitations of the other Hive file formats.
+The [Optimized Row Columnar (ORC)](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+ORC) file format provides a highly efficient way to store Hive data. It was designed to overcome limitations of the other Hive file formats.
 
 Using ORC files improves performance when Hive is reading, writing, and processing data.
+
+## Performance tuning
+A word about performance tuning; it is very subjective. The most important thing note when using a tool like Spark is __not to optimize prematurely__. The same rule actually applies to most databases. The database actually optimizes your instruction, your SQL expression, which is just an expression of the result you want, and all your effort to squeeze some extra percents out of such a complex system can work against you.
+
+For the sake of discussion, a RDMS system is a very complex system, now imagine Spark, which is even more complex and on top of that, uses optimization tricks that leverages I/O, memory, serialization, execution paths, distribution, scheduling and rewrites your code / expressions to get the most optimized execution plan to deliver the result you want. Of course, every new version of Spark can deliver a better execution plan than the previous version, so the best thing that you can do is read up on the tuning guide, listen to some Spark Conferences (Spark has a  great [Youtube channel](https://www.youtube.com/user/TheApacheSpark)) and just use Spark without going all out with settings.
+
+The most important thing of note here is __'Do we really need to performance tune our jobs?'__ Which needs an answer. __When our jobs meets the SLAs specified by the business__, then there is no need to squeeze the most performance out of the cluster, which leads to the next question: __What goals do we want to achieve and is it realistic?__. Most of the time the goals we set are unrealistic or need so much money/effort that it becomes unrealistic. Bottom line is, __when we meet the business requirements, it is fast enough__.
 
 # Extensions for Apache Spark
 
@@ -1435,6 +1610,7 @@ TBC
 # Books
 - [Jacek Laskowski - Mastering Apache Spark (Free)](https://www.gitbook.com/book/jaceklaskowski/mastering-apache-spark/)
 - [Databricks Spark Knowledge Base (Free)](https://databricks.gitbooks.io/databricks-spark-knowledge-base/content/index.html)
+- [Databricks Spark Reference Applications (Free)](https://www.gitbook.com/book/databricks/databricks-spark-reference-applications/details)
 
 # Spark documentation
 - [Spark Documentation](http://spark.apache.org/docs/latest/)
@@ -1447,6 +1623,8 @@ TBC
 - [Matei Zaharia et al. - Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing][rddpaper]
 - [Michael Armbrust et al. - Spark SQL: Relational Data Processing in Spark][sqlpaper]
 - [Matei Zaharia et al. - Discretized Streams: An Efficient and Fault-Tolerant Model for Stream Processing on Large Clusters][streamingpaper]
+- [Reynold S. Xin et al - Shark: SQL and Rich Analytics at Scale](https://amplab.cs.berkeley.edu/wp-content/uploads/2013/02/shark_sigmod2013.pdf)
+- [TPC BENCHMARK DS](http://www.tpc.org/tpc_documents_current_versions/pdf/tpc-ds_v2.1.0.pdf)
 
 # Online resources
 - [Spark packages - A community index of third-party packages for Apache Spark][spackages]
@@ -1457,6 +1635,9 @@ TBC
 - [How to define partitioning of a Spark DataFrame?](http://stackoverflow.com/questions/30995699/how-to-define-partitioning-of-a-spark-dataframe)
 - [SPARK-11410 - Add a DataFrame API that provides functionality similar to HiveQL's DISTRIBUTE BY](https://issues.apache.org/jira/browse/SPARK-11410)
 - [SPARK-4849 - Pass partitioning information (distribute by) to In-memory caching](https://issues.apache.org/jira/browse/SPARK-4849)
+- [Technical Preview of Apache Spark 2.0](https://databricks.com/blog/2016/05/11/apache-spark-2-0-technical-preview-easier-faster-and-smarter.html)
+- [SQL Subqueries in Apache Spark 2.0](https://databricks.com/blog/2016/06/17/sql-subqueries-in-apache-spark-2-0.html)
+- [Project Tungsten](https://databricks.com/blog/2015/04/28/project-tungsten-bringing-spark-closer-to-bare-metal.html)
 
 # Video Resources
 - [Matei Zaharia - Keynote: Spark 2.0](https://www.youtube.com/watch?v=L029ZNBG7bk)

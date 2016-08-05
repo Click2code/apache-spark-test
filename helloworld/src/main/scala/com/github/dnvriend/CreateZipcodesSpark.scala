@@ -78,4 +78,5 @@ object CreateZipcodesSpark extends App with DefaultJsonProtocol {
   println("==> Writing to parquet")
   tickets.write.parquet("/tmp/tickets_spark.parquet")
   println("==> Done, took: " + (Platform.currentTime - start) + " millis")
+  spark.stop()
 }
