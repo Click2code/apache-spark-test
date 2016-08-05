@@ -381,7 +381,11 @@ The following asynchronous methods are available:
 - __foreachPartitionAsync:__
 
 # Spark SQL
-[Spark SQL][sparksql] is a Spark module for structured data processing. Spark SQL knows about the structure of your data because it can infer the structure from the data source it uses, or because the structure has been given by the programmer by means of the Spark SQL API. In any case, because Spark SQL knows about the structure and the operations we wish to perform on the data, Spark SQL can perform extra optimizations. There are several ways to interact with Spark SQL including SQL and the Dataset API. When computing a result the same execution engine is used, independent whether the DataFrame of DataSet API is being used. 
+[Spark SQL][sparksql] is a Spark module for structured data processing. Spark SQL knows about the structure of your data because it can infer the structure from the data source it uses, or because the structure has been given by the programmer by means of the Spark SQL API. In any case, because Spark SQL knows about the structure and the operations we wish to perform on the data, Spark SQL can perform extra optimizations. There are several ways to interact with Spark SQL including SQL and the Dataset API. When computing a result the same execution engine is used, independent whether the DataFrame of DataSet API is being used.
+
+Spark SQL provides functions for manipulating large sets of distributed, structured data using a SQL dialect. Spark SQL
+can be used for reading and writing data to and from various structured formats and data sources such as JSON, Parquet,
+relational databases, CSV, ORC and more.
 
 ## Datasets and DataFrames
 A Dataset is a distributed collection of data. Dataset is a new interface added in Spark 1.6 that provides the benefits of RDDs (strong typing, ability to use powerful lambda functions) with the benefits of Spark SQL’s optimized execution engine. A Dataset can be constructed from JVM objects and then manipulated using functional transformations (map, flatMap, filter, etc.).
@@ -1410,7 +1414,7 @@ Building zeppelin:
 export ZEPPELIN_PORT=8001
 export MASTER=spark://localhost:7077
 export SPARK_HOME=/Users/dennis/projects/spark-2.0.0-bin-hadoop2.7
-export SPARK_SUBMIT_OPTIONS="--packages com.databricks:spark-xml_2.11:0.3.3,com.databricks:spark-csv_2.11:1.4.0,org.postgresql:postgresql:9.4.1209 --driver-class-path /Users/dennis/.ivy2/cache/org.postgresql/postgresql/bundles/postgresql-9.4.1209.jar --conf spark.sql.warehouse.dir=file:/tmp/spark-warehouse"
+export SPARK_SUBMIT_OPTIONS="--packages com.databricks:spark-xml_2.11:0.3.3,com.databricks:spark-csv_2.11:1.4.0,org.postgresql:postgresql:9.4.1209 --driver-class-path /Users/dennis/.ivy2/cache/org.postgresql/postgresql/bundles/postgresql-9.4.1209.jar --conf spark.sql.warehouse.dir=file:/tmp/spark-warehouse --conf spark.sql.crossJoin.enabled=true"
 ```
 
 6. Launch the zeppelin daemon: `$ZEPPELIN_HOME/bin/zeppelin-daemon.sh start`

@@ -21,13 +21,13 @@ import java.nio.file.StandardOpenOption._
 import java.text.SimpleDateFormat
 import java.util.Date
 
-import akka.actor.{ActorSystem, Terminated}
-import akka.stream.scaladsl.{FileIO, Source}
-import akka.stream.{ActorMaterializer, Materializer}
+import akka.actor.{ ActorSystem, Terminated }
+import akka.stream.scaladsl.{ FileIO, Source }
+import akka.stream.{ ActorMaterializer, Materializer }
 import akka.util.ByteString
-import spray.json.{DefaultJsonProtocol, _}
+import spray.json.{ DefaultJsonProtocol, _ }
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Random
 
 object CreatePosts extends App with DefaultJsonProtocol {
