@@ -22,6 +22,7 @@ import akka.stream.{ ActorMaterializer, Materializer }
 import org.apache.spark.sql.SparkSession
 import spray.json.DefaultJsonProtocol
 
+import scala.compat.Platform
 import scala.concurrent.ExecutionContext
 
 object CreateZipcodesSpark extends App with DefaultJsonProtocol {
@@ -37,6 +38,8 @@ object CreateZipcodesSpark extends App with DefaultJsonProtocol {
     .config("spark.sql.crossJoin.enabled", "true")
     .master("local[*]") // gebruik zoveel threads als cores
     .appName("CreateZipcodesSpark").getOrCreate()
+
+  val start = Platform.currentTime
 
   import spark.implicits._
 
@@ -62,7 +65,7 @@ object CreateZipcodesSpark extends App with DefaultJsonProtocol {
   // join letters and houses
   val lettersWithHouseNr = spark.sql(
     """
-      |SELECT CONCAT(letters, '-', nr) letters_with_housenr FROM letters
+      |SELECT CONCAT(letters, '-', nr) letterswithhousenr FROM letters
       |JOIN
       |(SELECT format_string("%03d", value) nr FROM houses)
     """.stripMargin
@@ -71,8 +74,8 @@ object CreateZipcodesSpark extends App with DefaultJsonProtocol {
   lettersWithHouseNr.createOrReplaceTempView("lwh")
 
   // join the districts with the house numbers
-  val tickets = spark.sql("SELECT CONCAT(value, letters_with_housenr) FROM districts JOIN lwh LIMIT 5000000")
+  val tickets = spark.sql("SELECT concat(value, letterswithhousenr) value FROM districts JOIN lwh LIMIT 5000000")
   println("==> Writing to parquet")
-  tickets.write.parquet("/tmp/tickets.parquet")
-  println("==> Done")
+  tickets.write.parquet("/tmp/tickets_spark.parquet")
+  println("==> Done, took: " + (Platform.currentTime - start) + " millis")
 }
