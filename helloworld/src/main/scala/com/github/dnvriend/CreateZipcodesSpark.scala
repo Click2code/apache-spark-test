@@ -19,10 +19,9 @@ package com.github.dnvriend
 import akka.actor.ActorSystem
 import akka.event.{ Logging, LoggingAdapter }
 import akka.stream.{ ActorMaterializer, Materializer }
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{ SaveMode, SparkSession }
 import spray.json.DefaultJsonProtocol
 
-import scala.compat.Platform
 import scala.concurrent.ExecutionContext
 
 object CreateZipcodesSpark extends App with DefaultJsonProtocol {
@@ -36,20 +35,18 @@ object CreateZipcodesSpark extends App with DefaultJsonProtocol {
     .config("spark.cores.max", "4")
     .config("spark.scheduler.mode", "FAIR")
     .config("spark.sql.crossJoin.enabled", "true")
-    .master("local[*]") // gebruik zoveel threads als cores
+    .master("local[*]") // use as many threads as cores
     .appName("CreateZipcodesSpark").getOrCreate()
-
-  val start = Platform.currentTime
 
   import spark.implicits._
 
   // define an RDD for the district range
-  val districts = spark.sparkContext.makeRDD(1000 to 9000).map(_.toString).toDS
+  val districts = spark.sparkContext.parallelize(1000 to 9000).map(_.toString).toDS
   // create temp view
   districts.createOrReplaceTempView("districts")
 
   // define an RDD with a range for the letters
-  val l1 = spark.sparkContext.makeRDD('A' to 'Z').map(_.toString).toDS
+  val l1 = spark.sparkContext.parallelize('A' to 'Z').map(_.toString).toDS
   l1.createOrReplaceTempView("l1")
 
   // join the letters
@@ -75,8 +72,12 @@ object CreateZipcodesSpark extends App with DefaultJsonProtocol {
 
   // join the districts with the house numbers
   val tickets = spark.sql("SELECT concat(value, letterswithhousenr) value FROM districts JOIN lwh LIMIT 5000000")
-  println("==> Writing to parquet")
-  tickets.write.parquet("/tmp/tickets_spark.parquet")
-  println("==> Done, took: " + (Platform.currentTime - start) + " millis")
-  spark.stop()
+  tickets.write.mode(SaveMode.Overwrite).parquet("/tmp/tickets_spark.parquet")
+  shutdown
+
+  def shutdown: Unit = {
+    spark.stop()
+    system.terminate()
+  }
+  sys.addShutdownHook(shutdown)
 }

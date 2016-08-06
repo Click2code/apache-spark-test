@@ -20,7 +20,7 @@ import akka.actor.ActorSystem
 import akka.event.{ Logging, LoggingAdapter }
 import akka.stream.{ ActorMaterializer, Materializer }
 import com.github.dnvriend.spark.CalculatePi
-import org.apache.spark.{ SparkConf, SparkContext }
+import org.apache.spark.sql.SparkSession
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -36,25 +36,27 @@ object HelloWorld extends App {
 
   val n = 10000000
 
-  // The first thing a Spark program must do is to create a SparkContext object, which tells Spark how to access a cluster.
-  // To create a SparkContext you first need to build a SparkConf object that contains information about your application.
-  // Only one SparkContext may be active per JVM. You must stop() the active SparkContext before creating a new one.
-  val conf = new SparkConf()
-    .setAppName("Hello World") // The appName parameter is a name for your application to show on the cluster UI.
-    .setMaster(s"spark://localhost:7077")
-  val sc = new SparkContext(conf)
+  // The first thing a Spark program must do is to create a SparkSession object,
+  // which tells Spark how to access a cluster, or to run in local mode
+  val spark = SparkSession.builder()
+    .config("spark.sql.warehouse.dir", "file:/tmp/spark-warehouse")
+    .config("spark.scheduler.mode", "FAIR")
+    .config("spark.sql.crossJoin.enabled", "true")
+    .master("local[*]") // use as many threads as cores
+    .appName("Hello World") // The appName parameter is a name for your application to show on the cluster UI.
+    .getOrCreate()
 
   for {
-    count <- Future(CalculatePi(sc, n))
+    count <- Future(CalculatePi(spark.sparkContext, n))
     _ <- system.terminate()
   } yield {
     val pi = 2.0 * count / (n - 1)
     println(s"Hello World, Pi = $pi")
-    sc.stop()
+    spark.stop()
   }
 
   sys.addShutdownHook {
-    sc.stop()
+    spark.stop()
     system.terminate()
   }
 }

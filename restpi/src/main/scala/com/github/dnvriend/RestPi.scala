@@ -23,7 +23,8 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.server.{ Directives, Route }
 import akka.stream.{ ActorMaterializer, Materializer }
 import com.github.dnvriend.spark.CalculatePi
-import org.apache.spark.{ SparkConf, SparkContext }
+import org.apache.spark.SparkContext
+import org.apache.spark.sql.SparkSession
 import spray.json.DefaultJsonProtocol
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -34,17 +35,22 @@ object RestPi extends App with Directives with SprayJsonSupport with DefaultJson
   implicit val ec: ExecutionContext = system.dispatcher
   implicit val log: LoggingAdapter = Logging(system, this.getClass)
 
-  val conf = new SparkConf()
-    .setAppName("Hello World")
-    .setMaster(s"spark://localhost:7077")
-  val sc = new SparkContext(conf)
+  val spark = SparkSession.builder()
+    .config("spark.sql.warehouse.dir", "file:/tmp/spark-warehouse")
+    .config("spark.scheduler.mode", "FAIR")
+    .config("spark.sql.crossJoin.enabled", "true")
+    .master("local[*]") // use as many threads as cores
+    .appName("RestPi") // The appName parameter is a name for your application to show on the cluster UI.
+    .getOrCreate()
 
   final case class Pi(pi: Double)
 
   implicit val piJsonFormat = jsonFormat1(Pi)
 
+  def sparkContext: SparkContext = spark.newSession().sparkContext
+
   def calculatePi(num: Long = 1000000, slices: Int = 2): Future[Double] =
-    Future(CalculatePi(sc, num, slices)).map(count => slices.toDouble * count / (num - 1))
+    Future(CalculatePi(sparkContext, num, slices)).map(count => slices.toDouble * count / (num - 1))
 
   val route: Route =
     pathEndOrSingleSlash {
@@ -56,7 +62,7 @@ object RestPi extends App with Directives with SprayJsonSupport with DefaultJson
   Http().bindAndHandle(route, "0.0.0.0", 8008)
 
   sys.addShutdownHook {
-    sc.stop()
+    spark.stop()
     system.terminate()
   }
 }
