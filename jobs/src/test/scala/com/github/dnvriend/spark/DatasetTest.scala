@@ -17,12 +17,8 @@
 package com.github.dnvriend.spark
 
 import com.github.dnvriend.TestSpec
-import com.github.dnvriend.spark.DatasetTest.Person
+import com.github.dnvriend.TestSpec.Person
 import org.apache.spark.sql.Dataset
-
-object DatasetTest {
-  final case class Person(name: String, age: Int)
-}
 
 class DatasetTest extends TestSpec {
   lazy val xs = Seq(
@@ -63,7 +59,12 @@ class DatasetTest extends TestSpec {
   }
 
   it should "load parquet file of people" in withSpark { spark =>
-    val people = spark.read.parquet("src/test/resources/people.parquet")
+    val people = spark.read.parquet(TestSpec.PersonsParquet)
     people.count shouldBe 5
+  }
+
+  it should "load parquet file of purchase_items" in withSpark { spark =>
+    val people = spark.read.parquet(TestSpec.PurchaseItems)
+    people.count shouldBe 25
   }
 }
