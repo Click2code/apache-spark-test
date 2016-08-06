@@ -1,5 +1,5 @@
 # Apache Spark Test
-A small study project on how to create and run applications with [Apache Spark][spark]. Its my personal study project and is mostly a copy/paste of a lot of resources available on the Internet to get the concepts on one page.
+A small study project on how to create and run applications with [Apache Spark 2.0][spark]. Its my personal study project and is mostly a copy/paste of a lot of resources available on the Internet to get the concepts on one page.
 
 We will be using the Structured Query Language (SQL), for a tutorial see the free [SQL tutorial by TutorialsPoint](http://www.tutorialspoint.com/sql/index.htm).
 
@@ -1793,6 +1793,7 @@ TBC
 - [SQL Subqueries in Apache Spark 2.0](https://databricks.com/blog/2016/06/17/sql-subqueries-in-apache-spark-2-0.html)
 - [Project Tungsten](https://databricks.com/blog/2015/04/28/project-tungsten-bringing-spark-closer-to-bare-metal.html)
 - [Reshaping Data with Pivot in Apache Spark](https://databricks.com/blog/2016/02/09/reshaping-data-with-pivot-in-apache-spark.html)
+- [Stackoverflow - DataFrame-ified zipWithIndex](http://stackoverflow.com/questions/30304810/dataframe-ified-zipwithindex)
 
 # Video Resources
 - [Matei Zaharia - Keynote: Spark 2.0](https://www.youtube.com/watch?v=L029ZNBG7bk)
