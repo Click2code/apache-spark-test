@@ -1590,6 +1590,8 @@ Parquet has support for partitioning eg. partioning data (files) by year automat
 
 Data skipping for statistics, column, min, max, etc.
 
+The data used in web and scientific computing is often nonrelational. Hence, a flexible data model is essential in these domains. Data structures used in programming languages, messages exchanged by distributed systems, structured documents, etc. lend themselves naturally to a nested representation. Normalizing and recombining such data at web scale is usually prohibitive. A nested data model underlies most of structured data processing at Google and reportedly at other major web companies.
+
 # ORC format
 The [Optimized Row Columnar (ORC)](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+ORC) file format provides a highly efficient way to store Hive data. It was designed to overcome limitations of the other Hive file formats.
 
@@ -1844,6 +1846,7 @@ TBC
 - [Matei Zaharia et al. - Discretized Streams: An Efficient and Fault-Tolerant Model for Stream Processing on Large Clusters][streamingpaper]
 - [Reynold S. Xin et al - Shark: SQL and Rich Analytics at Scale](https://amplab.cs.berkeley.edu/wp-content/uploads/2013/02/shark_sigmod2013.pdf)
 - [TPC BENCHMARK DS](http://www.tpc.org/tpc_documents_current_versions/pdf/tpc-ds_v2.1.0.pdf)
+- [Sergey Melnik et al. - Google - Dremel: Interactive Analysis of Web-Scale Datasets](http://research.google.com/pubs/pub36632.html)
 
 # Online resources
 - [Spark packages - A community index of third-party packages for Apache Spark][spackages]
@@ -1865,6 +1868,8 @@ TBC
 - [Brian Clapper - RDDs, DataFrames and Datasets in Apache Spark - NE Scala 2016](https://www.youtube.com/watch?v=pZQsDloGB4w)
 - [Michael Armbrust - Structuring Spark: DataFrames, Datasets, and Streaming](https://www.youtube.com/watch?v=i7l3JQRx7Qw)
 - [Michael Armbrust - Spark Dataframes: Simple and Fast Analysis of Structured Data](https://www.youtube.com/watch?v=A7Ef_ZB884g)
+- [Julien Le Dem - Parquet Format at Twitter](https://www.youtube.com/watch?v=Qfp6Uv1UrA0)
+- [Parquet: Columnar Storage for the People](https://www.youtube.com/watch?v=pFS-FScophU)
 
 [spark]: http://spark.apache.org/
 [standalone-mode]: http://spark.apache.org/docs/latest/spark-standalone.html
