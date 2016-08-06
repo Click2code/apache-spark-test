@@ -19,9 +19,12 @@ package com.github.dnvriend
 import akka.actor.ActorSystem
 import akka.event.{ Logging, LoggingAdapter }
 import akka.http.scaladsl._
+import akka.http.scaladsl.common.{ EntityStreamingSupport, JsonEntityStreamingSupport }
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.server.{ Directives, Route }
+import akka.stream.scaladsl.{ Flow, Source }
 import akka.stream.{ ActorMaterializer, Materializer }
+import akka.util.ByteString
 import com.github.dnvriend.spark.CalculatePi
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.SparkSession
@@ -39,13 +42,19 @@ object RestPi extends App with Directives with SprayJsonSupport with DefaultJson
     .config("spark.sql.warehouse.dir", "file:/tmp/spark-warehouse")
     .config("spark.scheduler.mode", "FAIR")
     .config("spark.sql.crossJoin.enabled", "true")
-    .master("local[*]") // use as many threads as cores
+    .master("local") // use as many threads as cores
     .appName("RestPi") // The appName parameter is a name for your application to show on the cluster UI.
     .getOrCreate()
 
   final case class Pi(pi: Double)
 
   implicit val piJsonFormat = jsonFormat1(Pi)
+  val start = ByteString.empty
+  val sep = ByteString("\n")
+  val end = ByteString.empty
+  implicit val jsonStreamingSupport: JsonEntityStreamingSupport = EntityStreamingSupport.json()
+    .withFramingRenderer(Flow[ByteString].intersperse(start, sep, end))
+    .withParallelMarshalling(parallelism = 8, unordered = true)
 
   def sparkContext: SparkContext = spark.newSession().sparkContext
 
@@ -57,6 +66,9 @@ object RestPi extends App with Directives with SprayJsonSupport with DefaultJson
       complete(calculatePi().map(Pi))
     } ~ path("pi" / LongNumber / IntNumber) { (num, slices) =>
       complete(calculatePi(num, slices).map(Pi))
+    } ~ path("stream" / "pi" / LongNumber) { num =>
+      complete(Source.fromFuture(calculatePi()).map(Pi)
+        .flatMapConcat(Source.repeat).take(num))
     }
 
   Http().bindAndHandle(route, "0.0.0.0", 8008)
