@@ -1,4 +1,9 @@
 # Apache Spark Test
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/3cf754d15e4a4d74aeb902c136c9f73e)](https://www.codacy.com/app/dnvriend/apache-spark-test?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dnvriend/apache-spark-test&amp;utm_campaign=Badge_Grade)
+[![Build Status](https://travis-ci.org/dnvriend/apache-spark-test.svg?branch=master)](https://travis-ci.org/dnvriend/apache-spark-test)
+[![License](http://img.shields.io/:license-Apache%202-red.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
 A small study project on how to create and run applications with [Apache Spark 2.0][spark]. Its my personal study project and is mostly a copy/paste of a lot of resources available on the Internet to get the concepts on one page.
 
 We will be using the Structured Query Language (SQL), for a tutorial see the free [SQL tutorial by TutorialsPoint](http://www.tutorialspoint.com/sql/index.htm).
