@@ -17,7 +17,7 @@
 package com.github.dnvriend.spark
 
 import com.github.dnvriend.TestSpec
-import com.github.dnvriend.TestSpec.Person
+import com.github.dnvriend.TestSpec.{ Person, Transaction }
 import org.apache.spark.sql.Dataset
 
 class DatasetTest extends TestSpec {
@@ -58,13 +58,19 @@ class DatasetTest extends TestSpec {
     ds.filter(_.age >= 30).count shouldBe 3
   }
 
-  it should "load parquet file of people" in withSpark { spark =>
+  it should "load people parquet" in withSpark { spark =>
     val people = spark.read.parquet(TestSpec.PersonsParquet)
     people.count shouldBe 5
   }
 
-  it should "load parquet file of purchase_items" in withSpark { spark =>
+  it should "load purchase_items parquet" in withSpark { spark =>
     val people = spark.read.parquet(TestSpec.PurchaseItems)
     people.count shouldBe 25
+  }
+
+  it should "load transactions parquet" in withSpark { spark =>
+    import spark.implicits._
+    val tx = spark.read.parquet(TestSpec.Transactions).as[Transaction]
+    tx.count shouldBe 1000
   }
 }

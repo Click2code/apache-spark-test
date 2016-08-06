@@ -17,9 +17,9 @@
 package com.github.dnvriend.spark
 
 import com.github.dnvriend.TestSpec
-import com.github.dnvriend.TestSpec.Transaction
 
-class ItemsParserTest extends TestSpec {
+class TransactionsTest extends TestSpec {
+
   it should "parse data_transactions" in withSpark { spark =>
     import spark.implicits._
     val tx = spark.sparkContext.textFile(TestSpec.TranscationsCSV)
@@ -27,9 +27,22 @@ class ItemsParserTest extends TestSpec {
     tx.count shouldBe 1000
   }
 
-  it should "load items parquet" in withSpark { spark =>
-    import spark.implicits._
-    val tx = spark.read.parquet(TestSpec.Transactions).as[Transaction]
+  it should "load transactions parquet" in withTx { spark => tx =>
     tx.count shouldBe 1000
+  }
+
+  it should "how many customers bought anywhing?" in withTx { spark => tx =>
+    import spark.implicits._
+    tx.map(_.customer_id).distinct().count shouldBe 100 // 1,66s
+  }
+
+  it should "Create pair rdd and count" in withTx { spark => tx =>
+    import spark.implicits._
+    tx.groupByKey(_.customer_id).keys.distinct().count shouldBe 100 // 1.32s
+  }
+
+  it should "Create pair rdd and count second" in withTx { spark => tx =>
+    import spark.implicits._
+    tx.map(tx => (tx.customer_id, tx)).rdd.keys.distinct().count shouldBe 100 // 0,178609
   }
 }

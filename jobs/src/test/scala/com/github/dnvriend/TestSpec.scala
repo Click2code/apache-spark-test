@@ -20,8 +20,9 @@ import akka.actor.ActorSystem
 import akka.event.{ Logging, LoggingAdapter }
 import akka.stream.{ ActorMaterializer, Materializer }
 import akka.util.Timeout
+import com.github.dnvriend.TestSpec.Transaction
 import org.apache.spark.SparkContext
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{ Dataset, SparkSession }
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{ BeforeAndAfterAll, FlatSpec, Matchers }
 
@@ -29,6 +30,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
 object TestSpec {
+
   final case class Person(name: String, age: Int)
 
   final case class Transaction(
@@ -111,6 +113,11 @@ abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures with Be
 
   def withSpark(f: SparkSession => Unit): Unit =
     f(_spark.newSession())
+
+  def withTx(f: SparkSession => Dataset[Transaction] => Unit): Unit = withSpark { spark =>
+    import spark.implicits._
+    f(spark)(spark.read.parquet(TestSpec.Transactions).as[Transaction])
+  }
 
   override protected def afterAll(): Unit = {
     _spark.stop()
