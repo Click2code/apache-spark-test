@@ -1137,6 +1137,133 @@ spark.sql("SELECT *, upperUDF(text) FROM df").show
 +---+-----+----------+
 ```
 
+## Generating Unique IDs
+Spark can create unique ids using the ` monotonically_increasing_id` function, which is part of `org.apache.spark.sql.function` and UUIDs when we create a User Defined Function (UDF) for it:
+
+```scala
+// create a simple Dataset
+val test = Seq("x1", "x1", "x2", "x3", "x4").toDF("x")
+test.createOrReplaceTempView("test")
+test.show
+
++---+
+|  x|
++---+
+| x1|
+| x1|
+| x2|
+| x3|
+| x4|
++---+
+
+// register a UDF for our UUID function
+import java.util.UUID
+spark.udf.register("uuid", () => UUID.randomUUID.toString)
+
+// lets create a result that has a monotonically increasing ID column, and a UUID column:
+spark.sql("SELECT *, monotonically_increasing_id() id, uuid() uuid from test").show(false)
+
++---+---+------------------------------------+
+|x  |id |uuid                                |
++---+---+------------------------------------+
+|x1 |0  |717ca817-b364-419a-8151-1ef0907203b5|
+|x1 |1  |61d18c20-15dc-4953-aee0-b99195a3903f|
+|x2 |2  |bfa0689b-0b2d-4d8a-bf10-efdd09a99636|
+|x3 |3  |9eb6a136-ee26-4188-9c99-ba3cc3324c94|
+|x4 |4  |b1a52edb-80fb-4b93-b1e1-ffa682ac57f7|
++---+---+------------------------------------+
+```
+
+## Array functions
+Spark supports an ArrayType, so a column can be of type Array. This can be handy when we use the table as a document, in which all the data is stored in the table and the data is not normalized leveraging relational algebra into two or more tables.
+
+We won't be touching the performance characteristics of the ArrayType vs. normalizing and using a JOIN column, but instead look at how we can use it using a simple example of a Book having multiple authors, in which the author_ids is an Array type that holds the authors's ids.
+
+The array functions we will use are all a member of `org.apache.spark.sql.functions`:
+
+```scala
+final case class Book(id: Int, author_ids: List[Int])
+val orders = Seq(Book(1, List(1)), Book(2, List(1, 2)), Book(3, List(1, 2, 3))).toDS
+orders.createOrReplaceTempView("books")
+
+// select the books that author 1 has worked on
+spark.sql("select * from books WHERE array_contains(author_ids, 1)").show
+
++---+----------+
+| id|author_ids|
++---+----------+
+|  1|       [1]|
+|  2|    [1, 2]|
+|  3| [1, 2, 3]|
++---+----------+
+
+// returns the size of the array
+spark.sql("select *, size(author_ids) size from books").show
+
++---+----------+----+
+| id|author_ids|size|
++---+----------+----+
+|  1|       [1]|   1|
+|  2|    [1, 2]|   2|
+|  3| [1, 2, 3]|   3|
++---+----------+----+
+
+// sort the array:
+spark.sql("select *, sort_array(author_ids, false) sorted  from books").show
+
++---+----------+---------+
+| id|author_ids|   sorted|
++---+----------+---------+
+|  1|       [1]|      [1]|
+|  2|    [1, 2]|   [2, 1]|
+|  3| [1, 2, 3]|[3, 2, 1]|
++---+----------+---------+
+
+// create a new row for each element in the array
+spark.sql("select *, explode(author_ids) exploded  from books").show
+
++---+----------+--------+
+| id|author_ids|exploded|
++---+----------+--------+
+|  1|       [1]|       1|
+|  2|    [1, 2]|       1|
+|  2|    [1, 2]|       2|
+|  3| [1, 2, 3]|       1|
+|  3| [1, 2, 3]|       2|
+|  3| [1, 2, 3]|       3|
++---+----------+--------+
+
+// create a new row for each element in the array with position information
+spark.sql("select *, posexplode(author_ids) from books").show
+
++---+----------+---+---+
+| id|author_ids|pos|col|
++---+----------+---+---+
+|  1|       [1]|  0|  1|
+|  2|    [1, 2]|  0|  1|
+|  2|    [1, 2]|  1|  2|
+|  3| [1, 2, 3]|  0|  1|
+|  3| [1, 2, 3]|  1|  2|
+|  3| [1, 2, 3]|  2|  3|
++---+----------+---+---+
+
+// create an array column from the value of a column and a function
+spark.sql("select *, array(id, monotonically_increasing_id()) ids from books").show
+
++---+----------+------+
+| id|author_ids|   ids|
++---+----------+------+
+|  1|       [1]|[1, 0]|
+|  2|    [1, 2]|[2, 1]|
+|  3| [1, 2, 3]|[3, 2]|
++---+----------+------+
+```
+
+## Pivot tables
+A pivot is an aggregation where one or more of the grouping columns has its distinct values transposed into individual columns.
+
+TBD
+
 ## SQL
 Spark 2.0 can run all the [99 TPC-DS queries](http://www.tpc.org/tpcds/default.asp), which require many of the [SQL:2003](https://en.wikipedia.org/wiki/SQL:2003) features and has support for subqueries. Because SQL has been one of the primary interfaces Spark applications use, this extended SQL capabilities drastically reduce the porting effort of legacy applications over to Spark.
 
@@ -1296,6 +1423,32 @@ SORT BY sort the data per reducer; which doesn't respect the total ordering
 ## ORDER BY
 ORDER BY guarantees total order in the output
 
+## Data Types
+Spark SQL and DataFrames support the following data types:
+
+__Numeric types:__
+- __ByteType:__ Represents 1-byte signed integer numbers. The range of numbers is from -128 to 127.
+- __ShortType:__ Represents 2-byte signed integer numbers. The range of numbers is from -32768 to 32767.
+- __IntegerType:__ Represents 4-byte signed integer numbers. The range of numbers is from -2147483648 to 2147483647.
+- __LongType:__ Represents 8-byte signed integer numbers. The range of numbers is from -9223372036854775808 to 9223372036854775807.
+- __FloatType:__ Represents 4-byte single-precision floating point numbers.
+- __DoubleType:__ Represents 8-byte double-precision floating point numbers.
+- __DecimalType:__ Represents arbitrary-precision signed decimal numbers. Backed internally by java.math.BigDecimal. A BigDecimal consists of an arbitrary precision integer unscaled value and a 32-bit integer scale.
+__String type:__
+- __StringType:__ Represents character string values.
+__Binary type:__
+- __BinaryType:__ Represents byte sequence values.
+__Boolean type:__
+- __BooleanType:__ Represents boolean values.
+__Datetime type:__
+- __TimestampType:__ Represents values comprising values of fields year, month, day, hour, minute, and second.
+- __DateType:__ Represents values comprising values of fields year, month, day.
+__Complex types:__
+- __ArrayType(elementType, containsNull):__ Represents values comprising a sequence of elements with the type of elementType. containsNull is used to indicate if elements in a ArrayType value can have null values.
+- __MapType(keyType, valueType, valueContainsNull):__ Represents values comprising a set of key-value pairs. The data type of keys are described by keyType and the data type of values are described by valueType. For a MapType value, keys are not allowed to have null values. valueContainsNull is used to indicate if values of a MapType value can have null values.
+- __StructType(fields):__ Represents values with the structure described by a sequence of StructFields (fields).
+  - StructField(name, dataType, nullable): Represents a field in a StructType. The name of a field is indicated by name. The data type of a field is indicated by dataType. nullable is used to indicate if values of this fields can have null values.
+
 ## TPC
 Transaction Processing Performance Council (TPC) is a non-profit organization founded in 1988 to define transaction processing and database benchmarks and to disseminate objective, verifiable TPC performance data to the industry. TPC benchmarks are used in evaluating the performance of computer systems; the results are published on the TPC web site.
 
@@ -1320,6 +1473,7 @@ This benchmark illustrates decision support systems that:
 In a nutshell, TPC-DS 2.0 is the first industry standard benchmark for measuring the end-to-end performance of SQL-based big data systems. Building upon the well-studied TPC-DS benchmark 1.0, Version 2.0 was specifically designed for SQL-based big data while retaining all key characteristics of a decision support benchmark. The richness and broad applicability of the schema, the ability to generate __100TB__ of realistic data on clustered systems, and the very large number of complex queries makes TPC-DS 2.0 the top candidate to show off performance of SQL-based big data solutions.
 
 ## Accumulator API
+TBD
 
 ## Repartition a DataFrame
 In Spark (1.6+) it is [possible](http://stackoverflow.com/questions/30995699/how-to-define-partitioning-of-a-spark-dataframe) to
@@ -1638,6 +1792,7 @@ TBC
 - [Technical Preview of Apache Spark 2.0](https://databricks.com/blog/2016/05/11/apache-spark-2-0-technical-preview-easier-faster-and-smarter.html)
 - [SQL Subqueries in Apache Spark 2.0](https://databricks.com/blog/2016/06/17/sql-subqueries-in-apache-spark-2-0.html)
 - [Project Tungsten](https://databricks.com/blog/2015/04/28/project-tungsten-bringing-spark-closer-to-bare-metal.html)
+- [Reshaping Data with Pivot in Apache Spark](https://databricks.com/blog/2016/02/09/reshaping-data-with-pivot-in-apache-spark.html)
 
 # Video Resources
 - [Matei Zaharia - Keynote: Spark 2.0](https://www.youtube.com/watch?v=L029ZNBG7bk)
