@@ -42,7 +42,7 @@ abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures with Be
     .config("spark.sql.crossJoin.enabled", "true")
     .config("spark.ui.enabled", "false")
     .master("local")
-    .appName("CreateZipcodesSpark").getOrCreate()
+    .appName("test").getOrCreate()
 
   def sc: SparkContext = _spark.newSession().sparkContext
   def spark: SparkSession = _spark.newSession()

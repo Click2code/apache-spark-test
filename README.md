@@ -1259,6 +1259,38 @@ spark.sql("select *, array(id, monotonically_increasing_id()) ids from books").s
 +---+----------+------+
 ```
 
+## 'Deleting' rows
+Spark SQL allows SQL expressions to operate on RDDs under the hood. Remember that RDDs are immutable and the workflow that Spark gives developers are transformations on RDDs so we transform one RDD into another and so on. Working with SQL however can give the illusion that we are working with a mutable data structure like we are used to with Databases, which is not the case.
+
+So there is no such thing as deleting a row in an RDD, so Spark SQL doesn't support the DELETE or TRUNCATE operation. What we _can_ do is create a new RDD in which the row isn't present by transforming the RDD into a new RDD where we have FILTERED the row that we don't want to have present:
+
+```scala
+val test = Seq("x1", "x1", "x2", "x3", "x4").toDF("x")
+test.createOrReplaceTempView("test")
+test.show
+
++---+
+|  x|
++---+
+| x1|
+| x1|
+| x2|
+| x3|
+| x4|
++---+
+
+// filter 'x1', we don't want them present in the new RDD:
+sql("FROM test WHERE x != 'x1'").show
+
++---+
+|  x|
++---+
+| x2|
+| x3|
+| x4|
++---+
+```
+
 ## Pivot tables
 A pivot is an aggregation where one or more of the grouping columns has its distinct values transposed into individual columns.
 
