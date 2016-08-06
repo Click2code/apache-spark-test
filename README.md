@@ -1565,6 +1565,34 @@ For the sake of discussion, a RDMS system is a very complex system, now imagine 
 
 The most important thing of note here is __'Do we really need to performance tune our jobs?'__ Which needs an answer. __When our jobs meets the SLAs specified by the business__, then there is no need to squeeze the most performance out of the cluster, which leads to the next question: __What goals do we want to achieve and is it realistic?__. Most of the time the goals we set are unrealistic or need so much money/effort that it becomes unrealistic. Bottom line is, __when we meet the business requirements, it is fast enough__.
 
+## Master URL
+Spark supports the following master URLs:
+
+- __local__, __local[N]__ and __local[*]__ for Spark local
+- __local[N, maxRetries]__ for Spark local-with-retries
+- __local-cluster[N, cores, memory]__ for simulating a Spark cluster of [N, cores, memory] locally
+- __spark://host:port,host1:port1,…__​ for connecting to Spark [Standalone cluster(s)](https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/spark-standalone.html)
+- __mesos://__ or __zk://__ for Spark on Mesos cluster
+- __yarn-cluster__ (deprecated: yarn-standalone) for Spark on YARN (cluster mode)
+- __yarn-client__ for Spark on YARN cluster (client mode)
+- __simr://__ for Spark in MapReduce (SIMR) cluster
+
+You use a master URL with spark-submit as the value of --master command-line option or when creating SparkContext using setMaster method.
+
+## Spark Local
+The [local mode](https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/spark-local.html) is very convenient for testing, debugging or demonstration purposes as it requires no earlier setup to launch Spark applications. This mode of operation is also called Spark in-process or (less commonly) a local version of Spark.
+
+You can run Spark in local mode using _local_, _local[n]_ or the most general _local[*]_ for the master URL.
+
+The URL says how many threads can be used in total:
+
+- __local__ uses 1 thread only.
+- __local[n]__ uses n threads.
+- __local[*]__ uses as many threads as the number of processors available to the Java virtual machine (it uses Runtime.getRuntime.availableProcessors() to know the number).
+
+## Spark Stand-alone
+Spark [Standalone cluster](https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/spark-standalone.html) (aka Spark deploy cluster or standalone cluster) is Spark’s own built-in clustered environment. Since Spark Standalone is available in the default distribution of Apache Spark it is the easiest way to run your Spark applications in a clustered environment in many cases.
+
 # Extensions for Apache Spark
 
 ## XML Data Source for Apache Spark
