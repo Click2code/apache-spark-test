@@ -61,4 +61,9 @@ class DatasetTest extends TestSpec {
     ds.filter(_.age > 30).count shouldBe 2
     ds.filter(_.age >= 30).count shouldBe 3
   }
+
+  it should "load parquet file of people" in withSpark { spark =>
+    val people = spark.read.parquet("src/test/resources/people.parquet")
+    people.count shouldBe 5
+  }
 }
