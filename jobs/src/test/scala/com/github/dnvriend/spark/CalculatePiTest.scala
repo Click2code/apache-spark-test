@@ -19,7 +19,7 @@ package com.github.dnvriend.spark
 import com.github.dnvriend.TestSpec
 
 class CalculatePiTest extends TestSpec {
-  it should "calculate pi" in {
+  it should "calculate pi" in withSc { sc =>
     CalculatePi(sc) shouldBe a[java.lang.Long]
   }
 }

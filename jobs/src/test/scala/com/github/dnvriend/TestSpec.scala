@@ -44,8 +44,11 @@ abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures with Be
     .master("local")
     .appName("test").getOrCreate()
 
-  def sc: SparkContext = _spark.newSession().sparkContext
-  def spark: SparkSession = _spark.newSession()
+  def withSc(f: SparkContext => Unit): Unit =
+    f(_spark.newSession().sparkContext)
+
+  def withSpark(f: SparkSession => Unit): Unit =
+    f(_spark.newSession())
 
   override protected def afterAll(): Unit = {
     _spark.stop()

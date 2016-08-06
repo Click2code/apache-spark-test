@@ -17,32 +17,37 @@
 package com.github.dnvriend.spark
 
 import com.github.dnvriend.TestSpec
+import org.apache.spark.SparkContext
+import org.apache.spark.rdd.RDD
 
 class RDDTest extends TestSpec {
-  val data = Array(1, 2, 3, 4, 5)
-  val rdd = sc.parallelize(data)
+  def withRDD(f: SparkContext => RDD[Int] => Unit): Unit = withSc { sc =>
+    val data = Array(1, 2, 3, 4, 5)
+    val rdd = sc.parallelize(data)
+    f(sc)(rdd)
+  }
 
-  it should "collect sync" in {
+  it should "collect sync" in withRDD { sc => rdd =>
     rdd.map(_ * 2).collect shouldBe Array(2, 4, 6, 8, 10)
   }
 
-  it should "collect async" in {
+  it should "collect async" in withRDD { sc => rdd =>
     rdd.map(_ * 2).collectAsync.futureValue shouldBe Array(2, 4, 6, 8, 10)
   }
 
-  it should "reduce" in {
+  it should "reduce" in withRDD { sc => rdd =>
     rdd.reduce(_ + _) shouldBe 15
   }
 
-  it should "count sync" in {
+  it should "count sync" in withRDD { sc => rdd =>
     rdd.count shouldBe 5
   }
 
-  it should "count async" in {
+  it should "count async" in withRDD { sc => rdd =>
     rdd.countAsync.futureValue shouldBe 5
   }
 
-  it should "zip" in {
+  it should "zip" in withRDD { sc => rdd =>
     rdd.zip(sc.parallelize(('A' to 'Z').take(rdd.count.toInt)))
       .map { case (int, char) => s"$char-$int" }
       .collect shouldBe Seq("A-1", "B-2", "C-3", "D-4", "E-5")
