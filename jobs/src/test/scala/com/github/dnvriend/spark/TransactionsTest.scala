@@ -17,6 +17,7 @@
 package com.github.dnvriend.spark
 
 import com.github.dnvriend.TestSpec
+import org.apache.spark.rdd.RDD
 
 class TransactionsTest extends TestSpec {
 
@@ -31,18 +32,25 @@ class TransactionsTest extends TestSpec {
     tx.count shouldBe 1000
   }
 
-  it should "how many customers bought anywhing?" in withTx { spark => tx =>
+  it should "count distinct customers" in withTx { spark => tx =>
     import spark.implicits._
     tx.map(_.customer_id).distinct().count shouldBe 100 // 1,66s
   }
 
-  it should "Create pair rdd and count" in withTx { spark => tx =>
+  it should "count distinct customers using groupByKey (avoid)" in withTx { spark => tx =>
     import spark.implicits._
     tx.groupByKey(_.customer_id).keys.distinct().count shouldBe 100 // 1.32s
   }
 
-  it should "Create pair rdd and count second" in withTx { spark => tx =>
+  it should "Create pair rdd and count distinct customers" in withTx { spark => tx =>
     import spark.implicits._
-    tx.map(tx => (tx.customer_id, tx)).rdd.keys.distinct().count shouldBe 100 // 0,178609
+    val pair: RDD[(Int, Int)] = tx.map(tx => (tx.customer_id, 1)).rdd
+    pair.keys.distinct().count shouldBe 100 // 0,218609s
+  }
+
+  it should "Create pair rdd and count total transactions" in withTx { spark => tx =>
+    import spark.implicits._
+    val pair: RDD[(Int, Int)] = tx.map(tx => (tx.customer_id, 1)).rdd
+    pair.reduceByKey(_ + _).values.sum shouldBe 1000 // 0,051471s
   }
 }

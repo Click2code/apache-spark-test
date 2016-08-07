@@ -1430,8 +1430,7 @@ Should be [avoided](https://databricks.gitbooks.io/databricks-spark-knowledge-ba
 Calling groupByKey - all the key-value pairs are shuffled around. This is a lot of unnessary data to being transferred over the network.
 
 ## ReduceByKey
-ReduceByKey works much better on a large dataset. That's because Spark knows it can combine output with a common key on each partition
-before shuffling the data.
+ReduceByKey works much better on a large dataset. That's because Spark knows it can combine output with a common key on each partition before shuffling the data.
 
 ## CombineByKey
 Can be used when you are combining elements but your return type differs from your input value type.
