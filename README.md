@@ -1425,27 +1425,88 @@ SQRT
 ABS
 ```
 
-## GroupByKey
-Should be [avoided](https://databricks.gitbooks.io/databricks-spark-knowledge-base/content/best_practices/prefer_reducebykey_over_groupbykey.html)
-Calling groupByKey - all the key-value pairs are shuffled around. This is a lot of unnessary data to being transferred over the network.
+## The Shuffle
+__TL;DR:__
+First do a __combine-before-shuffle__ step, then the shuffle (transfer), as the shuffle _cannot_ be prevented.
 
-## ReduceByKey
-ReduceByKey works much better on a large dataset. That's because Spark knows it can combine output with a common key on each partition before shuffling the data.
+Shuffle occurs to transfer all data with the same key to the same worker node.
 
-## CombineByKey
-Can be used when you are combining elements but your return type differs from your input value type.
+For example, imagine that `mydata.csv` is read by a number of worker node that each read (a part) of the csv file and will hold that part of the data in memory, `mydata.csv` has been partitioned:
 
-## FoldByKey
-Merges the values for each key using an associative function and a neutral "zero value".
+```scala
+val pairs = sc.textFile("/tmp/mydata.csv")
+  .flatMap(_.split(","))
+  .map(word => (word, 1))
+```
 
-## CountByKey
-..
+When we call `reduceByKey` or `groupByKey`, what we are asking Spark to do is take all the key/value-pairs that have the same key and put all them on the same machine (partition), so that is going to trigger a `shuffle` that will transfer all the data with the same key to the same machine (partition). Remember, `mydata.csv` data has been distributed over multiple worker nodes, each having read a chunk of the CSV and each having a part of the key/value pairs, but when we want a new RDD having all the pairs eg. _grouped-by-key_, Spark must copy all the pairs with the same matching keys to the same worker node (partition), this can only be done with a `shuffle`.
 
-## countByValue
-..
+```scala
+pairs.reduceByKey
 
-## collectAsMap
-..
+// or
+
+pairs.groupByKey
+```
+
+## How to optimize?
+Nobody can tell you. __You should understand your data and it's unique properties in order to best optimize your Spark job.__
+
+## ShuffledHashJoin
+![shuffled_hash_join](img/shuffled_hash_join.png)
+
+## BroadcastHashJoin
+![broadcast_hash_join](img/broadcast_hash_join)
+
+To show all the config, execute `SET -v` in Spark SQL:
+
+```
+spark.sql.autoBroadcastJoinThreshold=10,485,760
+```
+
+## Analyze Tables
+[SPARK-4760](https://issues.apache.org/jira/browse/SPARK-4760): The native parquet support (which is used for both Spark SQL and Hive DDL by default) automatically computes sizes starting with Spark 1.3. So running ANALYZE is not needed for auto broadcast joins anymore. Please reopen if you see any issues with this new feature.
+
+[Do we support analyze table table_name compute statistics for Spark SQl?](https://forums.databricks.com/questions/2645/do-we-support-analyze-table-table-name-compute-sta.html): If you created the table using one of the new Dataframes API implementations, then this functionality is not supported.
+
+## GroupByKey (shuffle-first)
+With group-by-key all the data is sent over the network and collected on the partition. Moreover, more data has to be stored as there has not been a reduce phase; it will use more disk space as a result because the new partitions have to store all the data.
+
+![group_by_key_shuffle](img/group_by_key_shuffle.png)
+
+This does not mean that groupByKey has to be avoided at all cost like the [best practise from databricks](https://databricks.gitbooks.io/databricks-spark-knowledge-base/content/best_practices/prefer_reducebykey_over_groupbykey.html), it has to be used where it is appropriate as `reduceByKey` cannot solve all problems.
+
+## ReduceByKey (combine-before-shuffle)
+ReduceByKey works much better on a large dataset. That's because Spark knows it can __combine__ output with a common key on each partition before shuffling the data, which leads to less data to be transferred.
+
+For example:
+
+![reduce_by_key_shuffle](img/reduce_by_key_shuffle.png)
+
+With ReduceByKey, data is combined so each partition outputs at most one value for each key to send over the network. Moreover, we have to __store less__ data on the new partitions as the key/value pairs are combined, which leads to more performance when we want to operate on them.
+
+## AggregateByKey (combine-before-shuffle)
+Aggregate the values of each key, using given combine functions and a neutral "zero value". Returns `RDD[(K, U)]` which is lazy.
+
+## FoldByKey (combine-before-shuffle)
+Merges the values for each key using an associative function and a neutral "zero value". Returns a `RDD[(K, V)]` which is lazy.
+
+## CombineByKey (combine-before-transfer)
+[org.apache.spark.rdd.PairRDDFunctions](https://github.com/apache/spark/blob/master/core/src/main/scala/org/apache/spark/rdd/PairRDDFunctions.scala#L113)
+
+Combination step before shuffle. Can be used when you are combining elements but your return type differs from your input value type. Returns `RDD[(K, C)]` which is lazy.
+
+## CountByKey (Map[K, Long])
+Group the values for each key in the RDD into a single sequence. Allows controlling the partitioning of the resulting key-value pair RDD by passing a Partitioner. Note, because the whole result is moved to the driver application, it can cause an Out Of Memory (OOM) error.
+
+## collectAsMap (Map[K, V])
+Return the key-value pairs in this RDD to the master as a Map. Returns `Map[K, V]` so beware of __OOM__.
+
+## countByValue (Map[T, Long])
+Return the count of each unique value in this RDD as a local map of (value, count) pairs. Returns `Map[K, V]` so beware of __OOM__.
+
+## Collect (Array[T])
+Return an array that contains all of the elements in this RDD. Returns an `Array[T]`, so beware of __OOM__.
 
 ## CLUSTER BY
 CLUSTER BY is a short-cut for both DISTRIBUTE BY and SORT BY.
@@ -1862,10 +1923,15 @@ TBC
 - [Reshaping Data with Pivot in Apache Spark](https://databricks.com/blog/2016/02/09/reshaping-data-with-pivot-in-apache-spark.html)
 - [Stackoverflow - DataFrame-ified zipWithIndex](http://stackoverflow.com/questions/30304810/dataframe-ified-zipwithindex)
 
+# Slide Decks
+- [Spark shuffle introduction](http://www.slideshare.net/colorant/spark-shuffle-introduction)
+- [Everyday I'm Shuffling - Tips for Writing Better Spark Programs](http://www.slideshare.net/databricks/strata-sj-everyday-im-shuffling-tips-for-writing-better-spark-programs)
+
 # Video Resources
 - [Matei Zaharia - Keynote: Spark 2.0](https://www.youtube.com/watch?v=L029ZNBG7bk)
 - [Brian Clapper - RDDs, DataFrames and Datasets in Apache Spark - NE Scala 2016](https://www.youtube.com/watch?v=pZQsDloGB4w)
 - [Michael Armbrust - Structuring Spark: DataFrames, Datasets, and Streaming](https://www.youtube.com/watch?v=i7l3JQRx7Qw)
+- [Vida Ha - Everyday I'm Shuffling - Tips for Writing Better Spark Programs](https://www.youtube.com/watch?v=Wg2boMqLjCg)
 - [Michael Armbrust - Spark Dataframes: Simple and Fast Analysis of Structured Data](https://www.youtube.com/watch?v=A7Ef_ZB884g)
 - [Julien Le Dem - Parquet Format at Twitter](https://www.youtube.com/watch?v=Qfp6Uv1UrA0)
 - [Parquet: Columnar Storage for the People](https://www.youtube.com/watch?v=pFS-FScophU)
