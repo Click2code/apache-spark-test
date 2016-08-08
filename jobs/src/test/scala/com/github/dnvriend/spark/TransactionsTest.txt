@@ -1,0 +1,36 @@
+
+SELECT SUM(count)
+ FROM
+  (SELECT count(distinct customer_id) count
+   FROM tx
+   GROUP BY customer_id
+  )
+
+== Parsed Logical Plan ==
+'Project [unresolvedalias('SUM('count), None)]
++- 'Aggregate ['customer_id], ['count('customer_id) AS count#18]
+   +- 'UnresolvedRelation `tx`
+
+== Analyzed Logical Plan ==
+sum(count): bigint
+Aggregate [sum(count#18L) AS sum(count)#30L]
++- Aggregate [customer_id#0], [count(distinct customer_id#0) AS count#18L]
+   +- SubqueryAlias tx
+      +- Relation[customer_id#0,product_id#1,quantity#2,total_price#3,purchase_time#4] parquet
+
+== Optimized Logical Plan ==
+Aggregate [sum(count#18L) AS sum(count)#30L]
++- Aggregate [customer_id#0], [count(distinct customer_id#0) AS count#18L]
+   +- Project [customer_id#0]
+      +- Relation[customer_id#0,product_id#1,quantity#2,total_price#3,purchase_time#4] parquet
+
+== Physical Plan ==
+*HashAggregate(keys=[], functions=[sum(count#18L)], output=[sum(count)#30L])
++- Exchange SinglePartition
+   +- *HashAggregate(keys=[], functions=[partial_sum(count#18L)], output=[sum#32L])
+      +- *HashAggregate(keys=[customer_id#0], functions=[count(distinct customer_id#0)], output=[count#18L])
+         +- *HashAggregate(keys=[customer_id#0], functions=[partial_count(distinct customer_id#0)], output=[customer_id#0, count#35L])
+            +- *HashAggregate(keys=[customer_id#0, customer_id#0], functions=[], output=[customer_id#0, customer_id#0])
+               +- Exchange hashpartitioning(customer_id#0, customer_id#0, 200)
+                  +- *HashAggregate(keys=[customer_id#0, customer_id#0], functions=[], output=[customer_id#0, customer_id#0])
+                     +- *BatchedScan parquet [customer_id#0] Format: ParquetFormat, InputPaths: file:/Users/dennis/projects/apache-spark-test/jobs/src/test/resources/transactions.parquet, PushedFilters: [], ReadSchema: struct<customer_id:int>

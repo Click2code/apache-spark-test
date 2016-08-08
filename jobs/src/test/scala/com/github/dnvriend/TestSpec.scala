@@ -105,6 +105,7 @@ abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures with Be
     .config("spark.scheduler.mode", "FAIR")
     .config("spark.sql.crossJoin.enabled", "true")
     .config("spark.ui.enabled", "false")
+    .config("spark.sql.autoBroadcastJoinThreshold", "1")
     .master("local")
     .appName("test").getOrCreate()
 

@@ -34,12 +34,12 @@ class TransactionsTest extends TestSpec {
 
   it should "count distinct customers" in withTx { spark => tx =>
     import spark.implicits._
-    tx.map(_.customer_id).distinct().count shouldBe 100 // 1,66s
+    tx.map(_.customer_id).distinct().count shouldBe 100 // 1,29s
   }
 
   it should "count distinct customers using groupByKey (avoid)" in withTx { spark => tx =>
     import spark.implicits._
-    tx.groupByKey(_.customer_id).keys.distinct().count shouldBe 100 // 1.32s
+    tx.groupByKey(_.customer_id).keys.distinct().count shouldBe 100 // 1.18s
   }
 
   it should "Create pair rdd and count distinct customers" in withTx { spark => tx =>
@@ -57,7 +57,7 @@ class TransactionsTest extends TestSpec {
   it should "use spark sql catalyst optimizer to count" in withTx { spark => tx =>
     import spark.implicits._
     tx.createOrReplaceTempView("tx")
-    tx.sqlContext.sql("SELECT COUNT(DISTINCT customer_id) FROM tx").as[Long].head shouldBe 100 // 1,624883s
+    tx.sqlContext.sql("SELECT COUNT(DISTINCT customer_id) FROM tx").as[Long].head shouldBe 100 // 0,624883s
   }
 
   it should "use spark sql catalyst optimizer to count using a GROUP BY" in withTx { spark => tx =>
@@ -72,6 +72,6 @@ class TransactionsTest extends TestSpec {
         |   GROUP BY customer_id
         |  )
       """.stripMargin
-    ).as[Long].head shouldBe 100 // 1,878691s
+    ).as[Long].head shouldBe 100 // 0,898015S
   }
 }
