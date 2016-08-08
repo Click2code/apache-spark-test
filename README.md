@@ -1456,7 +1456,7 @@ Nobody can tell you. __You should understand your data and it's unique propertie
 ![shuffled_hash_join](img/shuffled_hash_join.png)
 
 ## BroadcastHashJoin
-![broadcast_hash_join](img/broadcast_hash_join)
+![broadcast_hash_join](img/broadcast_hash_join.png)
 
 To show all the config, execute `SET -v` in Spark SQL:
 
