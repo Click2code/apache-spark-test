@@ -22,11 +22,11 @@ import org.apache.spark.sql.Dataset
 
 class DatasetTest extends TestSpec {
   lazy val xs = Seq(
-    Person("foo", 30),
-    Person("bar", 21),
-    Person("baz", 25),
-    Person("jaz", 40),
-    Person("bab", 50)
+    Person(1, "foo", 30),
+    Person(2, "bar", 21),
+    Person(3, "baz", 25),
+    Person(4, "jaz", 40),
+    Person(5, "bab", 50)
   )
 
   it should "typed Dataset operations: count" in withSpark { spark =>

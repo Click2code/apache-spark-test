@@ -31,7 +31,7 @@ import scala.concurrent.duration._
 
 object TestSpec {
 
-  final case class Person(name: String, age: Int)
+  final case class Person(id: Long, name: String, age: Int)
 
   final case class Transaction(
     customer_id: Int,
