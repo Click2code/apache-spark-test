@@ -1449,6 +1449,26 @@ pairs.reduceByKey
 pairs.groupByKey
 ```
 
+## Why so many Spark jobs?
+StackOverflow: [Why so many tasks in my spark jobs?](http://stackoverflow.com/questions/37758647/why-so-many-tasks-in-my-spark-job).
+
+__Answer:__
+This is a classic Spark question.
+
+The two tasks used for reading (Stage Id 0 in second figure) is the defaultMinPartitions setting which is set to 2. You can get this parameter by reading the value in the REPL `sc.defaultMinPartitions`. It should also be visible in the Spark UI under the "Environment" tap.
+
+You can take a look at the [code from github](https://github.com/apache/spark/blob/master/core/src/main/scala/org/apache/spark/SparkContext.scala#L799) to see that this exactly what is happening. If you want more partitions to be used on read, just add it as a parameter e.g., `sc.textFile("a.txt", 20)`.
+
+Now the interesting part comes from the `200 partitions` that come on the second stage (Stage Id 1 in second figure). Well, each time there is a shuffle, Spark needs to decide how many partitions will the shuffle RDD have. As you can imagine, the default is 200.
+
+You can change that using `spark.sql.shuffle.partitions` set to  eg. `4`.
+
+If you run your code with this configuration you will see that the 200 partitions are not going to be there any more. How to set this parameter is kind of an art. Maybe choose _2x the number of cores_ you have (or whatever).
+
+I think Spark 2.0 has a way to automatically infer the best number of partitions for shuffle RDDs. Looking forward to that!
+
+Finally, the number of jobs you get has to do with how many __RDD actions__ the resulting optimized Dataframe code resulted to. If you read the Spark specs it says that _each RDD action will trigger one job_. When your action involves a Dataframe or SparkSQL the Catalyst optimizer will figure out an execution plan and generate some RDD based code to execute it. It's hard to say exactly why it uses two actions in your case. You may need to look at the optimized query plan to see exactly what is doing.
+
 ## How to optimize?
 Nobody can tell you. __You should understand your data and it's unique properties in order to best optimize your Spark job.__
 
