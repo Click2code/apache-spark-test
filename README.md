@@ -1906,8 +1906,6 @@ Jupyter is a Python based notebook.
 # Pandas
 [Pandas][pandas] ia a Python library providing high-performance, easy-to-use data structures and data analysis tools.
 
-TBC
-
 # Books
 - [Jacek Laskowski - Mastering Apache Spark (Free)](https://www.gitbook.com/book/jaceklaskowski/mastering-apache-spark/)
 - [Databricks Spark Knowledge Base (Free)](https://databricks.gitbooks.io/databricks-spark-knowledge-base/content/index.html)
@@ -1916,6 +1914,16 @@ TBC
 # Spark documentation
 - [Spark Documentation](http://spark.apache.org/docs/latest/)
 - [Spark SQL - Overview of all the functions available for DataFrame](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.functions$)
+
+# Spark
+- [Training Apache Spark Essentials](https://www.youtube.com/watch?v=OheiUl_uXwo)
+
+# Machine Learning
+- [Juliet Hougland - Introduction to Machine Learning on Apache Spark MLlib](https://www.youtube.com/watch?v=qKYpMPPL-fo)
+- [Joseph K. Bradley - Apache Spark MLlib 2 0 Preview: Data Science and Production](https://www.youtube.com/watch?v=kvk4gnXL9H4)
+- [Training: Data Science With Apache Spark](https://www.youtube.com/watch?v=BpR2oCKzqLI)(https://www.youtube.com/watch?v=BpR2oCKzqLI)
+- [Training Continues: Data Science With Apache Spark](https://www.youtube.com/watch?v=pOYBexyQLo8)
+- [Robert Hryniewicz - Hands-on Intro to Machine Learning with Apache Spark and Apache Zeppelin](https://www.youtube.com/watch?v=k4KOmnenuFk)
 
 # Spark Streaming
 - [Custom Receivers](http://spark.apache.org/docs/latest/streaming-custom-receivers.html)
