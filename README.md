@@ -1942,6 +1942,8 @@ TBC
 - [Project Tungsten](https://databricks.com/blog/2015/04/28/project-tungsten-bringing-spark-closer-to-bare-metal.html)
 - [Reshaping Data with Pivot in Apache Spark](https://databricks.com/blog/2016/02/09/reshaping-data-with-pivot-in-apache-spark.html)
 - [Stackoverflow - DataFrame-ified zipWithIndex](http://stackoverflow.com/questions/30304810/dataframe-ified-zipwithindex)
+- [Cloudera - How to tune your Apache Spark jobs part1](http://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-1/)
+- [Cloudera - How to tune your Apache Spark jobs part2](http://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-2/)
 
 # Slide Decks
 - [Spark shuffle introduction](http://www.slideshare.net/colorant/spark-shuffle-introduction)
