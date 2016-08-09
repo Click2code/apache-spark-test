@@ -38,6 +38,8 @@ lazy val deps = {
   Seq(
       "org.apache.spark" %% "spark-core" % SparkVersion,
       "org.apache.spark" %% "spark-sql" % SparkVersion,
+      "org.apache.spark" %% "spark-mllib" % SparkVersion,
+      "com.github.fommil.netlib" % "all" % "1.1.2",
       "org.apache.spark" %% "spark-tags" % SparkVersion,
       "org.apache.spark" %% "spark-streaming" % SparkVersion,
       "com.typesafe.akka" %% "akka-actor" % AkkaVersion,

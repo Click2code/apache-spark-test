@@ -107,7 +107,7 @@ abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures with Be
     .config("spark.ui.enabled", "false")
     .config("spark.sql.autoBroadcastJoinThreshold", 1)
     .config("spark.default.parallelism", 4) // number of cores
-    .config("spark.sql.shuffle.partitions", 1) // default 200
+    .config("spark.sql.shuffle.partitions", 4) // default 200
     .master("local")
     .appName("test").getOrCreate()
 
