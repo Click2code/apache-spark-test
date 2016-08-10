@@ -97,6 +97,7 @@ object TestSpec {
     PurchaseItem(25, "Craftsman", "Hardware", 12341.09, "2014-05-22")
   )
 
+  final val AliceInWonderlandText = "src/test/resources/alice_in_wonderland.txt"
   final val TreesParquet = "src/test/resources/bomen.parquet"
   final val PersonsParquet = "src/test/resources/people.parquet"
   final val PurchaseItems = "src/test/resources/purchase_items.parquet"

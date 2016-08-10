@@ -1953,6 +1953,7 @@ Jupyter is a Python based notebook.
 - [Stackoverflow - DataFrame-ified zipWithIndex](http://stackoverflow.com/questions/30304810/dataframe-ified-zipwithindex)
 - [Cloudera - How to tune your Apache Spark jobs part1](http://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-1/)
 - [Cloudera - How to tune your Apache Spark jobs part2](http://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-2/)
+- [Knoldus - DataFrame word count](https://blog.knoldus.com/2015/10/21/using-spark-dataframes-for-word-count/)
 
 # Slide Decks
 - [Spark shuffle introduction](http://www.slideshare.net/colorant/spark-shuffle-introduction)
