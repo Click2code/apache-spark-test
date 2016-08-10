@@ -1924,6 +1924,7 @@ Jupyter is a Python based notebook.
 - [Training: Data Science With Apache Spark](https://www.youtube.com/watch?v=BpR2oCKzqLI)(https://www.youtube.com/watch?v=BpR2oCKzqLI)
 - [Training Continues: Data Science With Apache Spark](https://www.youtube.com/watch?v=pOYBexyQLo8)
 - [Robert Hryniewicz - Hands-on Intro to Machine Learning with Apache Spark and Apache Zeppelin](https://www.youtube.com/watch?v=k4KOmnenuFk)
+- [Spark MLlib: Making Practical Machine Learning Easy and Scalable](https://www.youtube.com/watch?v=7gHlgk8F58w)
 
 # Spark Streaming
 - [Custom Receivers](http://spark.apache.org/docs/latest/streaming-custom-receivers.html)

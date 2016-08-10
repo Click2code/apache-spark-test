@@ -49,6 +49,17 @@ object TestSpec {
     PurchaseDate: java.sql.Date
   )
 
+  final case class Tree(
+    fid: String,
+    gbiId: String,
+    naam: String,
+    latijn: String, // latin name
+    soort: Option[String],
+    jaar: Option[Int], // year
+    ondergrond: String, // soil
+    geom: String
+  )
+
   def mapToTransaction(xs: Array[String]) =
     Transaction(xs(2).toInt, xs(3).toInt, xs(4).toInt, xs(5).toDouble, strToSqlTime(xs(0).trim + " " + xs(1).trim))
 
@@ -86,6 +97,7 @@ object TestSpec {
     PurchaseItem(25, "Craftsman", "Hardware", 12341.09, "2014-05-22")
   )
 
+  final val TreesParquet = "src/test/resources/bomen.parquet"
   final val PersonsParquet = "src/test/resources/people.parquet"
   final val PurchaseItems = "src/test/resources/purchase_items.parquet"
   final val Transactions = "src/test/resources/transactions.parquet"

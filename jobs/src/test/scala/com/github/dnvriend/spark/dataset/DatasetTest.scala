@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dnvriend.spark
+package com.github.dnvriend.spark.dataset
 
 import com.github.dnvriend.TestSpec
 import com.github.dnvriend.TestSpec.{ Person, Transaction }
