@@ -50,6 +50,12 @@ class DatasetTest extends TestSpec {
     ds.sqlContext.sql("SELECT COUNT(*) FROM people").as[Long].head() shouldBe 5
   }
 
+  it should "count using dataset operations" in withSpark { spark =>
+    import spark.implicits._
+    val ds = xs.toDS()
+    ds.count() shouldBe 5
+  }
+
   it should "filter a ds" in withSpark { spark =>
     import spark.implicits._
     val ds = xs.toDS()

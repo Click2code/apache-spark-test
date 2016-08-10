@@ -60,18 +60,21 @@ class TransactionsTest extends TestSpec {
     tx.sqlContext.sql("SELECT COUNT(DISTINCT customer_id) FROM tx").as[Long].head shouldBe 100 // 0,624883s
   }
 
-  it should "use spark sql catalyst optimizer to count using a GROUP BY" in withTx { spark => tx =>
+  it should "count distinct using dsl" in withTx { spark => tx =>
     import spark.implicits._
-    tx.createOrReplaceTempView("tx")
-    spark.sql(
-      """
-        |SELECT SUM(count)
-        | FROM
-        |  (SELECT count(distinct customer_id) count
-        |   FROM tx
-        |   GROUP BY customer_id
-        |  )
-      """.stripMargin
-    ).as[Long].head shouldBe 100 // 0,898015S
+    tx.map(_.customer_id).distinct().count shouldBe 100
+  }
+
+  it should "calculate the number of orders" in withTx { spark => tx =>
+    import spark.implicits._
+    import org.apache.spark.sql.functions._
+    tx.groupBy('customer_id).agg(count('customer_id).alias("count"))
+      .select('count).agg(sum('count)).as[Long].head() shouldBe 1000
+  }
+
+  it should "calculate the number of distinct customers" in withTx { spark => tx =>
+    import spark.implicits._
+    import org.apache.spark.sql.functions._
+    tx.select('customer_id).distinct().agg(count('customer_id)).as[Long].head shouldBe 100
   }
 }

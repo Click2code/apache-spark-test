@@ -20,7 +20,7 @@ import akka.actor.ActorSystem
 import akka.event.{ Logging, LoggingAdapter }
 import akka.stream.{ ActorMaterializer, Materializer }
 import akka.util.Timeout
-import com.github.dnvriend.TestSpec.Transaction
+import com.github.dnvriend.TestSpec.{ Transaction, Tree }
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.{ Dataset, SparkSession }
 import org.scalatest.concurrent.ScalaFutures
@@ -120,6 +120,9 @@ abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures with Be
     .config("spark.sql.autoBroadcastJoinThreshold", 1)
     .config("spark.default.parallelism", 4) // number of cores
     .config("spark.sql.shuffle.partitions", 1) // default 200
+    // see: https://spark.apache.org/docs/latest/sql-programming-guide.html#caching-data-in-memory
+    //    .config("spark.sql.inMemoryColumnarStorage.compressed", "true")
+    //    .config("spark.sql.inMemoryColumnarStorage.batchSize", "10000")
     .master("local")
     .appName("test").getOrCreate()
 
@@ -132,6 +135,11 @@ abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures with Be
   def withTx(f: SparkSession => Dataset[Transaction] => Unit): Unit = withSpark { spark =>
     import spark.implicits._
     f(spark)(spark.read.parquet(TestSpec.Transactions).as[Transaction])
+  }
+
+  def withTrees(f: SparkSession => Dataset[Tree] => Unit): Unit = withSpark { spark =>
+    import spark.implicits._
+    f(spark)(spark.read.parquet(TestSpec.TreesParquet).as[Tree])
   }
 
   override protected def afterAll(): Unit = {
