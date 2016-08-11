@@ -8,6 +8,12 @@ A small study project on how to create and run applications with [Apache Spark 2
 
 We will be using the Structured Query Language (SQL), for a tutorial see the free [SQL tutorial by TutorialsPoint](http://www.tutorialspoint.com/sql/index.htm).
 
+# Spark pages
+- [Spark News](http://spark.apache.org/news/)
+- [Spark 2.0 Release Notes](http://spark.apache.org/releases/spark-release-2-0-0.html)
+- [Spark Issue Tracker](https://issues.apache.org/jira/browse/SPARK/?selectedTab=com.atlassian.jira.jira-projects-plugin:summary-panel)
+- [Spark Roadmap](https://issues.apache.org/jira/browse/SPARK/?selectedTab=com.atlassian.jira.jira-projects-plugin:roadmap-panel)
+
 # Introduction
 Apache Spark is an Open Source distributed general-purpose cluster computing framework with in-memory data processing engine that can do ETL, analytics, machine learning and graph processing on large volumes of data at rest (batch processing) or in motion (streaming processing) with rich concise high-level APIs for the programming languages: Scala, Python, Java, R, and SQL.
 
@@ -404,6 +410,16 @@ relational databases, CSV, ORC and more.
 
 ## Datasets and DataFrames
 A Dataset is a distributed collection of data. Dataset is a new interface added in Spark 1.6 that provides the benefits of RDDs (strong typing, ability to use powerful lambda functions) with the benefits of Spark SQL’s optimized execution engine. A Dataset can be constructed from JVM objects and then manipulated using functional transformations (map, flatMap, filter, etc.).
+
+A Dataset is a strongly typed collection of domain-specific objects that can be transformed in parallel using functional or relational operations. Each Dataset also has an untyped view called a `DataFrame`, which is a Dataset of Row.
+
+Operations available on Datasets are divided into `transformations` and `actions`. Transformations are the ones that produce new Datasets, and actions are the ones that trigger computation and return results. Example transformations include map, filter, select, and aggregate (groupBy). Example actions count, show, or writing data out to file systems.
+
+Datasets are "lazy", i.e. computations are only triggered when an action is invoked. Internally, a Dataset represents a logical plan that describes the computation required to produce the data. When an action is invoked, Spark's query optimizer optimizes the logical plan and generates a physical plan for efficient execution in a parallel and distributed manner. To explore the logical plan as well as optimized physical plan, use the explain function.
+
+To efficiently support domain-specific objects, an Encoder is required. The encoder maps the domain specific type T to Spark's internal type system. For example, given a class Person with two fields, name (string) and age (int), an encoder is used to tell Spark to generate code at runtime to serialize the Person object into a binary structure. This binary structure often has much lower memory footprint as well as are optimized for efficiency in data processing (e.g. in a columnar format). To understand the internal binary representation for data, use the schema function.
+
+Dataset operations can also be untyped, through various domain-specific-language (DSL) functions defined in: [Dataset](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.Dataset), [Column](http://spark.apache.org/docs/latest/api/scala/org/apache/spark/sql/Column.html), and [functions](http://spark.apache.org/docs/latest/api/scala/org/apache/spark/sql/functions$.html).
 
 A DataFrame _is a_ Dataset organized into named columns. It is conceptually equivalent to a table in a relational database, but with richer optimizations under the hood. DataFrames can be constructed from a wide array of sources such as:
 
@@ -1429,7 +1445,7 @@ ABS
 __TL;DR:__
 First do a __combine-before-shuffle__ step, then the shuffle (transfer), as the shuffle _cannot_ be prevented.
 
-Shuffle occurs to transfer all data with the same key to the same worker node.
+As you know, Resilient __Distributed__ Datasets are all about partitioning your data across multiple nodes as the dataset is too big to fit on a single node. Spark partitions your data across multiple nodes, this causes data to be not in one place. Shuffling is related to partitioning and occurs when an action mandates that data should be on the same node when eg. Spark needs to sort the data. Shuffling (the transfer of data) occurs when it is time to transfer all data with the same key to the same worker node.
 
 For example, imagine that `mydata.csv` is read by a number of worker node that each read (a part) of the csv file and will hold that part of the data in memory, `mydata.csv` has been partitioned:
 

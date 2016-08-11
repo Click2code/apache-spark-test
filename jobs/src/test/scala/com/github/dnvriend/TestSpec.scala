@@ -135,12 +135,12 @@ abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures with Be
 
   def withTx(f: SparkSession => Dataset[Transaction] => Unit): Unit = withSpark { spark =>
     import spark.implicits._
-    f(spark)(spark.read.parquet(TestSpec.Transactions).as[Transaction].cache())
+    f(spark)(spark.read.parquet(TestSpec.Transactions).as[Transaction])
   }
 
   def withTrees(f: SparkSession => Dataset[Tree] => Unit): Unit = withSpark { spark =>
     import spark.implicits._
-    f(spark)(spark.read.parquet(TestSpec.TreesParquet).as[Tree].cache())
+    f(spark)(spark.read.parquet(TestSpec.TreesParquet).as[Tree])
   }
 
   override protected def afterAll(): Unit = {
