@@ -25,7 +25,9 @@ class QueryPeopleTest extends TestSpec {
     import spark.implicits._
     import org.apache.spark.sql.functions._
 
-    val people: DataFrame = spark.read.parquet(TestSpec.PersonsParquet).cache() // name, age
+    val people: DataFrame =
+      spark.read.parquet(TestSpec.PersonsParquet).cache() // name, age
+
     people.select('name).limit(1).as[String].head() shouldBe "foo"
     people.select($"name").limit(1).as[String].head() shouldBe "foo"
     people.select("name").limit(1).as[String].head() shouldBe "foo"
@@ -41,6 +43,11 @@ class QueryPeopleTest extends TestSpec {
     val departments: DataFrame =
       Seq((1, "sales"), (2, "administration"), (3, "human resources"))
         .toDF("department_id", "department_name").cache()
+
+    people
+      .withColumn("department_id", lit(1))
+      .withColumn("age_plus_ten", people("age") + 10)
+      .as[(String, Int, Int, Int)].limit(1).head() shouldBe ("foo", 30, 1, 40)
 
     people
       .withColumn("department_id", lit(1))

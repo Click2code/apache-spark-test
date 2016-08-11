@@ -60,6 +60,19 @@ object TestSpec {
     geom: String
   )
 
+  final case class Order(
+    order_id: Int,
+    customer_id: Int,
+    order_date: java.sql.Date
+  )
+
+  final case class Customer(
+    customer_id: Int,
+    customer_name: String,
+    contact_name: String,
+    country: String
+  )
+
   def mapToTransaction(xs: Array[String]) =
     Transaction(xs(2).toInt, xs(3).toInt, xs(4).toInt, xs(5).toDouble, strToSqlTime(xs(0).trim + " " + xs(1).trim))
 
@@ -102,6 +115,8 @@ object TestSpec {
   final val PersonsParquet = "src/test/resources/people.parquet"
   final val PurchaseItems = "src/test/resources/purchase_items.parquet"
   final val Transactions = "src/test/resources/transactions.parquet"
+  final val OrdersParquet = "src/test/resources/orders.parquet"
+  final val CustomersParquet = "src/test/resources/customers.parquet"
   final val TranscationsCSV = "src/test/resources/data_transactions.csv"
 }
 
