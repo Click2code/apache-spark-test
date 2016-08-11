@@ -135,8 +135,6 @@ class JoinTest extends TestSpec {
       )
   }
 
-  //  case "leftanti" => LeftAnti
-
   it should "left anti semi join - returns only rows from the left side for which no match on the right side exists" in withSpark { spark =>
     import spark.implicits._
     val orders = spark.read.parquet(TestSpec.OrdersParquet).as[Order].cache()
