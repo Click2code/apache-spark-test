@@ -24,7 +24,9 @@ class JdbcDatasourceTest extends TestSpec {
   val jdbcOptions = Map(
     "url" -> "jdbc:h2:mem:test;INIT=runscript from 'src/test/resources/create.sql'\\;runscript from 'src/test/resources/init.sql'",
     "dbtable" -> "customer",
-    "driver" -> "org.h2.Driver"
+    "driver" -> "org.h2.Driver",
+    "user" -> "root",
+    "password" -> "root"
   )
 
   it should "join JDBC and parquet" in withSpark { spark =>

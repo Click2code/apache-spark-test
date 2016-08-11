@@ -1,0 +1,421 @@
+jaar;buurtnaam;buurtnr;aant_aang_dfst_won;aant_aang_autodfst;aant_aang_fietsdfst;aant_aang_dfst_bedr;aant_aang_dfst_auto;aant_aang_vernieling;aant_aang_mishand
+2007;Stadscentrum;0;19;0;317;28;32;110;113
+2007;Binnenstad-zuid;1;47;7;421;72;66;192;273
+2007;Binnenstad-oost;2;27;2;99;12;51;49;19
+2007;Binnenstad-west;3;15;0;63;21;1;26;16
+2007;Binnenstad-noord;4;42;0;173;21;98;84;27
+2007;Schildersbuurt;10;57;2;166;10;49;89;16
+2007;Zeeheldenbuurt;11;25;2;241;9;32;45;24
+2007;Friesestraatweg;12;0;0;1;6;3;2;0
+2007;Kostverloren;13;16;2;25;9;12;24;10
+2007;Vinkhuizen-zuid;14;21;4;30;3;32;67;46
+2007;Vinkhuizen-noord;15;38;4;41;1;31;71;12
+2007;Hoendiep;16;1;0;3;4;5;5;0
+2007;Oranjebuurt;20;85;3;148;3;83;72;23
+2007;Concordiabuurt;21;18;1;34;0;22;23;6
+2007;Selwerd;22;55;1;74;9;51;75;42
+2007;Paddepoel-zuid;23;18;4;21;5;33;37;26
+2007;Paddepoel-noord;24;55;2;33;9;72;61;29
+2007;Noorderhoogebrug;25;3;0;0;3;2;8;6
+2007;Universiteitscomplex;26;0;0;20;7;2;3;3
+2007;Koningslaagte;27;0;0;1;0;1;2;1
+2007;West-Indische buurt;30;12;2;18;1;25;16;7
+2007;De Hoogte;31;43;3;67;9;64;91;21
+2007;Oost-Indische buurt;32;75;4;82;1;65;62;26
+2007;Korrewegbuurt;33;77;2;124;19;54;59;21
+2007;Gorechtbuurt;40;37;4;164;35;52;62;20
+2007;Oosterparkbuurt;41;17;0;17;0;7;17;7
+2007;Bloemenbuurt;42;17;5;29;0;15;28;20
+2007;Florabuurt;43;4;2;8;12;8;19;4
+2007;Damsterbuurt;44;3;2;33;12;15;8;3
+2007;Oosterpoortbuurt;50;41;3;72;11;25;60;20
+2007;Industriebuurt;51;2;6;26;36;69;41;15
+2007;Euvelgunne;52;1;2;0;40;6;11;5
+2007;Middelbert;53;1;0;0;1;0;0;0
+2007;Engelbert;54;0;0;1;1;0;4;1
+2007;Roodehaan;55;1;0;0;0;0;0;0
+2007;Woonschepenhaven;59;1;1;0;0;0;1;1
+2007;Herewegbuurt;60;18;0;41;6;14;24;6
+2007;Rivierenbuurt;61;20;4;57;7;31;29;7
+2007;Helpman-west;62;23;0;31;8;33;34;1
+2007;Villabuurt-oost;63;2;0;6;1;3;4;0
+2007;Helpman-oost;64;19;2;41;7;55;27;5
+2007;Coendersborg;65;6;0;14;0;21;31;7
+2007;De Wijert-noord;66;12;1;22;5;25;73;18
+2007;De Wijert-zuid;67;10;0;11;8;10;25;7
+2007;Villabuurt-west;68;0;0;0;1;0;1;0
+2007;Woonwagenkamp 'Helpman';69;0;0;0;0;0;0;0
+2007;Laanhuizen;70;2;3;13;11;22;20;11
+2007;Grunobuurt;71;18;1;23;0;12;25;3
+2007;Corpus den Hoorn-noord;72;12;3;26;26;19;47;12
+2007;Corpus den Hoorn-zuid;73;24;1;14;18;28;57;10
+2007;Stadspark;74;6;0;1;4;4;10;1
+2007;Peizerweg;75;9;0;11;12;10;7;5
+2007;Woonwagenkamp 'De Kring';79;2;0;0;0;1;1;1
+2007;Hoogkerk-dorp;80;4;0;4;7;8;13;9
+2007;Hoogkerk-zuid;81;6;0;12;6;15;54;9
+2007;Vierverlaten;82;0;0;0;0;0;1;0
+2007;Leegkerk;83;1;0;3;1;1;1;1
+2007;Dorkwerd;84;4;0;0;2;5;5;6
+2007;Bangeweer;85;3;1;2;0;6;12;1
+2007;De Held;86;8;1;3;4;12;14;1
+2007;Zuidwending;87;0;0;0;1;1;0;0
+2007;Oosterhoogebrug;90;3;0;10;6;14;24;6
+2007;Lewenborg-zuid;91;11;7;5;2;9;22;15
+2007;Lewenborg-noord;92;10;1;22;12;17;42;29
+2007;Lewenborg-west;93;5;1;5;0;4;23;5
+2007;Bovenstreek;94;1;0;12;7;4;12;4
+2007;Beijum-oost;95;31;2;14;3;26;49;22
+2007;Beijum-west;96;24;3;30;5;25;108;31
+2007;Ulgersmabuurt;97;7;2;14;14;51;48;8
+2007;Ruischerbrug;98;2;0;1;2;2;16;0
+2008;Stadscentrum;0;53;0;284;56;24;91;138
+2008;Binnenstad-zuid;1;77;7;391;65;68;178;241
+2008;Binnenstad-oost;2;37;4;61;15;30;60;12
+2008;Binnenstad-west;3;12;0;59;10;2;20;18
+2008;Binnenstad-noord;4;63;8;148;20;95;80;22
+2008;Schildersbuurt;10;105;2;156;30;27;59;7
+2008;Zeeheldenbuurt;11;72;1;295;4;16;66;28
+2008;Friesestraatweg;12;2;0;0;1;2;3;0
+2008;Kostverloren;13;27;0;20;0;10;25;11
+2008;Vinkhuizen-zuid;14;22;0;24;6;21;71;32
+2008;Vinkhuizen-noord;15;29;2;35;5;29;80;18
+2008;Hoendiep;16;0;0;2;13;2;5;4
+2008;Oranjebuurt;20;98;2;102;11;40;54;21
+2008;Concordiabuurt;21;24;2;24;4;12;30;4
+2008;Selwerd;22;30;2;75;14;40;58;23
+2008;Paddepoel-zuid;23;17;2;9;8;9;50;20
+2008;Paddepoel-noord;24;42;3;31;15;28;47;21
+2008;Noorderhoogebrug;25;1;2;2;8;1;6;1
+2008;Universiteitscomplex;26;0;1;17;13;9;7;3
+2008;Koningslaagte;27;1;0;1;0;0;0;0
+2008;West-Indische buurt;30;17;1;20;1;21;18;12
+2008;De Hoogte;31;49;4;80;4;40;40;12
+2008;Oost-Indische buurt;32;113;3;125;3;62;60;26
+2008;Korrewegbuurt;33;137;4;112;8;53;61;30
+2008;Gorechtbuurt;40;59;2;99;22;37;41;8
+2008;Oosterparkbuurt;41;16;0;9;1;7;23;9
+2008;Bloemenbuurt;42;18;2;11;1;6;29;12
+2008;Florabuurt;43;17;2;4;1;5;21;4
+2008;Damsterbuurt;44;9;0;8;6;20;13;2
+2008;Oosterpoortbuurt;50;54;5;63;5;32;63;9
+2008;Industriebuurt;51;22;5;33;36;66;51;13
+2008;Euvelgunne;52;0;3;1;34;14;19;7
+2008;Middelbert;53;0;0;0;0;0;3;0
+2008;Engelbert;54;0;0;0;1;0;8;2
+2008;Roodehaan;55;0;0;0;0;0;2;0
+2008;Woonschepenhaven;59;0;0;0;0;0;2;2
+2008;Herewegbuurt;60;30;0;35;8;15;32;10
+2008;Rivierenbuurt;61;31;3;65;1;34;22;9
+2008;Helpman-west;62;24;2;44;7;28;36;5
+2008;Villabuurt-oost;63;4;0;3;0;3;10;1
+2008;Helpman-oost;64;29;1;48;6;35;44;13
+2008;Coendersborg;65;6;0;3;0;10;38;4
+2008;De Wijert-noord;66;9;2;20;5;28;53;22
+2008;De Wijert-zuid;67;8;0;6;5;3;20;2
+2008;Villabuurt-west;68;4;0;0;1;0;0;0
+2008;Woonwagenkamp 'Helpman';69;0;0;0;0;0;0;0
+2008;Laanhuizen;70;15;0;28;16;22;15;10
+2008;Grunobuurt;71;26;0;29;3;7;12;1
+2008;Corpus den Hoorn-noord;72;18;2;28;18;22;55;4
+2008;Corpus den Hoorn-zuid;73;26;3;13;5;19;39;9
+2008;Stadspark;74;4;0;1;15;8;7;3
+2008;Peizerweg;75;6;0;4;2;6;16;2
+2008;Woonwagenkamp 'De Kring';79;0;0;0;0;0;0;0
+2008;Hoogkerk-dorp;80;4;0;3;6;4;8;6
+2008;Hoogkerk-zuid;81;7;0;5;0;10;48;4
+2008;Vierverlaten;82;0;0;0;0;1;1;0
+2008;Leegkerk;83;3;0;4;0;3;4;1
+2008;Dorkwerd;84;1;0;4;0;1;4;8
+2008;Bangeweer;85;1;0;1;2;2;6;3
+2008;De Held;86;2;1;3;1;3;15;0
+2008;Zuidwending;87;0;0;0;1;1;0;0
+2008;Oosterhoogebrug;90;4;3;5;5;7;23;8
+2008;Lewenborg-zuid;91;11;1;7;2;3;80;7
+2008;Lewenborg-noord;92;2;2;17;15;3;82;21
+2008;Lewenborg-west;93;4;1;5;0;1;25;2
+2008;Bovenstreek;94;1;1;10;6;3;16;9
+2008;Beijum-oost;95;38;2;22;2;4;66;25
+2008;Beijum-west;96;48;0;39;9;13;101;24
+2008;Ulgersmabuurt;97;18;5;30;13;27;53;9
+2008;Ruischerbrug;98;1;0;2;0;3;6;2
+2009;Stadscentrum;0;17;0;419;27;14;66;140
+2009;Binnenstad-zuid;1;22;3;611;32;52;128;196
+2009;Binnenstad-oost;2;19;4;92;5;22;47;17
+2009;Binnenstad-west;3;15;1;60;6;3;24;18
+2009;Binnenstad-noord;4;31;1;179;14;93;66;16
+2009;Schildersbuurt;10;40;4;214;8;43;66;16
+2009;Zeeheldenbuurt;11;33;2;396;6;39;61;25
+2009;Friesestraatweg;12;1;0;0;2;1;1;0
+2009;Kostverloren;13;17;0;25;1;12;31;5
+2009;Vinkhuizen-zuid;14;12;2;12;3;24;54;31
+2009;Vinkhuizen-noord;15;33;2;57;6;45;51;21
+2009;Hoendiep;16;1;0;5;12;9;8;5
+2009;Oranjebuurt;20;52;1;135;3;46;66;8
+2009;Concordiabuurt;21;36;1;28;0;10;21;6
+2009;Selwerd;22;31;4;100;5;31;73;21
+2009;Paddepoel-zuid;23;19;1;42;4;24;58;16
+2009;Paddepoel-noord;24;25;0;43;8;37;33;26
+2009;Noorderhoogebrug;25;0;0;0;3;0;5;1
+2009;Universiteitscomplex;26;0;0;16;3;6;5;5
+2009;Koningslaagte;27;1;0;0;1;0;1;0
+2009;West-Indische buurt;30;8;3;19;0;6;17;6
+2009;De Hoogte;31;25;0;75;2;47;53;1
+2009;Oost-Indische buurt;32;80;5;166;1;32;67;37
+2009;Korrewegbuurt;33;76;3;137;5;48;82;16
+2009;Gorechtbuurt;40;30;2;162;14;41;50;18
+2009;Oosterparkbuurt;41;11;3;12;3;11;12;6
+2009;Bloemenbuurt;42;16;1;20;0;4;36;11
+2009;Florabuurt;43;9;2;13;0;10;14;6
+2009;Damsterbuurt;44;2;1;17;2;9;9;15
+2009;Oosterpoortbuurt;50;27;2;95;7;49;48;13
+2009;Industriebuurt;51;10;8;77;28;38;36;11
+2009;Euvelgunne;52;0;1;4;30;8;22;3
+2009;Middelbert;53;0;0;1;0;0;1;0
+2009;Engelbert;54;1;0;1;1;4;7;0
+2009;Roodehaan;55;0;0;0;0;0;1;0
+2009;Woonschepenhaven;59;1;0;0;0;0;1;1
+2009;Herewegbuurt;60;21;1;44;7;15;27;9
+2009;Rivierenbuurt;61;15;0;52;2;35;25;4
+2009;Helpman-west;62;14;1;49;6;38;25;8
+2009;Villabuurt-oost;63;10;0;6;0;3;7;1
+2009;Helpman-oost;64;19;0;36;5;23;30;12
+2009;Coendersborg;65;9;1;17;1;10;55;2
+2009;De Wijert-noord;66;10;3;33;3;25;46;1
+2009;De Wijert-zuid;67;8;0;0;2;1;8;18
+2009;Villabuurt-west;68;2;0;0;1;0;1;0
+2009;Woonwagenkamp 'Helpman';69;0;0;0;0;0;0;0
+2009;Laanhuizen;70;6;1;11;9;19;9;3
+2009;Grunobuurt;71;17;0;32;0;15;16;6
+2009;Corpus den Hoorn-noord;72;11;1;40;5;24;55;8
+2009;Corpus den Hoorn-zuid;73;19;1;16;3;27;38;13
+2009;Stadspark;74;5;0;16;3;4;10;5
+2009;Peizerweg;75;0;0;0;0;1;5;1
+2009;Woonwagenkamp 'De Kring';79;0;0;0;0;0;0;0
+2009;Hoogkerk-dorp;80;3;2;1;0;5;16;5
+2009;Hoogkerk-zuid;81;7;1;9;0;19;42;10
+2009;Vierverlaten;82;1;0;0;1;0;3;0
+2009;Leegkerk;83;0;0;3;1;2;4;4
+2009;Dorkwerd;84;2;0;2;1;5;4;11
+2009;Bangeweer;85;3;0;5;0;5;12;1
+2009;De Held;86;5;0;6;0;5;7;2
+2009;Zuidwending;87;0;0;0;0;0;0;1
+2009;Oosterhoogebrug;90;7;2;14;3;5;29;5
+2009;Lewenborg-zuid;91;8;7;17;0;5;55;12
+2009;Lewenborg-noord;92;15;4;14;0;10;54;13
+2009;Lewenborg-west;93;4;2;12;0;3;22;0
+2009;Bovenstreek;94;1;0;19;2;2;14;2
+2009;Beijum-oost;95;28;8;55;2;26;87;18
+2009;Beijum-west;96;36;10;50;1;29;93;20
+2009;Ulgersmabuurt;97;19;0;33;2;20;79;7
+2009;Ruischerbrug;98;3;1;8;0;5;7;3
+2010;Stadscentrum;0;17;2;401;15;16;41;106
+2010;Binnenstad-zuid;1;37;8;539;52;51;169;237
+2010;Binnenstad-oost;2;37;1;73;7;16;45;8
+2010;Binnenstad-west;3;12;2;56;3;8;23;11
+2010;Binnenstad-noord;4;37;1;139;16;73;86;19
+2010;Schildersbuurt;10;54;6;186;18;63;61;18
+2010;Zeeheldenbuurt;11;35;3;272;7;32;39;23
+2010;Friesestraatweg;12;0;0;0;0;2;2;0
+2010;Kostverloren;13;9;1;24;1;6;14;6
+2010;Vinkhuizen-zuid;14;26;1;25;4;30;46;34
+2010;Vinkhuizen-noord;15;34;1;43;2;54;40;12
+2010;Hoendiep;16;1;0;10;13;5;10;4
+2010;Oranjebuurt;20;52;7;103;4;70;58;10
+2010;Concordiabuurt;21;10;1;23;0;5;7;3
+2010;Selwerd;22;41;2;98;3;33;59;30
+2010;Paddepoel-zuid;23;34;0;48;0;19;50;11
+2010;Paddepoel-noord;24;52;4;44;0;38;41;17
+2010;Noorderhoogebrug;25;0;2;0;2;0;3;0
+2010;Universiteitscomplex;26;0;0;18;4;10;7;4
+2010;Koningslaagte;27;1;0;0;0;0;1;1
+2010;West-Indische buurt;30;15;1;14;0;11;14;14
+2010;De Hoogte;31;3;1;19;3;14;11;1
+2010;Oost-Indische buurt;32;45;5;122;4;36;72;40
+2010;Korrewegbuurt;33;58;1;121;5;56;53;13
+2010;Gorechtbuurt;40;29;6;118;10;35;48;13
+2010;Oosterparkbuurt;41;8;3;19;0;5;24;8
+2010;Bloemenbuurt;42;13;1;22;0;12;35;10
+2010;Florabuurt;43;20;2;28;5;15;21;7
+2010;Damsterbuurt;44;20;2;45;6;24;51;20
+2010;Oosterpoortbuurt;50;41;6;94;6;41;27;12
+2010;Industriebuurt;51;9;3;51;25;46;37;10
+2010;Euvelgunne;52;1;2;2;21;13;13;2
+2010;Middelbert;53;0;0;0;0;0;0;0
+2010;Engelbert;54;0;0;1;0;0;2;1
+2010;Roodehaan;55;0;0;1;1;0;0;1
+2010;Woonschepenhaven;59;0;0;0;1;0;2;0
+2010;Herewegbuurt;60;31;2;45;2;13;23;4
+2010;Rivierenbuurt;61;20;3;57;2;47;34;3
+2010;Helpman-west;62;28;2;53;5;35;33;7
+2010;Villabuurt-oost;63;4;0;4;0;3;2;0
+2010;Helpman-oost;64;25;2;46;2;28;14;13
+2010;Coendersborg;65;20;1;14;1;14;13;3
+2010;De Wijert-noord;66;11;0;7;3;13;7;6
+2010;De Wijert-zuid;67;35;4;33;1;59;31;24
+2010;Villabuurt-west;68;2;0;1;1;0;1;0
+2010;Woonwagenkamp 'Helpman';69;0;0;0;0;0;0;0
+2010;Laanhuizen;70;1;1;33;1;28;10;4
+2010;Grunobuurt;71;3;0;23;2;14;13;2
+2010;Corpus den Hoorn-noord;72;9;2;23;3;32;41;5
+2010;Corpus den Hoorn-zuid;73;22;3;27;2;27;26;10
+2010;Stadspark;74;5;0;7;2;6;9;3
+2010;Peizerweg;75;0;0;1;2;1;0;0
+2010;Woonwagenkamp 'De Kring';79;0;0;0;0;0;0;0
+2010;Hoogkerk-dorp;80;4;0;6;0;4;5;8
+2010;Hoogkerk-zuid;81;12;1;12;2;14;27;4
+2010;Vierverlaten;82;2;0;1;0;0;3;0
+2010;Leegkerk;83;7;0;6;1;7;3;1
+2010;Dorkwerd;84;1;0;1;1;10;11;3
+2010;Bangeweer;85;5;0;5;0;1;7;2
+2010;De Held;86;12;0;1;0;8;8;0
+2010;Zuidwending;87;0;0;0;1;0;0;0
+2010;Oosterhoogebrug;90;18;0;12;8;8;25;1
+2010;Lewenborg-zuid;91;15;1;13;0;7;37;8
+2010;Lewenborg-noord;92;12;1;24;5;9;38;23
+2010;Lewenborg-west;93;6;0;8;0;13;19;1
+2010;Bovenstreek;94;0;0;11;6;18;9;3
+2010;Beijum-oost;95;34;4;41;0;14;59;24
+2010;Beijum-west;96;33;4;38;5;25;77;16
+2010;Ulgersmabuurt;97;44;0;21;6;35;74;19
+2010;Ruischerbrug;98;6;0;2;0;8;17;2
+2011;Stadscentrum;0;16;2;305;15;22;34;127
+2011;Binnenstad-zuid;1;63;3;426;24;55;141;239
+2011;Binnenstad-oost;2;28;0;66;4;21;29;11
+2011;Binnenstad-west;3;14;2;47;2;2;24;14
+2011;Binnenstad-noord;4;40;4;137;8;36;67;14
+2011;Schildersbuurt;10;62;3;166;1;37;69;17
+2011;Zeeheldenbuurt;11;33;3;270;1;55;42;20
+2011;Friesestraatweg;12;0;0;0;1;0;5;0
+2011;Kostverloren;13;14;1;11;1;16;16;5
+2011;Vinkhuizen-zuid;14;20;5;22;1;17;72;22
+2011;Vinkhuizen-noord;15;64;2;28;1;30;52;18
+2011;Hoendiep;16;1;0;4;6;3;5;5
+2011;Oranjebuurt;20;37;2;85;3;45;43;12
+2011;Concordiabuurt;21;13;0;15;0;6;16;1
+2011;Selwerd;22;51;2;82;1;39;59;22
+2011;Paddepoel-zuid;23;20;4;24;2;23;58;10
+2011;Paddepoel-noord;24;40;0;21;1;47;33;16
+2011;Noorderhoogebrug;25;0;0;0;0;0;0;0
+2011;Universiteitscomplex;26;0;0;21;2;13;4;1
+2011;Koningslaagte;27;0;0;0;0;0;2;1
+2011;West-Indische buurt;30;6;0;19;0;12;25;9
+2011;De Hoogte;31;42;2;49;8;22;33;16
+2011;Oost-Indische buurt;32;50;2;133;1;20;58;25
+2011;Korrewegbuurt;33;52;2;126;2;35;32;9
+2011;Gorechtbuurt;40;28;0;118;13;42;56;29
+2011;Oosterparkbuurt;41;12;2;27;1;2;20;7
+2011;Bloemenbuurt;42;9;3;34;0;5;24;16
+2011;Florabuurt;43;17;3;21;1;16;18;9
+2011;Damsterbuurt;44;11;0;18;0;3;7;0
+2011;Oosterpoortbuurt;50;28;1;80;5;31;51;6
+2011;Industriebuurt;51;12;2;29;8;41;34;15
+2011;Euvelgunne;52;0;4;4;7;18;19;5
+2011;Middelbert;53;0;0;1;0;0;0;0
+2011;Engelbert;54;3;0;0;0;0;0;2
+2011;Roodehaan;55;0;1;0;0;0;1;1
+2011;Woonschepenhaven;59;0;0;0;0;0;9;0
+2011;Herewegbuurt;60;14;0;36;2;14;9;3
+2011;Rivierenbuurt;61;24;3;51;0;10;21;3
+2011;Helpman-west;62;29;1;40;1;21;18;8
+2011;Villabuurt-oost;63;7;1;1;0;1;4;0
+2011;Helpman-oost;64;19;0;21;5;15;15;18
+2011;Coendersborg;65;15;1;10;2;2;8;4
+2011;De Wijert-noord;66;19;2;24;1;21;27;12
+2011;De Wijert-zuid;67;14;1;4;1;8;11;0
+2011;Villabuurt-west;68;1;0;2;0;2;1;0
+2011;Woonwagenkamp 'Helpman';69;0;0;0;0;0;0;0
+2011;Laanhuizen;70;2;1;22;1;15;7;2
+2011;Grunobuurt;71;3;0;20;2;7;8;2
+2011;Corpus den Hoorn-noord;72;10;2;23;3;37;38;7
+2011;Corpus den Hoorn-zuid;73;49;1;27;10;31;22;4
+2011;Stadspark;74;6;0;8;1;7;6;5
+2011;Peizerweg;75;0;0;0;1;3;3;0
+2011;Woonwagenkamp 'De Kring';79;0;0;1;0;3;1;0
+2011;Hoogkerk-dorp;80;9;1;4;0;1;17;2
+2011;Hoogkerk-zuid;81;23;1;7;0;22;34;7
+2011;Vierverlaten;82;0;0;1;1;0;2;0
+2011;Leegkerk;83;11;0;1;1;6;5;2
+2011;Dorkwerd;84;9;0;3;1;6;5;2
+2011;Bangeweer;85;2;0;5;2;5;4;1
+2011;De Held;86;6;1;6;0;2;2;3
+2011;Zuidwending;87;0;0;0;0;0;0;1
+2011;Oosterhoogebrug;90;13;1;12;2;5;21;4
+2011;Lewenborg-zuid;91;13;0;8;0;4;25;10
+2011;Lewenborg-noord;92;12;2;18;1;7;50;20
+2011;Lewenborg-west;93;7;1;5;0;5;17;5
+2011;Bovenstreek;94;0;1;11;0;4;2;5
+2011;Beijum-oost;95;52;1;26;0;9;60;24
+2011;Beijum-west;96;46;3;45;0;14;43;18
+2011;Ulgersmabuurt;97;44;1;16;0;14;34;13
+2011;Ruischerbrug;98;6;0;3;0;5;5;2
+2012;Stadscentrum;0;28;0;334;6;16;46;111
+2012;Binnenstad-zuid;1;71;5;413;21;42;124;199
+2012;Binnenstad-oost;2;24;2;68;1;24;31;5
+2012;Binnenstad-west;3;24;1;57;2;4;14;11
+2012;Binnenstad-noord;4;51;4;134;5;41;35;14
+2012;Schildersbuurt;10;67;2;166;7;36;82;15
+2012;Zeeheldenbuurt;11;37;1;286;2;27;38;27
+2012;Friesestraatweg;12;1;1;1;2;0;2;1
+2012;Kostverloren;13;14;1;28;2;13;18;6
+2012;Vinkhuizen-zuid;14;36;2;22;1;25;34;27
+2012;Vinkhuizen-noord;15;42;1;75;0;29;37;17
+2012;Hoendiep;16;0;1;5;1;4;7;8
+2012;Oranjebuurt;20;43;1;145;0;38;50;16
+2012;Concordiabuurt;21;6;0;27;0;6;21;3
+2012;Selwerd;22;48;1;117;2;19;45;22
+2012;Paddepoel-zuid;23;17;3;53;2;19;78;6
+2012;Paddepoel-noord;24;48;0;47;0;23;26;12
+2012;Noorderhoogebrug;25;2;1;1;0;0;0;3
+2012;Universiteitscomplex;26;0;0;10;3;2;1;2
+2012;Koningslaagte;27;0;0;0;0;1;0;0
+2012;West-Indische buurt;30;4;3;16;1;8;11;8
+2012;De Hoogte;31;41;0;79;1;34;32;14
+2012;Oost-Indische buurt;32;39;1;98;1;24;50;29
+2012;Korrewegbuurt;33;30;2;153;4;25;45;13
+2012;Gorechtbuurt;40;35;1;189;1;42;54;19
+2012;Oosterparkbuurt;41;21;2;26;1;8;29;13
+2012;Bloemenbuurt;42;14;1;15;0;2;18;18
+2012;Florabuurt;43;30;0;18;1;9;19;7
+2012;Damsterbuurt;44;8;0;16;2;9;8;1
+2012;Oosterpoortbuurt;50;43;0;78;2;11;30;11
+2012;Industriebuurt;51;29;1;51;9;47;19;13
+2012;Euvelgunne;52;1;3;10;6;14;15;8
+2012;Middelbert;53;2;0;0;0;0;2;0
+2012;Engelbert;54;0;0;1;0;1;4;2
+2012;Roodehaan;55;0;0;0;1;1;1;1
+2012;Woonschepenhaven;59;0;0;0;0;1;3;1
+2012;Herewegbuurt;60;21;0;56;2;16;20;6
+2012;Rivierenbuurt;61;18;0;82;0;23;20;4
+2012;Helpman-west;62;17;1;35;6;26;15;5
+2012;Villabuurt-oost;63;9;1;2;0;0;2;0
+2012;Helpman-oost;64;21;2;45;1;28;21;13
+2012;Coendersborg;65;26;0;18;1;5;21;1
+2012;De Wijert-noord;66;16;2;28;2;25;35;14
+2012;De Wijert-zuid;67;22;1;6;0;4;10;2
+2012;Villabuurt-west;68;4;0;1;0;2;2;0
+2012;Woonwagenkamp 'Helpman';69;0;0;0;0;0;0;0
+2012;Laanhuizen;70;1;1;24;2;6;11;0
+2012;Grunobuurt;71;5;0;17;0;9;13;3
+2012;Corpus den Hoorn-noord;72;20;2;24;4;23;41;8
+2012;Corpus den Hoorn-zuid;73;33;0;17;5;15;20;12
+2012;Stadspark;74;5;1;6;4;8;6;1
+2012;Peizerweg;75;0;0;0;3;1;1;1
+2012;Woonwagenkamp 'De Kring';79;0;0;0;0;0;0;0
+2012;Hoogkerk-dorp;80;5;2;4;0;3;20;6
+2012;Hoogkerk-zuid;81;14;2;8;0;19;20;7
+2012;Vierverlaten;82;0;0;1;0;0;2;0
+2012;Leegkerk;83;4;1;2;0;6;5;2
+2012;Dorkwerd;84;4;0;3;1;11;7;5
+2012;Bangeweer;85;1;0;3;0;19;3;0
+2012;De Held;86;3;0;7;0;2;11;4
+2012;Zuidwending;87;0;0;0;0;1;2;0
+2012;Oosterhoogebrug;90;22;1;19;2;8;19;2
+2012;Lewenborg-zuid;91;11;0;9;1;3;23;6
+2012;Lewenborg-noord;92;11;1;14;1;2;30;17
+2012;Lewenborg-west;93;12;0;13;0;2;8;3
+2012;Bovenstreek;94;1;0;8;1;2;6;6
+2012;Beijum-oost;95;18;2;24;1;8;87;30
+2012;Beijum-west;96;26;3;25;0;6;39;18
+2012;Ulgersmabuurt;97;36;2;19;2;13;30;9
+2012;Ruischerbrug;98;2;1;6;0;5;8;1

@@ -73,6 +73,34 @@ object TestSpec {
     country: String
   )
 
+  final case class ElectionCandidate(
+    txn_nm: String,
+    nom_ty: String,
+    state_ab: String,
+    div_nm: String,
+    ticket: String,
+    ballot_position: String,
+    surname: String,
+    ballot_given_nm: String,
+    party_ballot_nm: String,
+    occupation: String,
+    address_1: String,
+    address_2: String,
+    postcode: String,
+    suburb: String,
+    address_state_ab: String,
+    contact_work_ph: String,
+    contact_home_ph: String,
+    postal_address_1: String,
+    postal_address_2: String,
+    postal_suburb: String,
+    postal_postcode: String,
+    contact_fax: String,
+    postal_state_ab: String,
+    contact_mobile_no: String,
+    contact_email: String
+  )
+
   def mapToTransaction(xs: Array[String]) =
     Transaction(xs(2).toInt, xs(3).toInt, xs(4).toInt, xs(5).toDouble, strToSqlTime(xs(0).trim + " " + xs(1).trim))
 
@@ -118,6 +146,9 @@ object TestSpec {
   final val OrdersParquet = "src/test/resources/orders.parquet"
   final val CustomersParquet = "src/test/resources/customers.parquet"
   final val TranscationsCSV = "src/test/resources/data_transactions.csv"
+  final val FederalElectionCandidatesCSV = "src/test/resources/2016federalelection-all-candidates-nat-30-06-924.csv"
+  final val AangifteGroningenCSV = "src/test/resources/aangifte_groningen.csv"
+  final val AfvalContainersGroningenCSV = "src/test/resources/afvalcontainers_groningen.csv"
 }
 
 abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
@@ -136,6 +167,8 @@ abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures with Be
     .config("spark.sql.autoBroadcastJoinThreshold", 1)
     .config("spark.default.parallelism", 4) // number of cores
     .config("spark.sql.shuffle.partitions", 1) // default 200
+    .config("spark.memory.offHeap.enabled", "true") // If true, Spark will attempt to use off-heap memory for certain operations.
+    .config("spark.memory.offHeap.size", "536870912") // The absolute amount of memory in bytes which can be used for off-heap allocation.
     // see: https://spark.apache.org/docs/latest/sql-programming-guide.html#caching-data-in-memory
     //    .config("spark.sql.inMemoryColumnarStorage.compressed", "true")
     //    .config("spark.sql.inMemoryColumnarStorage.batchSize", "10000")

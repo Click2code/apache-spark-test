@@ -42,6 +42,8 @@ lazy val deps = {
       "com.github.fommil.netlib" % "all" % "1.1.2",
       "org.apache.spark" %% "spark-tags" % SparkVersion,
       "org.apache.spark" %% "spark-streaming" % SparkVersion,
+      "com.databricks" %% "spark-csv" % "1.4.0",
+      "com.databricks" %% "spark-xml" % "0.3.3",
       "com.typesafe.akka" %% "akka-actor" % AkkaVersion,
       "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
       "com.typesafe.akka" %% "akka-http-spray-json-experimental" % AkkaVersion,
