@@ -14,6 +14,11 @@ licenses += ("Apache-2.0", url("http://opensource.org/licenses/apache2.0.php"))
 
 lazy val jobs = (project in file("jobs"))
   .settings(SbtHeaderConf.settings ++ ScalariformConf.settings ++ commonSettings)
+  .dependsOn(datasources)
+  .enablePlugins(AutomateHeaderPlugin)
+
+lazy val datasources = (project in file("datasources"))
+  .settings(SbtHeaderConf.settings ++ ScalariformConf.settings ++ commonSettings)
   .enablePlugins(AutomateHeaderPlugin)
 
 lazy val helloworld = (project in file("helloworld"))
