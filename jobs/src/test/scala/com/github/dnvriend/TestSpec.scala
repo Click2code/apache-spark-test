@@ -163,7 +163,7 @@ abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures with Be
     .config("spark.sql.warehouse.dir", "file:/tmp/spark-warehouse")
     .config("spark.scheduler.mode", "FAIR")
     .config("spark.sql.crossJoin.enabled", "true")
-    .config("spark.ui.enabled", "false")
+    .config("spark.ui.enabled", "true") // better to enable this to see what is going on
     .config("spark.sql.autoBroadcastJoinThreshold", 1)
     .config("spark.default.parallelism", 4) // number of cores
     .config("spark.sql.shuffle.partitions", 1) // default 200
@@ -172,7 +172,7 @@ abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures with Be
     // see: https://spark.apache.org/docs/latest/sql-programming-guide.html#caching-data-in-memory
     //    .config("spark.sql.inMemoryColumnarStorage.compressed", "true")
     //    .config("spark.sql.inMemoryColumnarStorage.batchSize", "10000")
-    .master("local")
+    .master("local[2]") // better not to set this to 2 for spark-streaming
     .appName("test").getOrCreate()
 
   def withSc(f: SparkContext => Unit): Unit =
@@ -183,12 +183,18 @@ abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures with Be
 
   def withTx(f: SparkSession => Dataset[Transaction] => Unit): Unit = withSpark { spark =>
     import spark.implicits._
-    f(spark)(spark.read.parquet(TestSpec.Transactions).as[Transaction])
+    f(spark)(spark
+      .read
+      .option("mergeSchema", "false")
+      .parquet(TestSpec.Transactions).as[Transaction])
   }
 
   def withTrees(f: SparkSession => Dataset[Tree] => Unit): Unit = withSpark { spark =>
     import spark.implicits._
-    f(spark)(spark.read.parquet(TestSpec.TreesParquet).as[Tree])
+    f(spark)(spark
+      .read
+      .option("mergeSchema", "false")
+      .parquet(TestSpec.TreesParquet).as[Tree])
   }
 
   override protected def afterAll(): Unit = {

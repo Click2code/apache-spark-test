@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package com.github.dnvriend.spark.datasource
+package com.github.dnvriend.spark.datasources.helloworld
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.sources.{ BaseRelation, DataSourceRegister, RelationProvider, TableScan }
 import org.apache.spark.sql.types.{ StringType, StructField, StructType }
 import org.apache.spark.sql.{ Row, SQLContext }
 
-class helloworld extends RelationProvider with DataSourceRegister {
-  override def shortName(): String = "tickets"
+class HelloWorldDataSource extends RelationProvider with DataSourceRegister with Serializable {
+  override def shortName(): String = "helloworld"
+
+  override def hashCode(): Int = getClass.hashCode()
+
+  override def equals(other: scala.Any): Boolean = other.isInstanceOf[HelloWorldDataSource]
+
+  override def toString: String = "HelloWorldDataSource"
 
   override def createRelation(sqlContext: SQLContext, parameters: Map[String, String]): BaseRelation = {
     val path = parameters.get("path")

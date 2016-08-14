@@ -1,0 +1,2 @@
+com.github.dnvriend.spark.datasources.helloworld.HelloWorldDataSource
+com.github.dnvriend.spark.datasources.person.PersonDataSource

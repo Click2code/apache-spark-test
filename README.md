@@ -1677,7 +1677,24 @@ InMemoryTableScan [PurchaseID#103, Supplier#104, PurchaseType#105, PurchaseAmt#1
 :     :     +- LocalTableScan [PurchaseID#103, Supplier#104, PurchaseType#105, PurchaseAmt#106, PurchaseDate#107]
 ```
 
-# Parquet
+## Importing from files
+- [Original article](https://databricks.gitbooks.io/databricks-spark-reference-applications/content/logs_analyzer/chapter2/importing_from_files.html)
+
+To support batch import of data on a Spark cluster, the data needs to be accessible by all machines on the cluster. Files that are only accessible on one worker machine and cannot be read by the others will cause failures.
+
+If you have a small dataset that can fit on one machine, you could manually copy your files onto all the nodes on your Spark cluster, perhaps using _rsync_ to make that easier.
+
+__NFS__ or some other network file system makes sure all your machines can access the same files without requiring you to copy the files around. But NFS isn't fault tolerant to machine failures and if your dataset is too big to fit on one NFS volume - you'd have to store the data on multiple volumes and figure out which volume a particular file is on - which could get cumbersome.
+
+__HDFS__, __S3__ and __EMRF__ are all great file systems for massive datasets - built to store a lot of data and give all the machines on the cluster access to those files, while still being fault tolerant.
+
+__S3__ and __EMRFS__ are an Amazon AWS solution for storing files in the cloud, easily accessible to anyone who signs up for an account.
+
+__HDFS__ is a distributed file system that is part of __Hadoop__ and can be installed on your own datacenters.
+
+The good news is that regardless of which of these file systems you choose, you can run the same code to read from them - these file systems are all _Hadoop compatible_ file systems.
+
+## Parquet
 [Parquet][parquet] is an efficient _columnar_ storage format that is used by Spark SQL to improve the analysis of any processing pipeline for structured data. It wins over JSON. It has compact binary encoding with intelligent compression.
 
 Parquet uses a columnar storage format which means that each column is stored separately with an index that allows skipping of unread columns.
@@ -1688,7 +1705,30 @@ Data skipping for statistics, column, min, max, etc.
 
 The data used in web and scientific computing is often nonrelational. Hence, a flexible data model is essential in these domains. Data structures used in programming languages, messages exchanged by distributed systems, structured documents, etc. lend themselves naturally to a nested representation. Normalizing and recombining such data at web scale is usually prohibitive. A nested data model underlies most of structured data processing at Google and reportedly at other major web companies.
 
-# ORC format
+## Parquet, Spark and S3
+- [Blog - The Bleeding Edge: Spark, Parquet and S3](https://www.appsflyer.com/blog/the-bleeding-edge-spark-parquet-and-s3/)
+
+Amazon S3 (Simple Storage Services) is an object storage solution that is relatively cheap to use. It does have a few _disadvantages_ vs. a _real_ file system; the major one is __eventual consistency__ i.e. changes made by one process are not immediately visible to other applications. If you are using [Amazon’s Elastic MapReduce (EMR)](https://aws.amazon.com/emr/), you can use EMRFS __consistent view__ to overcome this. However, if you understand this limitation, S3 is still a viable input and output source, at least for batch jobs.
+
+Spark __doesn’t__ have a native S3 implementation and relies on Hadoop classes to abstract the data access to Parquet. __Hadoop__ provides 3 file system clients to S3:
+
+- __S3 block file system__: (URI schema of the form `s3://..`, which doesn’t seem to work with Spark
+- __S3 native file system__: `s3n://..` URIs – download  Spark distribution that supports Hadoop 2.* and up if you want to use this __(tl;dr – you don’t)__
+- __s3a__: – a replacement for `s3n` that removes some of the limitations and problems of s3n. Download Spark with Hadoop 2.6 and up to use this one
+
+Finding the right S3 Hadoop library contributes to the stability of our jobs but regardless of S3 library (s3n or s3a) __the performance of Spark jobs that use Parquet files using S3 was abysmal.__ When looking at the Spark UI, the actual work of handling the data seemed quite reasonable but Spark spent a huge amount of time before actually starting the work and after the job was “completed” before it actually terminated. We like to call this phenomena _the Parquet Tax._
+
+## HDFS
+Hadoop File System (HDFS) is a file system that is meant for storing large data sets and being fault tolerant. In a production system, your Spark cluster should ideally be on the same machines as your Hadoop cluster to make it easy to read files. The Spark binary you run on your clusters must be compiled with the same HDFS version as the one you wish to use.
+
+There are many ways to install HDFS, but heading to the [Hadoop homepage](http://hadoop.apache.org/) and reading the [Hadoop documentation](http://hadoop.apache.org/docs/current/index.html) is one way to get started and run hdfs locally on your machine.
+
+Hadoop can be installed as a [Single Node](http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/SingleCluster.html) or as a [Cluster](http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/ClusterSetup.html)
+
+## EMRFS
+[EMRFS](http://docs.aws.amazon.com/ElasticMapReduce/latest/DeveloperGuide/emr-fs.html) is an implementation of HDFS which allows EMR clusters to store data on Amazon S3.
+
+## ORC format
 The [Optimized Row Columnar (ORC)](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+ORC) file format provides a highly efficient way to store Hive data. It was designed to overcome limitations of the other Hive file formats.
 
 Using ORC files improves performance when Hive is reading, writing, and processing data.

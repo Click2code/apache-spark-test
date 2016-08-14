@@ -1,0 +1,9 @@
+<people>
+    <person id="1" name="Jonathan Archer" age="41"/>
+    <person id="2" name="Reginald Barclay" age="45"/>
+    <person id="3" name="Julian Bashir" age="28"/>
+    <person id="4" name="Pavel Chekov" age="52"/>
+    <person id="5" name="Beverly Crusher" age="32"/>
+    <person id="6" name="Jadzia Dax" age="21"/>
+    <person id="7" name="Geordi La Forge" age="35"/>
+</people>

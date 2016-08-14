@@ -14,24 +14,25 @@
  * limitations under the License.
  */
 
-package com.github.dnvriend.spark.datasource
+package com.github.dnvriend.spark.datasources
 
 import com.github.dnvriend.TestSpec
 
-class HelloWorldTest extends TestSpec {
-  it should "read from helloworld" in withSpark { spark =>
+class PersonDataSourceTest extends TestSpec {
+  it should "read a simple person xml file using a custom data source" in withSpark { spark =>
     import spark.implicits._
     val result = spark.read
-      .format("com.github.dnvriend.spark.datasource.helloworld")
-      .option("message", "hi there!")
-      .option("name", "Dennis")
-      .load("/tmp/foobar.csv")
+      .format("person")
+      .load("src/test/resources/people.xml")
 
-    result.as[(String, String)].collect shouldBe Array(
-      ("path", "/tmp/foobar.csv"),
-      ("message", "hi there!"),
-      ("name", "Hello Dennis"),
-      ("hello_world", "Hello World!")
+    result.as[(Long, String, Int)].collect shouldBe Seq(
+      (1, "Jonathan Archer", 41),
+      (2, "Reginald Barclay", 45),
+      (3, "Julian Bashir", 28),
+      (4, "Pavel Chekov", 52),
+      (5, "Beverly Crusher", 32),
+      (6, "Jadzia Dax", 21),
+      (7, "Geordi La Forge", 35)
     )
   }
 }
