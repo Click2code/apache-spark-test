@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.github.dnvriend.spark.dataset
+package com.github.dnvriend.spark.job
 
 import com.github.dnvriend.TestSpec
 import com.github.dnvriend.spark.CalculatePi
 
 class CalculatePiTest extends TestSpec {
-  it should "calculate pi" in withSc { sc =>
+  it should "calculate pi" in withSparkContext { sc =>
     CalculatePi(sc) shouldBe a[java.lang.Long]
   }
 }

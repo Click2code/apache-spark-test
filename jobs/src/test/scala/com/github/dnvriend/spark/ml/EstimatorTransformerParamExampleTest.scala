@@ -24,7 +24,7 @@ import org.apache.spark.sql.{ DataFrame, Row }
 
 class EstimatorTransformerParamExampleTest extends TestSpec {
 
-  it should "EstimatorTransformerParamExample" in withSpark { spark =>
+  it should "EstimatorTransformerParamExample" in withSparkSession { spark =>
     import spark.implicits._
 
     // Prepare training data from a list of (label, features) tuples.

@@ -23,7 +23,8 @@ import akka.util.Timeout
 import com.github.dnvriend.TestSpec.{ Transaction, Tree }
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.{ Dataset, SparkSession }
-import org.scalatest.concurrent.ScalaFutures
+import org.apache.spark.streaming.{ ClockWrapper, Seconds, StreamingContext }
+import org.scalatest.concurrent.{ Eventually, ScalaFutures }
 import org.scalatest.{ BeforeAndAfterAll, FlatSpec, Matchers }
 
 import scala.concurrent.ExecutionContext
@@ -149,14 +150,15 @@ object TestSpec {
   final val FederalElectionCandidatesCSV = "src/test/resources/2016federalelection-all-candidates-nat-30-06-924.csv"
   final val AangifteGroningenCSV = "src/test/resources/aangifte_groningen.csv"
   final val AfvalContainersGroningenCSV = "src/test/resources/afvalcontainers_groningen.csv"
+  final val ScrabbleDictionaryCSV = "src/test/resources/scrabble_dictionary.csv.gz"
 }
 
-abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll {
+abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures with BeforeAndAfterAll with Eventually {
   implicit val system: ActorSystem = ActorSystem()
   implicit val mat: Materializer = ActorMaterializer()
   implicit val ec: ExecutionContext = system.dispatcher
   implicit val log: LoggingAdapter = Logging(system, this.getClass)
-  implicit val pc: PatienceConfig = PatienceConfig(timeout = 5.minutes)
+  implicit val pc: PatienceConfig = PatienceConfig(timeout = 5.minutes, 1.second)
   implicit val timeout = Timeout(5.minutes)
 
   private val _spark = SparkSession.builder()
@@ -169,30 +171,46 @@ abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures with Be
     .config("spark.sql.shuffle.partitions", 1) // default 200
     .config("spark.memory.offHeap.enabled", "true") // If true, Spark will attempt to use off-heap memory for certain operations.
     .config("spark.memory.offHeap.size", "536870912") // The absolute amount of memory in bytes which can be used for off-heap allocation.
+    .config("spark.streaming.clock", "org.apache.spark.streaming.util.ManualClock")
+    .config("spark.streaming.stopSparkContextByDefault", "false")
     // see: https://spark.apache.org/docs/latest/sql-programming-guide.html#caching-data-in-memory
     //    .config("spark.sql.inMemoryColumnarStorage.compressed", "true")
     //    .config("spark.sql.inMemoryColumnarStorage.batchSize", "10000")
     .master("local[2]") // better not to set this to 2 for spark-streaming
-    .appName("test").getOrCreate()
+    .appName("spark-sql-test").getOrCreate()
 
-  def withSc(f: SparkContext => Unit): Unit =
+  def withSparkContext[A](f: SparkContext => A): A =
     f(_spark.newSession().sparkContext)
 
-  def withSpark(f: SparkSession => Unit): Unit =
+  def withSparkSession[A](f: SparkSession => A): A =
     f(_spark.newSession())
 
-  def withTx(f: SparkSession => Dataset[Transaction] => Unit): Unit = withSpark { spark =>
+  def withStreamingContext[A](seconds: Long = 1)(f: SparkSession => StreamingContext => A): A = withSparkSession { spark =>
+    val ssc = new StreamingContext(spark.sparkContext, Seconds(seconds))
+    try f(spark)(ssc) finally stopStreamingContext(ssc)
+  }
+
+  def advanceClock(ssc: StreamingContext, timeToAdd: FiniteDuration): Unit = {
+    ClockWrapper.advance(ssc, timeToAdd)
+  }
+
+  def advanceClockOneBatch(ssc: StreamingContext): Unit = {
+    advanceClock(ssc, 1.second)
+  }
+
+  def stopStreamingContext(ssc: StreamingContext): Unit =
+    ssc.stop()
+
+  def withTx(f: SparkSession => Dataset[Transaction] => Unit): Unit = withSparkSession { spark =>
     import spark.implicits._
-    f(spark)(spark
-      .read
+    f(spark)(spark.read
       .option("mergeSchema", "false")
       .parquet(TestSpec.Transactions).as[Transaction])
   }
 
-  def withTrees(f: SparkSession => Dataset[Tree] => Unit): Unit = withSpark { spark =>
+  def withTrees(f: SparkSession => Dataset[Tree] => Unit): Unit = withSparkSession { spark =>
     import spark.implicits._
-    f(spark)(spark
-      .read
+    f(spark)(spark.read
       .option("mergeSchema", "false")
       .parquet(TestSpec.TreesParquet).as[Tree])
   }

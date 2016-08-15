@@ -24,7 +24,7 @@ import org.apache.spark.sql.Row
 
 class PipelineExampleTest extends TestSpec {
 
-  it should "PipelineExample" in withSpark { spark =>
+  it should "PipelineExample" in withSparkSession { spark =>
     import spark.implicits._
 
     // Prepare training documents from a list of (id, text, label) tuples.

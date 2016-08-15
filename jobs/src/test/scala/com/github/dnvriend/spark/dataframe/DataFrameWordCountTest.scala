@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.github.dnvriend.spark.dataset
+package com.github.dnvriend.spark.dataframe
 
 import com.github.dnvriend.TestSpec
 import org.apache.spark.sql.{ DataFrame, Dataset }
 
 class DataFrameWordCountTest extends TestSpec {
-  it should "wordcount alice in wonderland" in withSpark { spark =>
-    import spark.implicits._
+  it should "wordcount alice in wonderland" in withSparkSession { spark =>
     import org.apache.spark.sql.functions._
+    import spark.implicits._
     val lines: Dataset[String] = spark.read.text(TestSpec.AliceInWonderlandText).as[String]
     lines.count shouldBe 3599 // alice in wonderland contains 3599 lines
     val words: DataFrame = lines.flatMap((line: String) => line.split(" ")).map(_.trim).filter(_.nonEmpty).toDF("word")

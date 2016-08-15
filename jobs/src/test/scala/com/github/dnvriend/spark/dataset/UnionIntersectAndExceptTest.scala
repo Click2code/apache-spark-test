@@ -25,14 +25,14 @@ class UnionIntersectAndExceptTest extends TestSpec {
   lazy val p3 = Person(3, "baz", 41)
 
   // Returns a new Dataset containing union of rows in this Dataset and another Dataset.
-  it should "union datasets" in withSpark { spark =>
+  it should "union datasets" in withSparkSession { spark =>
     import spark.implicits._
     val ds1 = Seq(p1).toDS()
     val ds2 = Seq(p2).toDS()
     ds1.union(ds2).collect shouldBe Seq(p1, p2)
   }
 
-  it should "union multiple datasets" in withSpark { spark =>
+  it should "union multiple datasets" in withSparkSession { spark =>
     import spark.implicits._
     val ds1 = Seq(p1).toDS
     val ds2 = Seq(p2).toDS
@@ -46,14 +46,14 @@ class UnionIntersectAndExceptTest extends TestSpec {
 
   //intersect returns distinct rows that are output by both LEFT and RIGHT result
   // Returns a new Dataset containing rows only in both this Dataset and another Dataset
-  it should "intersect" in withSpark { spark =>
+  it should "intersect" in withSparkSession { spark =>
     import spark.implicits._
     val ds1 = Seq(p1).toDS
     val ds2 = Seq(p2).toDS
     ds1.intersect(ds2).collect shouldBe Nil
   }
 
-  it should "intersect when corresponding rows" in withSpark { spark =>
+  it should "intersect when corresponding rows" in withSparkSession { spark =>
     import spark.implicits._
     val ds1 = Seq(p1).toDS
     val ds2 = Seq(p1).toDS
@@ -62,35 +62,35 @@ class UnionIntersectAndExceptTest extends TestSpec {
 
   // EXCEPT returns distinct rows from the LEFT result that aren't output by the RIGHT result
   // Returns a new Dataset containing rows in this Dataset but not in another Dataset.
-  it should "except only p1 for ds1=Seq(p1) and ds2=Seq(p2)" in withSpark { spark =>
+  it should "except only p1 for ds1=Seq(p1) and ds2=Seq(p2)" in withSparkSession { spark =>
     import spark.implicits._
     val ds1 = Seq(p1).toDS
     val ds2 = Seq(p2).toDS
     ds1.except(ds2).collect shouldBe Seq(p1)
   }
 
-  it should "except only p1 when ds1=Seq(p1, p2) and ds2=Seq(p2)" in withSpark { spark =>
+  it should "except only p1 when ds1=Seq(p1, p2) and ds2=Seq(p2)" in withSparkSession { spark =>
     import spark.implicits._
     val ds1 = Seq(p1, p2).toDS
     val ds2 = Seq(p2).toDS
     ds1.except(ds2).collect shouldBe Seq(p1)
   }
 
-  it should "except only p2 when ds1=Seq(p1, p2) and ds2=Seq(p1)" in withSpark { spark =>
+  it should "except only p2 when ds1=Seq(p1, p2) and ds2=Seq(p1)" in withSparkSession { spark =>
     import spark.implicits._
     val ds1 = Seq(p1, p2).toDS
     val ds2 = Seq(p1).toDS
     ds1.except(ds2).collect shouldBe Seq(p2)
   }
 
-  it should "except Nil when ds1=Seq(p1, p2) and ds2=Seq(p1, p2)" in withSpark { spark =>
+  it should "except Nil when ds1=Seq(p1, p2) and ds2=Seq(p1, p2)" in withSparkSession { spark =>
     import spark.implicits._
     val ds1 = Seq(p1, p2).toDS
     val ds2 = Seq(p1, p2).toDS
     ds1.except(ds2).collect shouldBe Nil
   }
 
-  it should "except Nil when ds1=Seq(p1, p2) and ds2=Seq(p2, p1)" in withSpark { spark =>
+  it should "except Nil when ds1=Seq(p1, p2) and ds2=Seq(p2, p1)" in withSparkSession { spark =>
     import spark.implicits._
     val ds1 = Seq(p1, p2).toDS
     val ds2 = Seq(p2, p1).toDS

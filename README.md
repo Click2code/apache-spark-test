@@ -2011,6 +2011,7 @@ Jupyter is a Python based notebook.
 - [Cloudera - How to tune your Apache Spark jobs part2](http://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-2/)
 - [Knoldus - DataFrame word count](https://blog.knoldus.com/2015/10/21/using-spark-dataframes-for-word-count/)
 - [Writing a custom spark data source](http://blog.hydronitrogen.com/2015/12/04/writing-a-spark-data-source/)
+- [Demystifying Asynchronous Actions in Spark](https://blog.knoldus.com/2015/10/21/demystifying-asynchronous-actions-in-spark/)
 
 # Slide Decks
 - [Spark shuffle introduction](http://www.slideshare.net/colorant/spark-shuffle-introduction)

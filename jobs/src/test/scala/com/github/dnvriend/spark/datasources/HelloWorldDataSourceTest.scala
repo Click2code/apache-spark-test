@@ -17,9 +17,10 @@
 package com.github.dnvriend.spark.datasources
 
 import com.github.dnvriend.TestSpec
+import com.github.dnvriend.spark.datasources.SparkImplicits._
 
 class HelloWorldDataSourceTest extends TestSpec {
-  it should "read from helloworld" in withSpark { spark =>
+  it should "read from helloworld" in withSparkSession { spark =>
     import spark.implicits._
     val result = spark.read
       .format("com.github.dnvriend.spark.datasources.helloworld.HelloWorldDataSource")
@@ -35,13 +36,28 @@ class HelloWorldDataSourceTest extends TestSpec {
     )
   }
 
-  it should "read from helloworld using shortname" in withSpark { spark =>
+  it should "read from helloworld using shortname" in withSparkSession { spark =>
     import spark.implicits._
     val result = spark.read
       .format("helloworld")
       .option("message", "hi there!")
       .option("name", "Dennis")
       .load("/tmp/foobar.csv")
+
+    result.as[(String, String)].collect shouldBe Array(
+      ("path", "/tmp/foobar.csv"),
+      ("message", "hi there!"),
+      ("name", "Hello Dennis"),
+      ("hello_world", "Hello World!")
+    )
+  }
+
+  it should "read from helloworld using implicit conversion of DataFrameReader" in withSparkSession { spark =>
+    import spark.implicits._
+    val result = spark.read
+      .option("message", "hi there!")
+      .option("name", "Dennis")
+      .helloworld("/tmp/foobar.csv")
 
     result.as[(String, String)].collect shouldBe Array(
       ("path", "/tmp/foobar.csv"),

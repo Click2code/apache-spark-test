@@ -21,7 +21,7 @@ import org.apache.spark.rdd.RDD
 
 class TransactionsTest extends TestSpec {
 
-  it should "parse data_transactions" in withSpark { spark =>
+  it should "parse data_transactions" in withSparkSession { spark =>
     import spark.implicits._
     val tx = spark.sparkContext.textFile(TestSpec.TranscationsCSV)
       .map(_.split("#")).map(TestSpec.mapToTransaction).toDS

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.github.dnvriend.spark.dataset
+package com.github.dnvriend.spark.rdd
 
 import com.github.dnvriend.TestSpec
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
 class RDDTest extends TestSpec {
-  def withRDD(f: SparkContext => RDD[Int] => Unit): Unit = withSc { sc =>
+  def withRDD(f: SparkContext => RDD[Int] => Unit): Unit = withSparkContext { sc =>
     val data = Array(1, 2, 3, 4, 5)
     val rdd = sc.parallelize(data)
     f(sc)(rdd)

@@ -29,13 +29,13 @@ class DatasetTest extends TestSpec {
     Person(5, "bab", 50)
   )
 
-  it should "typed Dataset operations: count" in withSpark { spark =>
+  it should "typed Dataset operations: count" in withSparkSession { spark =>
     import spark.implicits._
     val ds: Dataset[Person] = xs.toDS()
     ds.count() shouldBe 5
   }
 
-  it should "untyped Dataset operations: (aka DataFrame, everything is a Row)" in withSpark { spark =>
+  it should "untyped Dataset operations: (aka DataFrame, everything is a Row)" in withSparkSession { spark =>
     import spark.implicits._
     val ds = xs.toDS()
     ds.createOrReplaceTempView("people")
@@ -43,20 +43,20 @@ class DatasetTest extends TestSpec {
       .head.getLong(0) shouldBe 5
   }
 
-  it should "count SQL, convert back to typed with .as[Long]" in withSpark { spark =>
+  it should "count SQL, convert back to typed with .as[Long]" in withSparkSession { spark =>
     import spark.implicits._
     val ds = xs.toDS()
     ds.createOrReplaceTempView("people")
     ds.sqlContext.sql("SELECT COUNT(*) FROM people").as[Long].head() shouldBe 5
   }
 
-  it should "count using dataset operations" in withSpark { spark =>
+  it should "count using dataset operations" in withSparkSession { spark =>
     import spark.implicits._
     val ds = xs.toDS()
     ds.count() shouldBe 5
   }
 
-  it should "filter a ds" in withSpark { spark =>
+  it should "filter a ds" in withSparkSession { spark =>
     import spark.implicits._
     val ds = xs.toDS()
     ds.filter(_.age < 30).count shouldBe 2
@@ -64,17 +64,17 @@ class DatasetTest extends TestSpec {
     ds.filter(_.age >= 30).count shouldBe 3
   }
 
-  it should "load people parquet" in withSpark { spark =>
+  it should "load people parquet" in withSparkSession { spark =>
     val people = spark.read.parquet(TestSpec.PersonsParquet)
     people.count shouldBe 5
   }
 
-  it should "load purchase_items parquet" in withSpark { spark =>
+  it should "load purchase_items parquet" in withSparkSession { spark =>
     val people = spark.read.parquet(TestSpec.PurchaseItems)
     people.count shouldBe 25
   }
 
-  it should "load transactions parquet" in withSpark { spark =>
+  it should "load transactions parquet" in withSparkSession { spark =>
     import spark.implicits._
     val tx = spark.read.parquet(TestSpec.Transactions).as[Transaction]
     tx.count shouldBe 1000

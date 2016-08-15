@@ -21,7 +21,7 @@ import org.apache.spark.sql.{ Column, DataFrame }
 
 class QueryPeopleTest extends TestSpec {
 
-  it should "query using DSL" in withSpark { spark =>
+  it should "query using DSL" in withSparkSession { spark =>
     import spark.implicits._
     import org.apache.spark.sql.functions._
 

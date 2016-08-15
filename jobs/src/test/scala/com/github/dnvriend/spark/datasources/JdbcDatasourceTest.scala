@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dnvriend.spark.dataset
+package com.github.dnvriend.spark.datasources
 
 import com.github.dnvriend.TestSpec
 import com.github.dnvriend.TestSpec.Order
@@ -29,7 +29,7 @@ class JdbcDatasourceTest extends TestSpec {
     "password" -> "root"
   )
 
-  it should "join JDBC and parquet" in withSpark { spark =>
+  it should "join JDBC and parquet" in withSparkSession { spark =>
     import spark.implicits._
     val orders = spark.read.parquet(TestSpec.OrdersParquet).as[Order].cache()
     val customers = spark.read.format("jdbc").options(jdbcOptions).load().cache()

@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.github.dnvriend.spark.dataset
+package com.github.dnvriend.spark.datasources
 
 import com.github.dnvriend.TestSpec
 import com.github.dnvriend.TestSpec.ElectionCandidate
+import com.github.dnvriend.spark.datasources.SparkImplicits._
 
-class DatabricksCsvDatasourceTest extends TestSpec {
+class CsvDatasourceTest extends TestSpec {
 
-  it should "read a CSV" in withSpark { spark =>
-    import spark.implicits._
+  it should "read a CSV" in withSparkSession { spark =>
     import org.apache.spark.sql.functions._
+    import spark.implicits._
 
     val aangifte = spark.read
       .format("com.databricks.spark.csv")
@@ -81,4 +82,28 @@ class DatabricksCsvDatasourceTest extends TestSpec {
       )
   }
 
+  it should "read compressed CSV" in withSparkSession { spark =>
+    import spark.implicits._
+    spark.read
+      .format("com.databricks.spark.csv")
+      .option("header", "false") // Use first line of all files as header
+      .option("inferSchema", "false") // Automatically infer data types
+      .option("delimiter", ",")
+      .load(TestSpec.ScrabbleDictionaryCSV)
+      .toDF("word")
+      .as[String]
+      .count() shouldBe 172820
+  }
+
+  it should "read compressed CSV from inplicit" in withSparkSession { spark =>
+    import spark.implicits._
+    spark.read
+      .option("header", "false") // Use first line of all files as header
+      .option("inferSchema", "false") // Automatically infer data types
+      .option("delimiter", ",")
+      .databricksCsv(TestSpec.ScrabbleDictionaryCSV)
+      .toDF("word")
+      .as[String]
+      .count() shouldBe 172820
+  }
 }

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.github.dnvriend.spark.dataset
+package com.github.dnvriend.spark.udf
 
 import com.github.dnvriend.TestSpec
 
 class UDFTest extends TestSpec {
-  it should "uppercase using a user defined function or UDF" in withSpark { spark =>
+  it should "uppercase using a user defined function or UDF" in withSparkSession { spark =>
     import spark.implicits._
     // lets create a DataFrame
     val df = Seq((0, "hello"), (1, "world")).toDF("id", "text")

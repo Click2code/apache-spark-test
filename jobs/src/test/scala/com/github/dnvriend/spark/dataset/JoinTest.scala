@@ -33,7 +33,7 @@ class JoinTest extends TestSpec {
   // them
   //
 
-  it should "inner join - returns all rows when there is at least one match in BOTH tables" in withSpark { spark =>
+  it should "inner join - returns all rows when there is at least one match in BOTH tables" in withSparkSession { spark =>
     import spark.implicits._
     val orders = spark.read.parquet(TestSpec.OrdersParquet).as[Order].cache()
     val customers = spark.read.parquet(TestSpec.CustomersParquet).as[Customer].cache()
@@ -52,7 +52,7 @@ class JoinTest extends TestSpec {
       )
   }
 
-  it should "left join - return all rows from the left table, and the matched rows from the right table" in withSpark { spark =>
+  it should "left join - return all rows from the left table, and the matched rows from the right table" in withSparkSession { spark =>
     import spark.implicits._
     val orders = spark.read.parquet(TestSpec.OrdersParquet).as[Order].cache()
     val customers = spark.read.parquet(TestSpec.CustomersParquet).as[Customer].cache()
@@ -74,7 +74,7 @@ class JoinTest extends TestSpec {
       )
   }
 
-  it should "right join - return all rows from the right table, and the matched rows from the left table" in withSpark { spark =>
+  it should "right join - return all rows from the right table, and the matched rows from the left table" in withSparkSession { spark =>
     import spark.implicits._
     val orders = spark.read.parquet(TestSpec.OrdersParquet).as[Order].cache()
     val customers = spark.read.parquet(TestSpec.CustomersParquet).as[Customer].cache()
@@ -96,7 +96,7 @@ class JoinTest extends TestSpec {
       )
   }
 
-  it should "full join - return all rows when there is a match in ONE of the tables" in withSpark { spark =>
+  it should "full join - return all rows when there is a match in ONE of the tables" in withSparkSession { spark =>
     import spark.implicits._
     val orders = spark.read.parquet(TestSpec.OrdersParquet).as[Order].cache()
     val customers = spark.read.parquet(TestSpec.CustomersParquet).as[Customer].cache()
@@ -117,7 +117,7 @@ class JoinTest extends TestSpec {
       )
   }
 
-  it should "left semi join - returns only rows from the left side for which a match on the right side exists" in withSpark { spark =>
+  it should "left semi join - returns only rows from the left side for which a match on the right side exists" in withSparkSession { spark =>
     import spark.implicits._
     val orders = spark.read.parquet(TestSpec.OrdersParquet).as[Order].cache()
     val customers = spark.read.parquet(TestSpec.CustomersParquet).as[Customer].cache()
@@ -135,7 +135,7 @@ class JoinTest extends TestSpec {
       )
   }
 
-  it should "left anti semi join - returns only rows from the left side for which no match on the right side exists" in withSpark { spark =>
+  it should "left anti semi join - returns only rows from the left side for which no match on the right side exists" in withSparkSession { spark =>
     import spark.implicits._
     val orders = spark.read.parquet(TestSpec.OrdersParquet).as[Order].cache()
     val customers = spark.read.parquet(TestSpec.CustomersParquet).as[Customer].cache()
