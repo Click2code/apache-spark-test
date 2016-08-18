@@ -19,7 +19,7 @@ package com.github.dnvriend.spark.dataset
 import java.text.SimpleDateFormat
 
 import com.github.dnvriend.TestSpec
-import com.github.dnvriend.TestSpec.{ Customer, Order }
+import com.github.dnvriend.spark._
 
 class JoinTest extends TestSpec {
 

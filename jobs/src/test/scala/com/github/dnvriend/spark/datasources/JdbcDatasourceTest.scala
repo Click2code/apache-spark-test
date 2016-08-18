@@ -17,11 +17,13 @@
 package com.github.dnvriend.spark.datasources
 
 import com.github.dnvriend.TestSpec
-import com.github.dnvriend.TestSpec.Order
+import com.github.dnvriend.spark._
+import com.github.dnvriend.spark.datasources.SparkImplicits._
+import org.apache.spark.sql.DataFrame
 
 class JdbcDatasourceTest extends TestSpec {
 
-  val jdbcOptions = Map(
+  implicit val jdbcOptions: Map[String, String] = Map(
     "url" -> "jdbc:h2:mem:test;INIT=runscript from 'src/test/resources/create.sql'\\;runscript from 'src/test/resources/init.sql'",
     "dbtable" -> "customer",
     "driver" -> "org.h2.Driver",
@@ -32,16 +34,33 @@ class JdbcDatasourceTest extends TestSpec {
   it should "join JDBC and parquet" in withSparkSession { spark =>
     import spark.implicits._
     val orders = spark.read.parquet(TestSpec.OrdersParquet).as[Order].cache()
-    val customers = spark.read.format("jdbc").options(jdbcOptions).load().cache()
-
+    val customers = spark.read.jdbc("customer").cache()
+    customers.printSchema()
     customers.count() shouldBe 7
 
-    orders
+    val orderCustomer = orders
       .join(customers, orders("customer_id") === customers("customer_id"))
-      .select(orders("order_id"), $"customer_name", $"customer_age")
-      .as[(Int, String, Int)].collect() shouldBe Seq(
-        (10308, "Ollie Olson", 34),
-        (10309, "Craig Hahn", 21)
-      )
+      .select(orders("order_id"), 'customer_name, 'customer_age)
+
+    orderCustomer.as[(Int, String, Int)].collect() shouldBe Seq(
+      (10308, "Ollie Olson", 34),
+      (10309, "Craig Hahn", 21)
+    )
+
+    orderCustomer.show()
+
+    orderCustomer.write.overwrite.jdbc("order_customer")
+
+    val order_cust: DataFrame = spark.read.jdbc("order_customer")
+    order_cust.printSchema()
   }
+
+  // http://stackoverflow.com/questions/2901453/sql-standard-to-escape-column-names
+  //
+  // The SQL-99 standard specifies that double quote (") is used to delimit identifiers.
+  //
+  //Oracle, PostgreSQL, MySQL, MSSQL and SQlite all support " as the identifier delimiter
+  // (though they don't all use " as the 'default' -
+  //
+  // for example, you have to be running MySQL in ANSI mode and SQL Server only supports it when QUOTED_IDENTIFIER is ON.)
 }

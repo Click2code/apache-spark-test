@@ -17,7 +17,8 @@
 package com.github.dnvriend.spark.dataset
 
 import com.github.dnvriend.TestSpec
-import com.github.dnvriend.TestSpec.{ Person, Transaction }
+import com.github.dnvriend.spark._
+import com.github.dnvriend.spark.datasources.person.Person
 import org.apache.spark.sql.Dataset
 
 class DatasetTest extends TestSpec {

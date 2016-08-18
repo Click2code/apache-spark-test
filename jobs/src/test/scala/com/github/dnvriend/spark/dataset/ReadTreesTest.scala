@@ -17,7 +17,7 @@
 package com.github.dnvriend.spark.dataset
 
 import com.github.dnvriend.TestSpec
-import com.github.dnvriend.TestSpec.Tree
+import com.github.dnvriend.spark._
 
 import scala.language.postfixOps
 

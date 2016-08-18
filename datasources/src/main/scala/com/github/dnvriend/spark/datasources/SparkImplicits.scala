@@ -16,10 +16,12 @@
 
 package com.github.dnvriend.spark.datasources
 
+import java.util.Properties
+
 import akka.NotUsed
 import akka.stream.Materializer
 import akka.stream.scaladsl.{ Sink, Source }
-import org.apache.spark.sql.{ DataFrame, DataFrameReader, SparkSession }
+import org.apache.spark.sql._
 
 import scala.collection.immutable._
 import scala.concurrent.duration.{ FiniteDuration, _ }
@@ -31,6 +33,43 @@ object SparkImplicits {
     def helloworld(path: String): DataFrame = dfr.format("helloworld").load(path)
     def person(path: String): DataFrame = dfr.format("person").load(path)
     def databricksCsv(path: String): DataFrame = dfr.format("com.databricks.spark.csv").load(path)
+    def jdbc(table: String)(implicit jdbcOptions: Map[String, String]): DataFrame =
+      dfr.format("jdbc").options(jdbcOptions ++ Map("dbtable" -> table)).load()
+  }
+
+  implicit class DataFrameWriterOps[T](dfw: DataFrameWriter[T]) {
+    /**
+     * Append mode means that when saving a DataFrame to a data source, if data/table already exists,
+     * contents of the DataFrame are expected to be appended to existing data.
+     */
+    def append = dfw.mode(SaveMode.Append)
+
+    /**
+     * Overwrite mode means that when saving a DataFrame to a data source,
+     * if data/table already exists, existing data is expected to be overwritten by the contents of
+     * the DataFrame.
+     */
+    def overwrite = dfw.mode(SaveMode.Overwrite)
+
+    /**
+     * ErrorIfExists mode means that when saving a DataFrame to a data source, if data already exists,
+     * an exception is expected to be thrown.
+     */
+    def errorIfExists = dfw.mode(SaveMode.ErrorIfExists)
+
+    /**
+     * Ignore mode means that when saving a DataFrame to a data source, if data already exists,
+     * the save operation is expected to not save the contents of the DataFrame and to not
+     * change the existing data.
+     */
+    def ignore = dfw.mode(SaveMode.Ignore)
+
+    def jdbc(table: String)(implicit jdbcOptions: Map[String, String]) = {
+      val properties = jdbcOptions.foldLeft(new Properties) { case (prop, (k, v)) => prop.put(k, v); prop }
+      dfw.jdbc(jdbcOptions("url"), table, properties)
+      // does not (yet) work see: https://issues.apache.org/jira/browse/SPARK-7646
+      // dfw.format("jdbc").mode(SaveMode.Overwrite).options(jdbcOptions ++ Map("dbtable" -> table))
+    }
   }
 
   implicit class SparkSessionOps(spark: SparkSession) {

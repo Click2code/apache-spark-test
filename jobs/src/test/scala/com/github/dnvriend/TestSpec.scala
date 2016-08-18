@@ -20,7 +20,7 @@ import akka.actor.ActorSystem
 import akka.event.{ Logging, LoggingAdapter }
 import akka.stream.{ ActorMaterializer, Materializer }
 import akka.util.Timeout
-import com.github.dnvriend.TestSpec.{ Transaction, Tree }
+import com.github.dnvriend.spark._
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.{ Dataset, SparkSession }
 import org.apache.spark.streaming.{ ClockWrapper, Seconds, StreamingContext }
@@ -31,76 +31,6 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
 object TestSpec {
-
-  final case class Person(id: Long, name: String, age: Int)
-
-  final case class Transaction(
-    customer_id: Int,
-    product_id: Int,
-    quantity: Int,
-    total_price: Double,
-    purchase_time: java.sql.Timestamp
-  )
-
-  final case class PurchaseItem(
-    PurchaseID: Int,
-    Supplier: String,
-    PurchaseType: String,
-    PurchaseAmt: Double,
-    PurchaseDate: java.sql.Date
-  )
-
-  final case class Tree(
-    fid: String,
-    gbiId: String,
-    naam: String,
-    latijn: String, // latin name
-    soort: Option[String],
-    jaar: Option[Int], // year
-    ondergrond: String, // soil
-    geom: String
-  )
-
-  final case class Order(
-    order_id: Int,
-    customer_id: Int,
-    order_date: java.sql.Date
-  )
-
-  final case class Customer(
-    customer_id: Int,
-    customer_name: String,
-    contact_name: String,
-    country: String
-  )
-
-  final case class ElectionCandidate(
-    txn_nm: String,
-    nom_ty: String,
-    state_ab: String,
-    div_nm: String,
-    ticket: String,
-    ballot_position: String,
-    surname: String,
-    ballot_given_nm: String,
-    party_ballot_nm: String,
-    occupation: String,
-    address_1: String,
-    address_2: String,
-    postcode: String,
-    suburb: String,
-    address_state_ab: String,
-    contact_work_ph: String,
-    contact_home_ph: String,
-    postal_address_1: String,
-    postal_address_2: String,
-    postal_suburb: String,
-    postal_postcode: String,
-    contact_fax: String,
-    postal_state_ab: String,
-    contact_mobile_no: String,
-    contact_email: String
-  )
 
   def mapToTransaction(xs: Array[String]) =
     Transaction(xs(2).toInt, xs(3).toInt, xs(4).toInt, xs(5).toDouble, strToSqlTime(xs(0).trim + " " + xs(1).trim))

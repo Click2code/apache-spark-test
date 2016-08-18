@@ -48,6 +48,8 @@ lazy val deps = {
       "com.github.fommil.netlib" % "all" % "1.1.2",
       "org.apache.spark" %% "spark-tags" % SparkVersion,
       "org.apache.spark" %% "spark-streaming" % SparkVersion,
+      "org.apache.spark" %% "spark-streaming-kafka-0-10" % SparkVersion,
+      "com.datastax.spark" %% "spark-cassandra-connector" % "2.0.0-M1",
       "com.databricks" %% "spark-csv" % "1.4.0",
       "com.databricks" %% "spark-xml" % "0.3.3",
       "com.typesafe.akka" %% "akka-actor" % AkkaVersion,
@@ -57,6 +59,7 @@ lazy val deps = {
       "ch.qos.logback" % "logback-classic" % "1.1.7",
       "org.postgresql" % "postgresql" % "9.4.1209",
       "com.h2database" % "h2" % "1.4.192",
+      "net.manub" %% "scalatest-embedded-kafka" % "0.7.1" % Test,
       "com.typesafe.akka" %% "akka-stream-testkit" % AkkaVersion % Test,
       "com.typesafe.akka" %% "akka-testkit" % AkkaVersion % Test,
       "org.scalatest" %% "scalatest" % "2.2.6" % Test

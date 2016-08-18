@@ -17,7 +17,7 @@
 package com.github.dnvriend.spark.datasources
 
 import com.github.dnvriend.TestSpec
-import com.github.dnvriend.TestSpec.ElectionCandidate
+import com.github.dnvriend.spark.ElectionCandidate
 import com.github.dnvriend.spark.datasources.SparkImplicits._
 
 class CsvDatasourceTest extends TestSpec {

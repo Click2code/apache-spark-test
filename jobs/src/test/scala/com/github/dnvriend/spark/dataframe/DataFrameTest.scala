@@ -18,8 +18,8 @@ package com.github.dnvriend.spark.dataframe
 
 import akka.stream.scaladsl.Source
 import com.github.dnvriend.TestSpec
-import com.github.dnvriend.TestSpec.Person
 import com.github.dnvriend.spark.datasources.SparkImplicits._
+import com.github.dnvriend.spark.datasources.person.Person
 
 import scala.collection.immutable._
 import scala.concurrent.Future

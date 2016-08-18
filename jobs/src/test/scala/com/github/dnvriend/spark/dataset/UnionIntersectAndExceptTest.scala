@@ -17,7 +17,7 @@
 package com.github.dnvriend.spark.dataset
 
 import com.github.dnvriend.TestSpec
-import com.github.dnvriend.TestSpec.Person
+import com.github.dnvriend.spark.datasources.person.Person
 
 class UnionIntersectAndExceptTest extends TestSpec {
   lazy val p1 = Person(1, "foo", 30)

@@ -2029,6 +2029,19 @@ Jupyter is a Python based notebook.
 # Pandas
 [Pandas][pandas] ia a Python library providing high-performance, easy-to-use data structures and data analysis tools.
 
+# Spark Connector for Apache Kafka
+Taken from the [Spark Kafka Integration Guide](http://spark.apache.org/docs/latest/streaming-kafka-integration.html)
+
+[Apache Kafka](http://kafka.apache.org/) is publish-subscribe messaging rethought as a distributed, partitioned, replicated commit log service. Please read the [Kafka documentation](http://kafka.apache.org/documentation.html) thoroughly before starting an integration using Spark.
+
+The Kafka project introduced a new consumer API between versions 0.8 and 0.10, so there are 2 separate corresponding Spark Streaming packages available. Please choose the correct package for your brokers and desired features; note that the 0.8 integration is compatible with later 0.9 and 0.10 brokers, but the 0.10 integration is not compatible with earlier brokers.
+
+## Embedded Kafka
+[Emanuele Blanco - Embedded Kafka](https://github.com/manub/scalatest-embedded-kafka) makes it possible to launch an embedded Kafka instance in your SBT unit test using the test framework of your choice.
+
+# Spark Connector for Apache Cassandra
+The [DataStax Spark Cassandra Connector](https://github.com/datastax/spark-cassandra-connector) lets you expose Cassandra tables as Spark RDDs, write Spark RDDs to Cassandra tables, and execute arbitrary CQL queries in your Spark applications.
+
 # Books
 - [Jacek Laskowski - Mastering Apache Spark (Free)](https://www.gitbook.com/book/jaceklaskowski/mastering-apache-spark/)
 - [Databricks Spark Knowledge Base (Free)](https://databricks.gitbooks.io/databricks-spark-knowledge-base/content/index.html)

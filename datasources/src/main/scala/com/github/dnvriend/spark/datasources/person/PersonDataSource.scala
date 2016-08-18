@@ -16,10 +16,59 @@
 
 package com.github.dnvriend.spark.datasources.person
 
+import akka.stream.scaladsl.{ Source => AkkaStreamSource }
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{ Row, SQLContext }
-import org.apache.spark.sql.sources.{ BaseRelation, DataSourceRegister, RelationProvider, TableScan }
+import org.apache.spark.sql.execution.streaming.{ LongOffset, Offset, Source }
+import org.apache.spark.sql.{ DataFrame, Row, SQLContext }
+import org.apache.spark.sql.sources._
 import org.apache.spark.sql.types._
+import com.github.dnvriend.spark._
+
+final case class Person(id: Long, name: String, age: Int)
+
+// see: org.apache.spark.sql.execution.streaming.TextSocketSource
+object PersonStreamingDataSource {
+  val name = "streaming-person"
+}
+
+class PersonStreamingDataSource extends StreamSourceProvider with DataSourceRegister {
+  override def sourceSchema(
+    sqlContext: SQLContext,
+    schema: Option[StructType],
+    providerName: String,
+    parameters: Map[String, String]
+  ): (String, StructType) = {
+    println(s"=> [PersonStreamingDataSource.sourceSchema]: providerName: '$providerName', schema: '$schema', parameters: $parameters")
+    PersonStreamingDataSource.name -> PersonRelationProvider.schema
+  }
+
+  override def createSource(
+    sqlContext: SQLContext,
+    metadataPath: String,
+    schema: Option[StructType],
+    providerName: String,
+    parameters: Map[String, String]
+  ): Source = {
+    println(s"=> [PersonStreamingDataSource.createSource]: metadataPath: '$metadataPath', schema: '$schema', providerName: '$providerName', parameters: '$parameters'")
+    val take = parameters.get("take")
+    val takeMax = take match {
+      case Some(nr) => nr.toInt
+      case _        => 250
+    }
+    new PersonStreamingSource(sqlContext, takeMax)
+  }
+  override def shortName(): String = PersonStreamingDataSource.name
+}
+
+class PersonStreamingSource(sqlContext: SQLContext, takeMax: Int) extends Source {
+  override def schema: StructType = PersonRelationProvider.schema
+
+  override def getOffset: Option[Offset] = Some(LongOffset(Long.MaxValue))
+
+  override def getBatch(start: Option[Offset], end: Offset): DataFrame = ???
+
+  override def stop(): Unit = ()
+}
 
 class PersonDataSource extends RelationProvider with DataSourceRegister with Serializable {
   override def shortName(): String = "person"
@@ -41,21 +90,20 @@ class PersonDataSource extends RelationProvider with DataSourceRegister with Ser
 
 object PersonRelationProvider {
   val regex = """(id="[\d]+)|(name="[\s\w]+)|(age="[\d]+)""".r
-}
-
-class PersonRelationProvider(val sqlContext: SQLContext, path: String) extends BaseRelation with TableScan with Serializable {
-  import PersonRelationProvider._
-
-  override def schema: StructType = StructType(Array(
+  val schema = StructType(Array(
     StructField("id", LongType, nullable = false),
     StructField("name", StringType, nullable = true),
     StructField("age", IntegerType, nullable = true)
   ))
+}
+
+class PersonRelationProvider(val sqlContext: SQLContext, path: String) extends BaseRelation with TableScan with Serializable {
+  override def schema: StructType = PersonRelationProvider.schema
 
   override def buildScan(): RDD[Row] =
     sqlContext.sparkContext.textFile(path)
       .filter(_.contains("person"))
-      .map(line => regex.findAllIn(line).toList)
+      .map(line => PersonRelationProvider.regex.findAllIn(line).toList)
       .map { xs =>
         val id = xs.head.replace("id=\"", "").toLong
         val name = xs.drop(1).map(str => str.replace("name=\"", "")).headOption
