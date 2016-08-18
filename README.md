@@ -1475,6 +1475,40 @@ The two tasks used for reading (Stage Id 0 in second figure) is the defaultMinPa
 
 You can take a look at the [code from github](https://github.com/apache/spark/blob/master/core/src/main/scala/org/apache/spark/SparkContext.scala#L799) to see that this exactly what is happening. If you want more partitions to be used on read, just add it as a parameter e.g., `sc.textFile("a.txt", 20)`.
 
+```scala
+// typically you want two to four (2..4) partitions for each CPU in your cluster
+// Spark tries to set the number of partitions automatically based on your cluster
+// and based on the 'spark.default.parallelism' setting
+// but it is possible to manually set the number of partitions
+val numberOfCpus: Int = 4
+val numberOfPartitionsPerCpu: Int = 2
+val numberOfPartitions: Int = numberOfCpus * numberOfPartitions
+
+// text file
+val rdd = sparkContext.textFile("/tmp/test.txt", numberOfPartitions)
+
+// for a pair-rdd
+import org.apache.spark.HashPartitioner
+val pairRdd = sparkContext.textFile("/tmp/test.txt")
+  .flatMap(_.split("/s+"))
+  .map(_ -> 1)
+  .partitionBy(new HashPartitioner(numberOfPartitions))
+
+In both cases the data will be shuffled across the partitions.
+
+// for spark.sql the following configuration is used when shuffling data for joins or aggregations
+// 'spark.sql.shuffle.partitions=200' which can be set to a lower setting when tuning your job
+// on Datasets
+import spark.implicits._
+val ds = Seq(1, 2, 3).toDS
+
+// returns a new Dataset that has exactly numPartitions partitions.
+val repartitionedDs = ds.coalesce(numberOfPartitions)
+
+// returns a new Dataset that has exactly numPartitions partitions.
+val repartitionedDs = ds.repartition(numberOfPartitions)
+```
+
 Now the interesting part comes from the `200 partitions` that come on the second stage (Stage Id 1 in second figure). Well, each time there is a shuffle, Spark needs to decide how many partitions will the shuffle RDD have. As you can imagine, the default is 200.
 
 You can change that using `spark.sql.shuffle.partitions` set to  eg. `4`.
@@ -1555,6 +1589,39 @@ SORT BY sort the data per reducer; which doesn't respect the total ordering
 
 ## ORDER BY
 ORDER BY guarantees total order in the output
+
+# SparkSession
+The [org.apache.spark.sql.SparkSession](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.SparkSession) class is the main entry point to programming Spark with the Dataset and DataFrame API.
+
+## SparkSession Implicits
+A SparkSession contains an implicit method for _converting common Scala objects into DataFrames_. The implicit method is also necessary for implicit conversions like _converting RDDs to DataFrames_. The implicit method also contains _encoders for most common types_ which are used by Spark to serialize objects for processing or transmitting over the network. These encoders are used by Spark to allow operations like filtering, sorting and hashing without deserializing the bytes back into an object. The implicit method also contains an implicit conversion that turns a [scala.Symbol](http://www.scala-lang.org/api/current/#scala.Symbol) into a [org.apache.spark.sql.Column](http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.Column) and allows for the `$"columnName"` notation.
+
+```scala
+val sparkSession = SparkSession.builder.getOrCreate()
+import sparkSession.implicits._
+```
+
+## Scala Symbols
+The class [scala.Symbol](http://www.scala-lang.org/api/current/#scala.Symbol) provides a simple way to get unique objects for equal strings. Since symbols are interned (cached), they can be compared using reference equality. Instances of Symbol can be created easily with Scala's built-in quote mechanism.
+
+```scala
+// for instance, the Scala term:
+'mysymbol
+
+// will invoke the constructor of the Symbol class in the following way:
+Symbol("mysymbol")
+```
+
+From: [Jesse Eichar Blog - Scala Symbols](http://daily-scala.blogspot.nl/2010/01/symbols.html)
+
+Scala has what are called symbolic literals which are instances of [scala.Symbol](http://www.scala-lang.org/api/current/#scala.Symbol). A symbol is very similar to a String except that they are cached. So symbol `'hi` will be the same object as `'hi` declared a second time. In addition there is special syntax for creating symbols that requires only a single quote.
+
+As odd as this may appear at first glance there are some good use cases for symbols:
+
+- It saves memory,
+- Extra semantics. Semantically they are the same object where "hi" is not necessarily the same as "hi" so 'hi has some extra semantics meaning this is the one an only 'hi object.
+- Symbols also have a shorter syntax. This can be useful when designing DSLs
+- Identifier syntax. When using the simpler syntax the symbol will be a valid Scala identifier so it can be good when intending to reference methods or variable, perhaps in a heavily reflection based framework
 
 ## Data Types
 Spark SQL and DataFrames support the following data types:
@@ -2012,6 +2079,8 @@ Jupyter is a Python based notebook.
 - [Knoldus - DataFrame word count](https://blog.knoldus.com/2015/10/21/using-spark-dataframes-for-word-count/)
 - [Writing a custom spark data source](http://blog.hydronitrogen.com/2015/12/04/writing-a-spark-data-source/)
 - [Demystifying Asynchronous Actions in Spark](https://blog.knoldus.com/2015/10/21/demystifying-asynchronous-actions-in-spark/)
+- [Madhukar's Blog - Spark 2.0](http://blog.madhukaraphatak.com/categories/spark-two/)
+- [Jesse Eichar - Scala Symbols](http://daily-scala.blogspot.nl/2010/01/symbols.html)
 
 # Slide Decks
 - [Spark shuffle introduction](http://www.slideshare.net/colorant/spark-shuffle-introduction)
