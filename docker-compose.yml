@@ -3,7 +3,10 @@ postgres:
   container_name: postgres
   environment:
     - "TZ=Europe/Amsterdam"
-    - "POSTGRES_USER=docker"
-    - "POSTGRES_PASSWORD=docker"
+    - "POSTGRES_DB=docker"
+    - "POSTGRES_USER=postgres"
+    - "POSTGRES_PASSWORD="
   ports:
     - "5432:5432"  # credentials (docker:docker)
+  volumes:
+    - "./initdb:/docker-entrypoint-initdb.d"

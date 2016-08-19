@@ -2042,6 +2042,19 @@ The Kafka project introduced a new consumer API between versions 0.8 and 0.10, s
 # Spark Connector for Apache Cassandra
 The [DataStax Spark Cassandra Connector](https://github.com/datastax/spark-cassandra-connector) lets you expose Cassandra tables as Spark RDDs, write Spark RDDs to Cassandra tables, and execute arbitrary CQL queries in your Spark applications.
 
+# Apache Bahir
+As of 2016-06-29, [Apache Bahir](https://github.com/apache/bahir) provides extensions to distributed analytics platforms such as Apache Spark & Apache Flink. From the [Apache Blog](https://blogs.apache.org/foundation/entry/the_apache_software_foundation_announces96); _Apache Bahir bolsters Big Data processing by serving as a home for existing connectors that initiated under Apache Spark, as well as provide additional extensions/plugins for other related distributed system, storage, and query execution systems._ Apache Bahir is a new community that aims to be a place to curate extensions related to distributed analytic platforms following the Apache Governance.
+
+Bahir code is extracted from the Apache Spark project, and has spun out as a standalone project to provide implementations for different Spark related extensions/plugins, connectors, and other pluggable components. Current extensions include:
+
+[Bahir](http://translation.babylon-software.com/english/Bahir/) or Sefer HaBahir comes from "Book of the Brightness".
+
+- [streaming-twitter](https://github.com/apache/bahir/blob/master/streaming-twitter/README.md) __Twitter__: online social networking service; Bahir allows the processing of social data from Twitter
+- [streaming-akka](https://github.com/apache/bahir/blob/master/streaming-akka/README.md) __Akka__: Open Source toolkit and runtime simplifying the construction of concurrent and distributed applications on the Java Virtual Machine
+- [streaming-mqtt](https://github.com/apache/bahir/blob/master/streaming-mqtt/README.md) __MQTT__: lightweight messaging protocol for small sensors and mobile devices, optimized for high-latency or unreliable networks
+- [sql-streaming-mqtt](https://github.com/apache/bahir/blob/master/sql-streaming-mqtt/README.md): __MQTT__: lightweight messaging protocol for small sensors and mobile devices, optimized for high-latency or unreliable networks
+- [streaming-zeromq](https://github.com/apache/bahir/blob/master/streaming-zeromq/README.md) __ZeroMQ__: a high-performance asynchronous messaging library, aimed at use in distributed or concurrent applications
+
 # Books
 - [Jacek Laskowski - Mastering Apache Spark (Free)](https://www.gitbook.com/book/jaceklaskowski/mastering-apache-spark/)
 - [Databricks Spark Knowledge Base (Free)](https://databricks.gitbooks.io/databricks-spark-knowledge-base/content/index.html)

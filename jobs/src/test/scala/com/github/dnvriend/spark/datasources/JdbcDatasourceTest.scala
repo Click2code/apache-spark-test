@@ -21,21 +21,29 @@ import com.github.dnvriend.spark._
 import com.github.dnvriend.spark.datasources.SparkImplicits._
 import org.apache.spark.sql.DataFrame
 
-class JdbcDatasourceTest extends TestSpec {
-
-  implicit val jdbcOptions: Map[String, String] = Map(
+object JdbcDatasourceTest {
+  implicit val H2Options: Map[String, String] = Map(
     "url" -> "jdbc:h2:mem:test;INIT=runscript from 'src/test/resources/create.sql'\\;runscript from 'src/test/resources/init.sql'",
     "dbtable" -> "customer",
     "driver" -> "org.h2.Driver",
     "user" -> "root",
     "password" -> "root"
   )
+  implicit val PostgresOptions: Map[String, String] = Map(
+    "url" -> "jdbc:postgresql://localhost:5432/docker?reWriteBatchedInserts=true",
+    "driver" -> "org.postgresql.Driver",
+    "user" -> "postgres",
+    "password" -> ""
+  )
+}
+
+class JdbcDatasourceTest extends TestSpec {
 
   it should "join JDBC and parquet" in withSparkSession { spark =>
     import spark.implicits._
+    implicit val jdbcOptions = JdbcDatasourceTest.PostgresOptions
     val orders = spark.read.parquet(TestSpec.OrdersParquet).as[Order].cache()
     val customers = spark.read.jdbc("customer").cache()
-    customers.printSchema()
     customers.count() shouldBe 7
 
     val orderCustomer = orders
@@ -47,12 +55,10 @@ class JdbcDatasourceTest extends TestSpec {
       (10309, "Craig Hahn", 21)
     )
 
-    orderCustomer.show()
-
-    orderCustomer.write.overwrite.jdbc("order_customer")
-
+    orderCustomer.write.append.jdbc("order_customer")
     val order_cust: DataFrame = spark.read.jdbc("order_customer")
     order_cust.printSchema()
+    order_cust.show()
   }
 
   // http://stackoverflow.com/questions/2901453/sql-standard-to-escape-column-names

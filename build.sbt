@@ -49,6 +49,8 @@ lazy val deps = {
       "org.apache.spark" %% "spark-tags" % SparkVersion,
       "org.apache.spark" %% "spark-streaming" % SparkVersion,
       "org.apache.spark" %% "spark-streaming-kafka-0-10" % SparkVersion,
+      "org.apache.bahir" %% "spark-streaming-twitter" % SparkVersion,
+      "org.apache.bahir" %% "spark-streaming-akka" % SparkVersion,
       "com.datastax.spark" %% "spark-cassandra-connector" % "2.0.0-M1",
       "com.databricks" %% "spark-csv" % "1.4.0",
       "com.databricks" %% "spark-xml" % "0.3.3",

@@ -1,7 +1,13 @@
 language: scala
-sudo: false
+sudo: true
+services:
+  - postgresql
+  - docker
 scala:
   - 2.11.8
 jdk:
   - oraclejdk8
+before_script:
+  - psql -c 'create database docker;' -U postgres
+  - psql --dbname=docker --username=postgres -f ./initdb.d/001_create-schema.sql
 script: sbt test
