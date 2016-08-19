@@ -9,5 +9,5 @@ jdk:
   - oraclejdk8
 before_script:
   - psql -c 'create database docker;' -U postgres
-  - psql --dbname=docker --username=postgres -f ./initdb.d/001_create-schema.sql
+  - psql --dbname=docker --username=postgres -f initdb.d/001_create-schema.sql
 script: sbt test
