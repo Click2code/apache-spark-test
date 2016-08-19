@@ -61,6 +61,7 @@ lazy val deps = {
       "ch.qos.logback" % "logback-classic" % "1.1.7",
       "org.postgresql" % "postgresql" % "9.4.1209",
       "com.h2database" % "h2" % "1.4.192",
+      "com.lihaoyi" %% "pprint" % "0.4.1",
       "net.manub" %% "scalatest-embedded-kafka" % "0.7.1" % Test,
       "com.typesafe.akka" %% "akka-stream-testkit" % AkkaVersion % Test,
       "com.typesafe.akka" %% "akka-testkit" % AkkaVersion % Test,

@@ -115,9 +115,9 @@ abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures with Be
   def withSparkSession[A](f: SparkSession => A): A =
     f(_spark.newSession())
 
-  def withStreamingContext[A](seconds: Long = 1)(f: SparkSession => StreamingContext => A): A = withSparkSession { spark =>
+  def withStreamingContext[A](seconds: Long = 1, await: Boolean = false)(f: SparkSession => StreamingContext => A): A = withSparkSession { spark =>
     val ssc = new StreamingContext(spark.sparkContext, Seconds(seconds))
-    try f(spark)(ssc) finally stopStreamingContext(ssc)
+    try f(spark)(ssc) finally if (await) ssc.awaitTermination() else stopStreamingContext(ssc)
   }
 
   def advanceClock(ssc: StreamingContext, timeToAdd: FiniteDuration): Unit = {
@@ -144,6 +144,18 @@ abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures with Be
       .option("mergeSchema", "false")
       .parquet(TestSpec.TreesParquet).as[Tree])
   }
+
+  // for twitter api
+  val cfg = system.settings.config.getConfig("twitter")
+  val consumerKey = cfg.getString("consumerKey")
+  val consumerSecret = cfg.getString("consumerSecret")
+  val accessToken = cfg.getString("accessToken")
+  val accessTokenSecret = cfg.getString("accessTokenSecret")
+  System.setProperty("twitter4j.oauth.consumerKey", consumerKey)
+  System.setProperty("twitter4j.oauth.consumerSecret", consumerSecret)
+  System.setProperty("twitter4j.oauth.accessToken", accessToken)
+  System.setProperty("twitter4j.oauth.accessTokenSecret", accessTokenSecret)
+  println(s"==> Twitter API: consumerKey: $consumerKey, consumerSecret: $consumerSecret, accessToken: $accessToken, accessTokenSecret: $accessTokenSecret")
 
   override protected def afterAll(): Unit = {
     _spark.stop()

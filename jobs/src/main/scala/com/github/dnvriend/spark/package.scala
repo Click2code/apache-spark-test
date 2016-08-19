@@ -16,6 +16,10 @@
 
 package com.github.dnvriend
 
+import java.util.Date
+
+import twitter4j.Status
+
 package object spark {
   final case class Transaction(
     customer_id: Int,
@@ -84,4 +88,40 @@ package object spark {
     contact_mobile_no: String,
     contact_email: String
   )
+
+  final case class Tweet(
+    createdAt: Date,
+    userName: String,
+    userScreenName: String,
+    userDescription: String,
+    text: String,
+    source: String,
+    inReplyToScreenName: String,
+    isFavorited: Boolean,
+    favoriteCount: Int,
+    isRetweeted: Boolean,
+    isRetweet: Boolean,
+    retweetCount: Int,
+    languageCode: String,
+    withheldInCountries: Array[String]
+  )
+  object Tweet {
+    def apply(status: Status): Tweet =
+      Tweet(
+        status.getCreatedAt,
+        status.getUser.getName,
+        status.getUser.getScreenName,
+        status.getUser.getDescription,
+        status.getText,
+        status.getSource,
+        status.getInReplyToScreenName,
+        status.isFavorited,
+        status.getFavoriteCount,
+        status.isRetweeted,
+        status.isRetweet,
+        status.getRetweetCount,
+        status.getLang,
+        status.getWithheldInCountries
+      )
+  }
 }
