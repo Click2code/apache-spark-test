@@ -2107,6 +2107,7 @@ Bahir code is extracted from the Apache Spark project, and has spun out as a sta
 - [Demystifying Asynchronous Actions in Spark](https://blog.knoldus.com/2015/10/21/demystifying-asynchronous-actions-in-spark/)
 - [Madhukar's Blog - Spark 2.0](http://blog.madhukaraphatak.com/categories/spark-two/)
 - [Jesse Eichar - Scala Symbols](http://daily-scala.blogspot.nl/2010/01/symbols.html)
+- [Mohamed El Sioufy - Spark Docker](https://www.anchormen.nl/spark-docker/)
 
 # Slide Decks
 - [Spark shuffle introduction](http://www.slideshare.net/colorant/spark-shuffle-introduction)

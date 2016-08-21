@@ -38,7 +38,7 @@ lazy val commonSettings = Seq(
 )
 
 lazy val deps = { 
-  val AkkaVersion = "2.4.9-RC2"
+  val AkkaVersion = "2.4.9"
   val SparkVersion = "2.0.0"
   Seq(
       "org.scala-lang" % "scala-reflect" % "2.11.8",
