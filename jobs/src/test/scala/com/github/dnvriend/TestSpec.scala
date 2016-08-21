@@ -16,9 +16,10 @@
 
 package com.github.dnvriend
 
-import akka.actor.ActorSystem
+import akka.actor.{ ActorRef, ActorSystem, PoisonPill }
 import akka.event.{ Logging, LoggingAdapter }
 import akka.stream.{ ActorMaterializer, Materializer }
+import akka.testkit.TestProbe
 import akka.util.Timeout
 import com.github.dnvriend.spark._
 import org.apache.spark.SparkContext
@@ -27,8 +28,9 @@ import org.apache.spark.streaming.{ ClockWrapper, Seconds, StreamingContext }
 import org.scalatest.concurrent.{ Eventually, ScalaFutures }
 import org.scalatest.{ BeforeAndAfterAll, FlatSpec, Matchers }
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
+import scala.util.Try
 
 object TestSpec {
 
@@ -103,11 +105,28 @@ abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures with Be
     .config("spark.memory.offHeap.size", "536870912") // The absolute amount of memory in bytes which can be used for off-heap allocation.
     .config("spark.streaming.clock", "org.apache.spark.streaming.util.ManualClock")
     .config("spark.streaming.stopSparkContextByDefault", "false")
+    .config("spark.debug.maxToStringFields", 50) // default 25 see org.apache.spark.util.Utils
     // see: https://spark.apache.org/docs/latest/sql-programming-guide.html#caching-data-in-memory
     //    .config("spark.sql.inMemoryColumnarStorage.compressed", "true")
     //    .config("spark.sql.inMemoryColumnarStorage.batchSize", "10000")
     .master("local[2]") // better not to set this to 2 for spark-streaming
     .appName("spark-sql-test").getOrCreate()
+
+  def killActors(actors: ActorRef*)(implicit system: ActorSystem): Unit = {
+    val tp = TestProbe()
+    actors.foreach { (actor: ActorRef) =>
+      tp watch actor
+      actor ! PoisonPill
+      tp.expectTerminated(actor)
+    }
+  }
+
+  implicit class PimpedFuture[T](self: Future[T]) {
+    def toTry: Try[T] = Try(self.futureValue)
+  }
+
+  def sleep(duration: Duration = 1.second): Unit =
+    Thread.sleep(duration.toMillis)
 
   def withSparkContext[A](f: SparkContext => A): A =
     f(_spark.newSession().sparkContext)

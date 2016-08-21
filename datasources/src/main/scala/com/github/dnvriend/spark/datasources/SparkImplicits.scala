@@ -32,7 +32,6 @@ object SparkImplicits {
   implicit class DataSourceOps(dfr: DataFrameReader) {
     def helloworld(path: String): DataFrame = dfr.format("helloworld").load(path)
     def person(path: String): DataFrame = dfr.format("person").load(path)
-    def databricksCsv(path: String): DataFrame = dfr.format("com.databricks.spark.csv").load(path)
     def jdbc(table: String)(implicit jdbcOptions: Map[String, String]): DataFrame =
       dfr.format("jdbc").options(jdbcOptions ++ Map("dbtable" -> table)).load()
   }

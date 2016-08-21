@@ -52,7 +52,7 @@ lazy val deps = {
       "org.apache.bahir" %% "spark-streaming-twitter" % SparkVersion,
       "org.apache.bahir" %% "spark-streaming-akka" % SparkVersion,
       "com.datastax.spark" %% "spark-cassandra-connector" % "2.0.0-M1",
-      "com.databricks" %% "spark-csv" % "1.4.0",
+//      "com.databricks" %% "spark-csv" % "1.4.0", // not necessary for spark v2.0.0
       "com.databricks" %% "spark-xml" % "0.3.3",
       "com.typesafe.akka" %% "akka-actor" % AkkaVersion,
       "com.typesafe.akka" %% "akka-stream" % AkkaVersion,

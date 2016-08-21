@@ -21,35 +21,35 @@ import com.github.dnvriend.spark.ElectionCandidate
 import com.github.dnvriend.spark.datasources.SparkImplicits._
 
 class CsvDatasourceTest extends TestSpec {
+  // spark v2.0.0 comes with the databricks csv datasource out of the box,
+  // so it is not necessary to have it on the classpath
+  // or use the `.format("com.databricks.spark.csv")` anymore.
 
   it should "read a CSV" in withSparkSession { spark =>
     import org.apache.spark.sql.functions._
     import spark.implicits._
 
     val aangifte = spark.read
-      .format("com.databricks.spark.csv")
       .option("header", "true") // Use first line of all files as header
       .option("inferSchema", "true") // Automatically infer data types
       .option("delimiter", ";")
-      .load(TestSpec.AangifteGroningenCSV)
+      .csv(TestSpec.AangifteGroningenCSV)
 
     aangifte.count() shouldBe 420
 
     val afvalContainers = spark.read
-      .format("com.databricks.spark.csv")
       .option("header", "true") // Use first line of all files as header
       .option("inferSchema", "true") // Automatically infer data types
       .option("delimiter", ";")
-      .load(TestSpec.AfvalContainersGroningenCSV)
+      .csv(TestSpec.AfvalContainersGroningenCSV)
 
     afvalContainers.count() shouldBe 961
 
     val candidates = spark.read
-      .format("com.databricks.spark.csv")
       .option("header", "true") // Use first line of all files as header
       .option("inferSchema", "false") // Automatically infer data types
       .option("delimiter", ",")
-      .load(TestSpec.FederalElectionCandidatesCSV).as[ElectionCandidate]
+      .csv(TestSpec.FederalElectionCandidatesCSV).as[ElectionCandidate]
 
     candidates.count() shouldBe 1626
 
@@ -85,11 +85,10 @@ class CsvDatasourceTest extends TestSpec {
   it should "read compressed CSV" in withSparkSession { spark =>
     import spark.implicits._
     spark.read
-      .format("com.databricks.spark.csv")
       .option("header", "false") // Use first line of all files as header
       .option("inferSchema", "false") // Automatically infer data types
       .option("delimiter", ",")
-      .load(TestSpec.ScrabbleDictionaryCSV)
+      .csv(TestSpec.ScrabbleDictionaryCSV)
       .toDF("word")
       .as[String]
       .count() shouldBe 172820
@@ -101,7 +100,7 @@ class CsvDatasourceTest extends TestSpec {
       .option("header", "false") // Use first line of all files as header
       .option("inferSchema", "false") // Automatically infer data types
       .option("delimiter", ",")
-      .databricksCsv(TestSpec.ScrabbleDictionaryCSV)
+      .csv(TestSpec.ScrabbleDictionaryCSV)
       .toDF("word")
       .as[String]
       .count() shouldBe 172820

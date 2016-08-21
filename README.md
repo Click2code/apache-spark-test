@@ -10,7 +10,7 @@ We will be using the Structured Query Language (SQL), for a tutorial see the fre
 
 # Spark pages
 - [Spark News](http://spark.apache.org/news/)
-- [Spark 2.0 Release Notes](http://spark.apache.org/releases/spark-release-2-0-0.html)
+- [Spark 2.0 Release Notes][sparkv200notes]
 - [Spark Issue Tracker](https://issues.apache.org/jira/browse/SPARK/?selectedTab=com.atlassian.jira.jira-projects-plugin:summary-panel)
 - [Spark Roadmap](https://issues.apache.org/jira/browse/SPARK/?selectedTab=com.atlassian.jira.jira-projects-plugin:roadmap-panel)
 
@@ -404,9 +404,9 @@ The following asynchronous methods are available:
 # Spark SQL
 [Spark SQL][sparksql] is a Spark module for structured data processing. Spark SQL knows about the structure of your data because it can infer the structure from the data source it uses, or because the structure has been given by the programmer by means of the Spark SQL API. In any case, because Spark SQL knows about the structure and the operations we wish to perform on the data, Spark SQL can perform extra optimizations. There are several ways to interact with Spark SQL including SQL and the Dataset API. When computing a result the same execution engine is used, independent whether the DataFrame of DataSet API is being used.
 
-Spark SQL provides functions for manipulating large sets of distributed, structured data using a SQL dialect. Spark SQL
-can be used for reading and writing data to and from various structured formats and data sources such as JSON, Parquet,
-relational databases, CSV, ORC and more.
+Spark SQL provides functions for manipulating large sets of distributed, structured data using a SQL dialect. Spark SQL can be used for reading and writing data to and from various structured formats and data sources such as JSON, Parquet, relational databases, CSV, ORC and more.
+
+Spark SQL support SQL 2003 and contains a native SQL parser that supports both ANSI-SQL as well as Hive QL. It has Subquery support, including Uncorrelated Scalar Subqueries Correlated Scalar Subqueries, NOT IN predicate Subqueries (in WHERE/HAVING clauses), IN predicate subqueries (in WHERE/HAVING clauses), (NOT) EXISTS predicate subqueries (in WHERE/HAVING clauses).
 
 ## Datasets and DataFrames
 A Dataset is a distributed collection of data. Dataset is a new interface added in Spark 1.6 that provides the benefits of RDDs (strong typing, ability to use powerful lambda functions) with the benefits of Spark SQL’s optimized execution engine. A Dataset can be constructed from JVM objects and then manipulated using functional transformations (map, flatMap, filter, etc.).
@@ -1772,6 +1772,10 @@ Data skipping for statistics, column, min, max, etc.
 
 The data used in web and scientific computing is often nonrelational. Hence, a flexible data model is essential in these domains. Data structures used in programming languages, messages exchanged by distributed systems, structured documents, etc. lend themselves naturally to a nested representation. Normalizing and recombining such data at web scale is usually prohibitive. A nested data model underlies most of structured data processing at Google and reportedly at other major web companies.
 
+When Spark v2.0.0 writes Parquet files, the summary files are not written by default. To enable it, users must set `parquet.enable.summary-metadata` to true.
+
+read: [Spark, Parquet and S3 – It’s complicated - August, 2015](http://arnon.me/2015/08/spark-parquet-s3/)
+
 ## Parquet, Spark and S3
 - [Blog - The Bleeding Edge: Spark, Parquet and S3](https://www.appsflyer.com/blog/the-bleeding-edge-spark-parquet-and-s3/)
 
@@ -1848,6 +1852,9 @@ wget -O /tmp/books.xml https://raw.githubusercontent.com/databricks/spark-xml/ma
 ```
 
 ## CSV Data Source for Apache Spark
+__Notice:__ Spark v2.0.0 contains this [databricks csv module][sparkcsv], as you can read from the [Spark v2.0.0 release notes][sparkv200notes] You can just write `spark.read.csv("test.csv")`, all options shown here already work. You shouldn't have to add the .jar nor use the ` .format("com.databricks.spark.csv")` format. The information below can be used, but are for Spark v1.6.1, but the options are the same.
+
+__Information for Spark v1.6.1:__
 [Spark CSV][sparkcsv] is a library for parsing and querying CSV data with Apache Spark, for Spark SQL and DataFrames.
 
 To add this feature to the shell, launch it with the following option:
@@ -2049,6 +2056,9 @@ Bahir code is extracted from the Apache Spark project, and has spun out as a sta
 
 [Bahir](http://translation.babylon-software.com/english/Bahir/) or Sefer HaBahir comes from "Book of the Brightness".
 
+## Logging
+To use logging in your application, you should use slf4j directly and not use the semi-private class `org.apache.spark.Logging`.
+
 - [streaming-twitter](https://github.com/apache/bahir/blob/master/streaming-twitter/README.md) __Twitter__: online social networking service; Bahir allows the processing of social data from Twitter
 - [streaming-akka](https://github.com/apache/bahir/blob/master/streaming-akka/README.md) __Akka__: Open Source toolkit and runtime simplifying the construction of concurrent and distributed applications on the Java Virtual Machine
 - [streaming-mqtt](https://github.com/apache/bahir/blob/master/streaming-mqtt/README.md) __MQTT__: lightweight messaging protocol for small sensors and mobile devices, optimized for high-latency or unreliable networks
@@ -2135,6 +2145,7 @@ Bahir code is extracted from the Apache Spark project, and has spun out as a sta
 [sparkxml]: https://github.com/databricks/spark-xml
 [sparkcsv]: https://github.com/databricks/spark-csv
 [parquet]: https://parquet.apache.org/
+[sparkv200notes]: http://spark.apache.org/releases/spark-release-2-0-0.html
 
 [spackages]: https://spark-packages.org/
 

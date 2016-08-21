@@ -33,12 +33,16 @@ class ReadTreesTest extends TestSpec {
 
     // number of trees in the dataset
     trees.count shouldBe 148648 // 148k trees in the city
+
     trees.sqlContext.sql("FROM trees ORDER BY jaar DESC LIMIT 1").as[Tree].head shouldBe oldestTree
   }
 
   it should "get the oldest tree using dsl" in withTrees { spark => trees =>
     import spark.implicits._
-    trees.orderBy('jaar.desc).limit(1).head shouldBe oldestTree
+    trees
+      .orderBy('jaar.desc)
+      .limit(1)
+      .head shouldBe oldestTree
   }
 
   it should "get the tree family there is most of" in withTrees { spark => trees =>

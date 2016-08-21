@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.github.dnvriend.spark.streaming
+package com.github.dnvriend.spark.streaming.twitter
 
 import com.github.dnvriend.TestSpec
 import com.github.dnvriend.spark.Tweet
 import org.apache.spark.streaming.Seconds
 import org.apache.spark.streaming.dstream.{ DStream, ReceiverInputDStream }
 import org.apache.spark.streaming.twitter.TwitterUtils
-import twitter4j.Status
-import pprint._
-import Config.Colors.PPrintConfig
 import org.scalatest.Ignore
+import pprint.Config.Colors.PPrintConfig
+import pprint._
+import twitter4j.Status
 
 // see: https://dev.twitter.com/streaming/overview
 // see: https://dev.twitter.com/streaming/public
