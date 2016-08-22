@@ -26,7 +26,7 @@ class QueryPeopleTest extends TestSpec {
     import org.apache.spark.sql.functions._
 
     val people: DataFrame =
-      spark.read.parquet(TestSpec.PersonsParquet).cache() // name, age
+      spark.read.parquet(TestSpec.PeopleParquet).cache() // name, age
 
     people.select('name).limit(1).as[String].head() shouldBe "foo"
     people.select($"name").limit(1).as[String].head() shouldBe "foo"

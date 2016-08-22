@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dnvriend.spark.dataset
+package com.github.dnvriend.spark.rdd
 
 import com.github.dnvriend.TestSpec
 

@@ -65,6 +65,6 @@ lazy val deps = {
       "net.manub" %% "scalatest-embedded-kafka" % "0.7.1" % Test,
       "com.typesafe.akka" %% "akka-stream-testkit" % AkkaVersion % Test,
       "com.typesafe.akka" %% "akka-testkit" % AkkaVersion % Test,
-      "org.scalatest" %% "scalatest" % "2.2.6" % Test
+      "org.scalatest" %% "scalatest" % "3.0.0" % Test
     )
   }

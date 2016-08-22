@@ -22,7 +22,6 @@ import akka.actor.Props
 import com.github.dnvriend.TestSpec
 import org.apache.spark.streaming.akka.{ ActorReceiver, AkkaUtils }
 
-import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
 class CustomActor extends ActorReceiver {

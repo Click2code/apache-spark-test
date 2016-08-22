@@ -22,8 +22,8 @@ import org.apache.spark.rdd.RDD
 
 class RDDTest extends TestSpec {
   def withRDD(f: SparkContext => RDD[Int] => Unit): Unit = withSparkContext { sc =>
-    val data = Array(1, 2, 3, 4, 5)
-    val rdd = sc.parallelize(data)
+    val data: Array[Int] = Array(1, 2, 3, 4, 5)
+    val rdd: RDD[Int] = sc.parallelize(data)
     f(sc)(rdd)
   }
 

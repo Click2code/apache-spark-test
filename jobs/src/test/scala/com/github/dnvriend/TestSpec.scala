@@ -71,9 +71,12 @@ object TestSpec {
     PurchaseItem(25, "Craftsman", "Hardware", 12341.09, "2014-05-22")
   )
 
+  final val ApacheErrorLog = "src/test/resources/apache_error_log.txt"
   final val AliceInWonderlandText = "src/test/resources/alice_in_wonderland.txt"
   final val TreesParquet = "src/test/resources/bomen.parquet"
-  final val PersonsParquet = "src/test/resources/people.parquet"
+  final val PeopleParquet = "src/test/resources/people.parquet"
+  final val PeopleXml = "src/test/resources/people.xml"
+  final val PeopleCsv = "src/test/resources/people.csv"
   final val PurchaseItems = "src/test/resources/purchase_items.parquet"
   final val Transactions = "src/test/resources/transactions.parquet"
   final val OrdersParquet = "src/test/resources/orders.parquet"

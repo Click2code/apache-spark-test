@@ -28,6 +28,7 @@ import org.apache.spark.streaming.akka.{ ActorReceiver, AkkaUtils }
 import org.scalatest.Ignore
 
 import scala.concurrent.duration._
+import scala.reflect.ClassTag
 import scala.util.Random
 
 /**
@@ -85,7 +86,7 @@ class FeederActor extends Actor {
  * goes and subscribe to a typical publisher/feeder actor and receives
  * data.
  */
-class SampleActorReceiver[T] extends ActorReceiver {
+class SampleActorReceiver[T: ClassTag] extends ActorReceiver {
   lazy private val remotePublisher =
     context.actorSelection(s"akka.tcp://test@localhost:2552/user/FeederActor")
 
@@ -94,7 +95,7 @@ class SampleActorReceiver[T] extends ActorReceiver {
     remotePublisher ! SubscribeReceiver(context.self)
   }
 
-  def receive: PartialFunction[Any, Unit] = {
+  def receive: Receive = {
     case msg => store(msg.asInstanceOf[T])
   }
 

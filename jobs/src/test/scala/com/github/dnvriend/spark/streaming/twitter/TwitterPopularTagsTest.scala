@@ -40,7 +40,7 @@ class TwitterPopularTagsTest extends TestSpec {
     val filters = Array("#summercamp", "#akka", "#scala", "#fastdata", "#spark", "#hadoop")
     val stream: ReceiverInputDStream[Status] = TwitterUtils.createStream(ssc, None, filters)
 
-    val msgs =
+    val msgs: DStream[Tweet] =
       stream
         .map(Tweet(_))
 

@@ -66,7 +66,7 @@ class DatasetTest extends TestSpec {
   }
 
   it should "load people parquet" in withSparkSession { spark =>
-    val people = spark.read.parquet(TestSpec.PersonsParquet)
+    val people = spark.read.parquet(TestSpec.PeopleParquet)
     people.count shouldBe 5
   }
 

@@ -41,7 +41,8 @@ class JdbcDatasourceTest extends TestSpec {
 
   it should "join JDBC and parquet" in withSparkSession { spark =>
     import spark.implicits._
-    implicit val jdbcOptions = JdbcDatasourceTest.PostgresOptions
+    //    implicit val jdbcOptions = JdbcDatasourceTest.PostgresOptions
+    implicit val jdbcOptions = JdbcDatasourceTest.H2Options
     val orders = spark.read.parquet(TestSpec.OrdersParquet).as[Order].cache()
     val customers = spark.read.jdbc("customer").cache()
     customers.count() shouldBe 7

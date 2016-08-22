@@ -18,11 +18,12 @@ package com.github.dnvriend.spark.datasources
 
 import com.github.dnvriend.TestSpec
 import com.github.dnvriend.spark.datasources.SparkImplicits._
+import org.apache.spark.sql.DataFrame
 
 class PersonDataSourceTest extends TestSpec {
   it should "read a simple person xml file using a custom data source" in withSparkSession { spark =>
     import spark.implicits._
-    val result = spark.read
+    val result: DataFrame = spark.read
       .format("person")
       .load("src/test/resources/people.xml")
 
@@ -39,7 +40,7 @@ class PersonDataSourceTest extends TestSpec {
 
   it should "read a simple person xml file using implicit conversion" in withSparkSession { spark =>
     import spark.implicits._
-    val result = spark.read.person("src/test/resources/people.xml")
+    val result: DataFrame = spark.read.person("src/test/resources/people.xml")
 
     result.as[(Long, String, Int)].collect shouldBe Seq(
       (1, "Jonathan Archer", 41),
