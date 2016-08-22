@@ -128,6 +128,9 @@ abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures with Be
     def toTry: Try[T] = Try(self.futureValue)
   }
 
+  implicit def FiniteDurationToMillis(duration: FiniteDuration): Long =
+    duration.toMillis
+
   def sleep(duration: Duration = 1.second): Unit =
     Thread.sleep(duration.toMillis)
 

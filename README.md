@@ -1643,8 +1643,25 @@ Spark SQL and DataFrames support the following data types:
 - [StructType(fields)](https://github.com/apache/spark/blob/master/sql/catalyst/src/main/scala/org/apache/spark/sql/types/StructType.scala): Represents values with the structure described by a sequence of StructFields (fields).
   - [StructField(name, dataType, nullable)](https://github.com/apache/spark/blob/master/sql/catalyst/src/main/scala/org/apache/spark/sql/types/StructField.scala): Represents a field in a StructType. The name of a field is indicated by name. The data type of a field is indicated by dataType. nullable is used to indicate if values of this fields can have null values.
 
+## Spark Streaming
+
+Pain points with DStreams:
+- Processing with event time, dealing with late data
+  - DStreams api exposes batch time (micro-batching); hard to incorporate event-time
+- Incorporate streaming with batch AND interactive
+  - RDD/DStream has _similar_ api, but still requires translation (more work for the developer; streaming=DStream, batch=RDD)
+- Reasoning about end-to-end guarantees
+  - Requires carefully constructing sinks that can handle failures correctly,
+  - Data consistency in the storage while being updated
+
 ## Structured Streaming
-[Structured Streaming](http://spark.apache.org/docs/latest/structured-streaming-programming-guide.html) is a new computation model introduced in Spark 2.0 for building end-to-end streaming applications termed as continuous applications. Structured streaming offers a high-level declarative streaming API built on top of Datasets (inside Spark SQL engine) for continuous incremental execution of structured queries.
+[Structured Streaming](http://spark.apache.org/docs/latest/structured-streaming-programming-guide.html) is a new computation model introduced in Spark 2.0 for building end-to-end streaming applications termed as _continuous applications_ (not just streaming any more). Structured streaming offers a high-level declarative streaming API built on top of Datasets (inside Spark SQL engine) for continuous incremental execution of structured queries.
+
+Structured streaming is an attempt to unify streaming, interactive, and batch queries that paves the way for continuous applications like continuous aggregations using groupBy operator or continuous windowed aggregations using groupBy operator with window function.
+
+Spark 2.0 aims at simplifying __streaming analytics__ without having to reason about streaming at all.
+
+The new model introduces the __streaming datasets__ that are _infinite datasets_ with primitives like __input streaming sources__ and __output streaming sinks__, __event time__, __windowing__, and __sessions__. You can specify __output mode__ of a streaming dataset which is what gets written to a streaming sink when there is new data available.
 
 - [Reynold Xin - The Future of Real Time in Spark](https://www.youtube.com/watch?v=oXkxXDG0gNk&)
 - [Michael Armbrust - Structuring Spark: DataFrames, Datasets, and Streaming](https://www.youtube.com/watch?v=i7l3JQRx7Qw&)
