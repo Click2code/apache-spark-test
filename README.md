@@ -409,7 +409,7 @@ Spark SQL provides functions for manipulating large sets of distributed, structu
 Spark SQL support SQL 2003 and contains a native SQL parser that supports both ANSI-SQL as well as Hive QL. It has Subquery support, including Uncorrelated Scalar Subqueries Correlated Scalar Subqueries, NOT IN predicate Subqueries (in WHERE/HAVING clauses), IN predicate subqueries (in WHERE/HAVING clauses), (NOT) EXISTS predicate subqueries (in WHERE/HAVING clauses).
 
 ## Datasets and DataFrames
-A Dataset is a distributed collection of data. Dataset is a new interface added in Spark 1.6 that provides the benefits of RDDs (strong typing, ability to use powerful lambda functions) with the benefits of Spark SQL’s optimized execution engine. A Dataset can be constructed from JVM objects and then manipulated using functional transformations (map, flatMap, filter, etc.).
+Datasets are Spark SQL’s view of structured data. A Dataset is a distributed collection of data. The Dataset is a new interface added in Spark 1.6 that provides the benefits of RDDs (strong typing, ability to use powerful lambda functions) with the benefits of Spark SQL’s optimized execution engine. A Dataset can be constructed from JVM objects and then manipulated using functional transformations (map, flatMap, filter, etc.).
 
 A Dataset is a strongly typed collection of domain-specific objects that can be transformed in parallel using functional or relational operations. Each Dataset also has an untyped view called a `DataFrame`, which is a Dataset of Row.
 
@@ -1626,28 +1626,29 @@ As odd as this may appear at first glance there are some good use cases for symb
 ## Data Types
 Spark SQL and DataFrames support the following data types:
 
-__Numeric types:__
-- __ByteType:__ Represents 1-byte signed integer numbers. The range of numbers is from -128 to 127.
-- __ShortType:__ Represents 2-byte signed integer numbers. The range of numbers is from -32768 to 32767.
-- __IntegerType:__ Represents 4-byte signed integer numbers. The range of numbers is from -2147483648 to 2147483647.
-- __LongType:__ Represents 8-byte signed integer numbers. The range of numbers is from -9223372036854775808 to 9223372036854775807.
-- __FloatType:__ Represents 4-byte single-precision floating point numbers.
-- __DoubleType:__ Represents 8-byte double-precision floating point numbers.
-- __DecimalType:__ Represents arbitrary-precision signed decimal numbers. Backed internally by java.math.BigDecimal. A BigDecimal consists of an arbitrary precision integer unscaled value and a 32-bit integer scale.
-__String type:__
-- __StringType:__ Represents character string values.
-__Binary type:__
-- __BinaryType:__ Represents byte sequence values.
-__Boolean type:__
-- __BooleanType:__ Represents boolean values.
-__Datetime type:__
-- __TimestampType:__ Represents values comprising values of fields year, month, day, hour, minute, and second.
-- __DateType:__ Represents values comprising values of fields year, month, day.
-__Complex types:__
-- __ArrayType(elementType, containsNull):__ Represents values comprising a sequence of elements with the type of elementType. containsNull is used to indicate if elements in a ArrayType value can have null values.
-- __MapType(keyType, valueType, valueContainsNull):__ Represents values comprising a set of key-value pairs. The data type of keys are described by keyType and the data type of values are described by valueType. For a MapType value, keys are not allowed to have null values. valueContainsNull is used to indicate if values of a MapType value can have null values.
-- __StructType(fields):__ Represents values with the structure described by a sequence of StructFields (fields).
-  - StructField(name, dataType, nullable): Represents a field in a StructType. The name of a field is indicated by name. The data type of a field is indicated by dataType. nullable is used to indicate if values of this fields can have null values.
+- [ByteType](https://github.com/apache/spark/blob/master/sql/catalyst/src/main/scala/org/apache/spark/sql/types/ByteType.scala): Represents 1-byte signed integer numbers. The range of numbers is from -128 to 127.
+- [ShortType](https://github.com/apache/spark/blob/master/sql/catalyst/src/main/scala/org/apache/spark/sql/types/ShortType.scala): Represents 2-byte signed integer numbers. The range of numbers is from -32768 to 32767.
+- [IntegerType](IntegerType.scala): Represents 4-byte signed integer numbers. The range of numbers is from -2147483648 to 2147483647.
+- [LongType](https://github.com/apache/spark/blob/master/sql/catalyst/src/main/scala/org/apache/spark/sql/types/LongType.scala): Represents 8-byte signed integer numbers. The range of numbers is from -9223372036854775808 to 9223372036854775807.
+- [FloatType](https://github.com/apache/spark/blob/master/sql/catalyst/src/main/scala/org/apache/spark/sql/types/FloatType.scala): Represents 4-byte single-precision floating point numbers.
+- [DoubleType](https://github.com/apache/spark/blob/master/sql/catalyst/src/main/scala/org/apache/spark/sql/types/DoubleType.scala): Represents 8-byte double-precision floating point numbers.
+- [DecimalType](https://github.com/apache/spark/blob/master/sql/catalyst/src/main/scala/org/apache/spark/sql/types/DecimalType.scala): Represents arbitrary-precision signed decimal numbers. Backed internally by java.math.BigDecimal. A BigDecimal consists of an arbitrary precision integer unscaled value and a 32-bit integer scale.
+- [StringType](https://github.com/apache/spark/blob/master/sql/catalyst/src/main/scala/org/apache/spark/sql/types/StringType.scala): Represents character string values.
+- [BinaryType](https://github.com/apache/spark/blob/master/sql/catalyst/src/main/scala/org/apache/spark/sql/types/BinaryType.scala): Represents byte sequence values.
+- [BooleanType](https://github.com/apache/spark/blob/master/sql/catalyst/src/main/scala/org/apache/spark/sql/types/BooleanType.scala): Represents boolean values.
+- [TimestampType](https://github.com/apache/spark/blob/master/sql/catalyst/src/main/scala/org/apache/spark/sql/types/TimestampType.scala): Represents values comprising values of fields year, month, day, hour, minute, and second.
+- [DateType](https://github.com/apache/spark/blob/master/sql/catalyst/src/main/scala/org/apache/spark/sql/types/DateType.scala): Represents values comprising values of fields year, month, day.
+- [ArrayType(elementType, containsNull)](https://github.com/apache/spark/blob/master/sql/catalyst/src/main/scala/org/apache/spark/sql/types/ArrayType.scala): Represents values comprising a sequence of elements with the type of elementType. containsNull is used to indicate if elements in a ArrayType value can have null values.
+- [MapType(keyType, valueType, valueContainsNull)](https://github.com/apache/spark/blob/master/sql/catalyst/src/main/scala/org/apache/spark/sql/types/MapType.scala): Represents values comprising a set of key-value pairs. The data type of keys are described by keyType and the data type of values are described by valueType. For a MapType value, keys are not allowed to have null values. valueContainsNull is used to indicate if values of a MapType value can have null values.
+- [StructType(fields)](https://github.com/apache/spark/blob/master/sql/catalyst/src/main/scala/org/apache/spark/sql/types/StructType.scala): Represents values with the structure described by a sequence of StructFields (fields).
+  - [StructField(name, dataType, nullable)](https://github.com/apache/spark/blob/master/sql/catalyst/src/main/scala/org/apache/spark/sql/types/StructField.scala): Represents a field in a StructType. The name of a field is indicated by name. The data type of a field is indicated by dataType. nullable is used to indicate if values of this fields can have null values.
+
+## Structured Streaming
+[Structured Streaming](http://spark.apache.org/docs/latest/structured-streaming-programming-guide.html) is a new computation model introduced in Spark 2.0 for building end-to-end streaming applications termed as continuous applications. Structured streaming offers a high-level declarative streaming API built on top of Datasets (inside Spark SQL engine) for continuous incremental execution of structured queries.
+
+- [Reynold Xin - The Future of Real Time in Spark](https://www.youtube.com/watch?v=oXkxXDG0gNk&)
+- [Michael Armbrust - Structuring Spark: DataFrames, Datasets, and Streaming](https://www.youtube.com/watch?v=i7l3JQRx7Qw&)
+- [Tathagata Das - A Deep Dive Into Structured Streaming](https://www.youtube.com/watch?v=rl8dIzTpxrI&)
 
 ## TPC
 Transaction Processing Performance Council (TPC) is a non-profit organization founded in 1988 to define transaction processing and database benchmarks and to disseminate objective, verifiable TPC performance data to the industry. TPC benchmarks are used in evaluating the performance of computer systems; the results are published on the TPC web site.
@@ -2087,6 +2088,10 @@ To use logging in your application, you should use slf4j directly and not use th
 
 # Spark Streaming
 - [Custom Receivers](http://spark.apache.org/docs/latest/streaming-custom-receivers.html)
+
+# Spark Structured Streaming
+- [Apache Spark Programming Guide](http://spark.apache.org/docs/latest/structured-streaming-programming-guide.html)
+- [Mastering Apache Spark - Spark Structured Streaming](https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/spark-sql-structured-streaming.html)
 
 # Papers
 - [Matei Zaharia et al. - Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing][rddpaper]
