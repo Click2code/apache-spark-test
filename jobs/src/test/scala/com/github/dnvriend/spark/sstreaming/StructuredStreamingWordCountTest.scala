@@ -41,7 +41,7 @@ class StructuredStreamingWordCountTest extends TestSpec {
     f(socketServer)
   }
 
-  it should " a running word count of text data received from csv" in withSparkSession { spark =>
+  it should "a running word count of text data received via a TCP server" in withSparkSession { spark =>
     withSocketServer(List("apache spark")) { socketServer =>
       import spark.implicits._
 
