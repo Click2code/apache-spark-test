@@ -434,6 +434,12 @@ In Scala a DataFrame is represented by a Dataset of Rows. A DataFrame is simply 
 
 The main entry point for SparkSQL is the `org.apache.spark.sql.SparkSession` class, which is available in both the SparkShell and Zeppelin notebook as the `spark` value. The `org.apache.spark.SparkContext` is available as the `sc` value, but this is only used for creating RDDs. Read the [SparkSQL Programming Guide][sparksql] on how to create a SparkSession programmatically.
 
+## Functions available on Datasets
+The class `org.apache.spark.sql.expressions.scalalang.typed._` contain type-safe functions available for `Dataset` operations in Scala. It contains the following aggregate functions: `avg`, `count`, `sum` and `sumLong`.
+
+## Functions available on DataFrames
+The class `org.apache.spark.sql.functions._` contain functions that are available on DataFrame, which are a lot more than on Datasets. Please take a look at the source code or scaladocs.
+
 ## Creating a DataFrame from an RDD
 
 __Address:__
@@ -1643,9 +1649,9 @@ Spark SQL and DataFrames support the following data types:
 - [StructType(fields)](https://github.com/apache/spark/blob/master/sql/catalyst/src/main/scala/org/apache/spark/sql/types/StructType.scala): Represents values with the structure described by a sequence of StructFields (fields).
   - [StructField(name, dataType, nullable)](https://github.com/apache/spark/blob/master/sql/catalyst/src/main/scala/org/apache/spark/sql/types/StructField.scala): Represents a field in a StructType. The name of a field is indicated by name. The data type of a field is indicated by dataType. nullable is used to indicate if values of this fields can have null values.
 
-## Spark Streaming
+# Spark Streaming
+[Spark Streaming](http://spark.apache.org/docs/latest/streaming-programming-guide.html) is an extension of the core Spark API that enables scalable, high-throughput, fault-tolerant stream processing of live data streams. Data can be ingested from many sources like Kafka, Flume, Kinesis, or TCP sockets, and can be processed using complex algorithms expressed with high-level functions like map, reduce, join and window. Finally, processed data can be pushed out to filesystems, databases, and live dashboards. In fact, you can apply Spark’s machine learning and graph processing algorithms on data streams. This all sounds great, but there are some pain points with Spark Streaming's DStreams specifically:
 
-Pain points with DStreams:
 - Processing with event time, dealing with late data
   - DStreams api exposes batch time (micro-batching); hard to incorporate event-time
 - Incorporate streaming with batch AND interactive
@@ -1654,7 +1660,9 @@ Pain points with DStreams:
   - Requires carefully constructing sinks that can handle failures correctly,
   - Data consistency in the storage while being updated
 
-## Structured Streaming
+Which brings us to the new implementation, [Structured Streaming](http://spark.apache.org/docs/latest/structured-streaming-programming-guide.html)
+
+# Structured Streaming / Continuous Applications
 [Structured Streaming](http://spark.apache.org/docs/latest/structured-streaming-programming-guide.html) is a new computation model introduced in Spark 2.0 for building end-to-end streaming applications termed as _continuous applications_ (not just streaming any more). Structured streaming offers a high-level declarative streaming API built on top of Datasets (inside Spark SQL engine) for continuous incremental execution of structured queries.
 
 Structured streaming is an attempt to unify streaming, interactive, and batch queries that paves the way for continuous applications like continuous aggregations using groupBy operator or continuous windowed aggregations using groupBy operator with window function.
@@ -1663,11 +1671,73 @@ Spark 2.0 aims at simplifying __streaming analytics__ without having to reason a
 
 The new model introduces the __streaming datasets__ that are _infinite datasets_ with primitives like __input streaming sources__ and __output streaming sinks__, __event time__, __windowing__, and __sessions__. You can specify __output mode__ of a streaming dataset which is what gets written to a streaming sink when there is new data available.
 
+What can you do with a stream? Well, for example you could perform computations on a stream like eg. run a function on each record of a stream, reduce it to aggregate events by time, etc. But as it turns out, there is no program that __only__ does computations on a stream. Instead, stream processing happens as part of a larger application, which are called _continiuous applications_. Here are some examples:
+
+- __Updating data that will be served in real-time:__ for instance a summary table that users will query through a web application. In this case, much of the complexity is the interaction between the streaming engine and the serving system. For example, can you run queries on the table while the streaming engine is updating it? The __complete application__ is a real-time serving system, not a map or reduce on a stream.
+- __Extract, transform and load (ETL):__ One common use case is continuously moving and transforming data from one storage system to another (eg. JSON logs to a database table). This requires careful interaction with both storage systems to ensure no data is duplicated or lost; much of the logic is in this coordination work.
+- __Creating a real-time version of an existing batch job__
+- __Online machine learning:__ these applications often combine large _static_ datasets, processed using batch jobs, with real-time data and live prediction serving.
+- __Explicit support for 'event time':__ to aggregate out of order data and rich support for windowing and sessions; this means that events should contain a time to be able to window these events and create time buckets.
+
+These examples show that streaming computations are part of larger applications that include query serving, storage, or batch jobs.
+
+Structured Streaming features:
+
+- __Strong guarantees about consistency with batch jobs:__ specify a streaming computation by writing a batch computation and the engine automatically _incrementalizes_ this computation; runs it continuously. At any point in time the output of the structured streaming job is _the same_ as running the batch job on a prefix of the input data.
+- __Transactional integration with storage systems:__ process data exactly-once and update output sinks transactionally. Spark 2.0 only supports a few streaming data sources (HDFS and S3), but more are to come.
+- __Tight integration with the rest of Spark:__ Structured streaming supports serving interactive queries on streaming state with Spark SQL and integrates with MLib.
+
+In Structured Streaming, we make a strong guarantee about the system: __at any time, the output of the application is equivalent to executing a batch job on a prefix of the data.__ This guarantee is called _prefix integrity_ guarantee, and makes it easy to reason about __consistency of the output tables__, __fault tolerance__ and __effect of out-of-order data__.
+
+## Output Modes
+Structured streaming provides __output modes__ that are used each time the result table is updated when a trigger is fired. There are three output modes:
+
+- __Append:__ Only the new rows will be appended to external storage. This is only applicable only on queries where existing rows cannot change (eg. map on an input stream)
+- __Complete:__ The entire updated result table will be written to external storage.
+- __Update:__ Only the rows that were updated in the result table since the last trigger will be changed in external storage. This mode works for output sinks that can be updated in place eg. JDBC.
+
+## Requirements put on Input Sources
+Input sources must be __replayable__, so that recent data can be re-read if the job crashes. For example, message busses like Amazon Kinesis and Apache Kafka are replayable, as is the file system input source. Only a few minutes' of input data needs to be retained; Structured streaming will maintain its own internal state after that.
+
+## Requirements put on Output Sinks
+Output sinks must support __transactional updates__, so that the system can make a set of records appear atomically. Structured streaming implements this for file sinks and there will be output sinks for JDBC and key-value stores.
+
+## Requirements put on Structured Streaming
+Structured streaming will manage its internal state in a reliable storage system such as S3 or HDFS, to store data. Given these requirements, Structured streaming will enforce _prefix integrity_ end-to-end.
+
+## Fault Tolerant Semantics
+Delivering end-to-end exactly-once semantics was one of key goals behind the design of Structured Streaming. To achieve that, we have designed the Structured Streaming sources, the sinks and the execution engine to reliably track the exact progress of the processing so that it can handle any kind of failure by restarting and/or reprocessing. Every streaming source is assumed to have offsets (similar to Kafka offsets, or Kinesis sequence numbers) to track the read position in the stream. The  (Spark Structured Streaming) engine uses checkpointing and write ahead logs to record the offset range of the data being processed in each trigger. The streaming sinks are designed to be idempotent for handling reprocessing. Together, using replayable sources and idempotant sinks, Structured Streaming can ensure end-to-end exactly-once semantics under any failure.
+
+## API
+Structured Streaming components are located in `org.apache.spark.sql.execution.streaming` and consists of:
+
+__Sink:__
+An `org.apache.spark.sql.execution.streaming.Sink` represents an interface for systems that can collect the results of a streaming query. In order to preserve exactly once semantics a sink must be `idempotent` in the face of multiple attempts to add the same batch.
+
+The following sinks are available:
+- __org.apache.spark.sql.execution.streaming.ConsoleSink:__ A sink that writes out to the console, useful for tutorials, logging and debugging.
+- __org.apache.spark.sql.execution.streaming.MemorySink:__ A sink that stores the results in memory. This Sink is primarily intended for use in unit tests and does not provide durability.
+- __org.apache.spark.sql.execution.streamingFileStreamSink__: A sink that writes out results to parquet files.
+- __org.apache.spark.sql.execution.streaming.ForeachSink:__ A Sink that forwards all data into `org.apache.spark.sql.ForeachWriter`. For the contract please see `org.apache.spark.sql.ForeachWriter.ForeachWriter`
+
+__Source:__
+A `org.apache.spark.sql.execution.streaming.Source` represents a source of continually arriving data for a streaming query. A Source must have a monotonically increasing notion of progress that can be represented as an Offset. Spark will regularly query each Source to see if any more data is available.
+
+The following sources are available:
+- __org.apache.spark.sql.execution.streaming.TextSocketSource:__ A source that reads text lines through a TCP socket, designed only for tutorials and debugging.
+- __org.apache.spark.sql.execution.streaming.MemoryStream:__ A Source that produces value stored in memory as they are added by the user.  This Source is primarily intended for use in unit tests as it can only replay data when the object is still available.
+- __org.apache.spark.sql.execution.streaming.FileStreamSource:__ A very simple source that reads text files from the given directory as they appear. The FileStreamSource uses the `fileFormatClassName` to load 'normal' DataSource(s). Supported file formats are text, csv, json and parquet. The files must be atomically placed in the given directory, which in most file systems can be achieved by file moving operations.
+
+
+## Streaming DataFrames and Streaming Datasets
+Streaming Dataframes can be created through the [org.apache.spark.sql.streaming.DataStreamReader](https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.streaming.DataStreamReader) interface returned by `spark.readStream()`.
+
+## Structured Streaming Video
 - [Reynold Xin - The Future of Real Time in Spark](https://www.youtube.com/watch?v=oXkxXDG0gNk&)
 - [Michael Armbrust - Structuring Spark: DataFrames, Datasets, and Streaming](https://www.youtube.com/watch?v=i7l3JQRx7Qw&)
 - [Tathagata Das - A Deep Dive Into Structured Streaming](https://www.youtube.com/watch?v=rl8dIzTpxrI&)
 
-## TPC
+# TPC
 Transaction Processing Performance Council (TPC) is a non-profit organization founded in 1988 to define transaction processing and database benchmarks and to disseminate objective, verifiable TPC performance data to the industry. TPC benchmarks are used in evaluating the performance of computer systems; the results are published on the TPC web site.
 
 ## TPC-DS
@@ -2109,6 +2179,8 @@ To use logging in your application, you should use slf4j directly and not use th
 # Spark Structured Streaming
 - [Apache Spark Programming Guide](http://spark.apache.org/docs/latest/structured-streaming-programming-guide.html)
 - [Mastering Apache Spark - Spark Structured Streaming](https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/spark-sql-structured-streaming.html)
+- [Databricks - Continuous Applications: Evolving Streaming in Apache Spark 2.0 - A foundation for end-to-end real-time applications](https://databricks.com/blog/2016/07/28/continuous-applications-evolving-streaming-in-apache-spark-2-0.html)
+- [Databricks - Structured Streaming In Apache Spark - A new high-level API for streaming](https://databricks.com/blog/2016/07/28/structured-streaming-in-apache-spark.html)
 
 # Papers
 - [Matei Zaharia et al. - Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing][rddpaper]

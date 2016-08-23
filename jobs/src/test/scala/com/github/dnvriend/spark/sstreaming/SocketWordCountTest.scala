@@ -18,7 +18,7 @@ package com.github.dnvriend.spark.sstreaming
 
 import akka.Done
 import akka.stream.scaladsl.Tcp._
-import akka.stream.scaladsl.{Flow, Sink, Source, Tcp}
+import akka.stream.scaladsl.{ Flow, Sink, Source, Tcp }
 import akka.util.ByteString
 import com.github.dnvriend.TestSpec
 import org.scalatest.Ignore
@@ -28,7 +28,7 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 @Ignore
-class StructuredStreamingWordCountTest extends TestSpec {
+class SocketWordCountTest extends TestSpec {
   def withSocketServer(xs: Seq[String])(f: Future[Done] => Unit): Unit = {
     val connections: Source[IncomingConnection, Future[ServerBinding]] = Tcp().bind("127.0.0.1", 9999)
     val socketServer = connections.runForeach { connection =>
