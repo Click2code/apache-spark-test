@@ -40,6 +40,8 @@ lazy val commonSettings = Seq(
 lazy val deps = { 
   val AkkaVersion = "2.4.9"
   val SparkVersion = "2.0.0"
+  val slickVersion = "3.1.1"
+  val hikariCPVersion = "2.4.7"
   Seq(
       "org.scala-lang" % "scala-reflect" % "2.11.8",
       "org.apache.spark" %% "spark-core" % SparkVersion,
@@ -62,6 +64,11 @@ lazy val deps = {
       "org.postgresql" % "postgresql" % "9.4.1209",
       "com.h2database" % "h2" % "1.4.192",
       "com.lihaoyi" %% "pprint" % "0.4.1",
+      "com.github.dnvriend" %% "akka-stream-extensions" % "0.0.2",
+      "com.github.dnvriend" %% "akka-persistence-jdbc" % "2.6.6",
+      "com.typesafe.slick" %% "slick-extensions" % "3.1.0",
+      "com.typesafe.slick" %% "slick-hikaricp" % slickVersion exclude("com.zaxxer", "HikariCP-java6"),
+      "com.zaxxer" % "HikariCP" % hikariCPVersion,
       "net.manub" %% "scalatest-embedded-kafka" % "0.7.1" % Test,
       "com.typesafe.akka" %% "akka-stream-testkit" % AkkaVersion % Test,
       "com.typesafe.akka" %% "akka-testkit" % AkkaVersion % Test,

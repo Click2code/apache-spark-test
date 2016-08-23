@@ -28,7 +28,6 @@ import scala.language.implicitConversions
 @Ignore
 class QueryCsvTest extends TestSpec {
   def copyFiles(nrTimes: Int = 10): Unit = {
-    implicit def toFile(str: String): java.io.File = new java.io.File(str)
     FileUtils.deleteDirectory("/tmp/csv")
     FileUtils.forceMkdir("/tmp/csv")
     (1 to nrTimes).foreach { x =>
@@ -66,7 +65,6 @@ class QueryCsvTest extends TestSpec {
       .queryName("consoleStream")
       .outputMode(OutputMode.Append())
       .start()
-
 
     // waiting for data
     sleep(3.seconds)

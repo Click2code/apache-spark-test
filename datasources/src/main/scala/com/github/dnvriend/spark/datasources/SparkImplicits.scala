@@ -22,6 +22,7 @@ import akka.NotUsed
 import akka.stream.Materializer
 import akka.stream.scaladsl.{ Sink, Source }
 import org.apache.spark.sql._
+import org.apache.spark.sql.streaming.DataStreamReader
 
 import scala.collection.immutable._
 import scala.concurrent.duration.{ FiniteDuration, _ }
@@ -34,6 +35,11 @@ object SparkImplicits {
     def person(path: String): DataFrame = dfr.format("person").load(path)
     def jdbc(table: String)(implicit jdbcOptions: Map[String, String]): DataFrame =
       dfr.format("jdbc").options(jdbcOptions ++ Map("dbtable" -> table)).load()
+  }
+
+  implicit class DataStreamReaderOps(dsr: DataStreamReader) {
+    def currentPersistenceIds(path: String = "jdbc-read-journal"): DataFrame = dsr.format("current-persistence-id").load(path)
+    def eventsByPersistenceId(path: String = "jdbc-read-journal"): DataFrame = dsr.format("current-events-by-persistence-id").load(path)
   }
 
   implicit class DataFrameWriterOps[T](dfw: DataFrameWriter[T]) {

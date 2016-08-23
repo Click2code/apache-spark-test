@@ -1,3 +1,4 @@
 com.github.dnvriend.spark.datasources.helloworld.HelloWorldDataSource
 com.github.dnvriend.spark.datasources.person.PersonDataSource
-com.github.dnvriend.spark.datasources.person.PersonStreamingDataSource
+akka.persistence.jdbc.spark.sql.execution.streaming.CurrentPersistenceIdsQuerySourceProvider
+akka.persistence.jdbc.spark.sql.execution.streaming.CurrentEventsByPersistenceIdQuerySourceProvider

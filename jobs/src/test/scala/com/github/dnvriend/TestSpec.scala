@@ -16,6 +16,8 @@
 
 package com.github.dnvriend
 
+import java.util.UUID
+
 import akka.actor.{ ActorRef, ActorSystem, PoisonPill }
 import akka.event.{ Logging, LoggingAdapter }
 import akka.stream.{ ActorMaterializer, Materializer }
@@ -130,6 +132,10 @@ abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures with Be
 
   implicit def FiniteDurationToMillis(duration: FiniteDuration): Long =
     duration.toMillis
+
+  implicit def toFile(str: String): java.io.File = new java.io.File(str)
+
+  def randomId: String = UUID.randomUUID().toString
 
   def sleep(duration: Duration = 1.second): Unit =
     Thread.sleep(duration.toMillis)
