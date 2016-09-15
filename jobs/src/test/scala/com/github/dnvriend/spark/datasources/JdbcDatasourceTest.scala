@@ -19,6 +19,7 @@ package com.github.dnvriend.spark.datasources
 import com.github.dnvriend.TestSpec
 import com.github.dnvriend.spark._
 import com.github.dnvriend.spark.datasources.SparkImplicits._
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.DataFrame
 
 object JdbcDatasourceTest {
@@ -39,7 +40,7 @@ object JdbcDatasourceTest {
 
 class JdbcDatasourceTest extends TestSpec {
 
-  it should "join JDBC and parquet" in withSparkSession { spark =>
+  ignore should "join JDBC and parquet" in withSparkSession { spark =>
     import spark.implicits._
     //    implicit val jdbcOptions = JdbcDatasourceTest.PostgresOptions
     implicit val jdbcOptions = JdbcDatasourceTest.H2Options

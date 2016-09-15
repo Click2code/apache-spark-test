@@ -22,6 +22,7 @@ import com.github.dnvriend.TestSpec
 import com.github.dnvriend.spark.datasources.SparkImplicits._
 import com.github.dnvriend.spark.mapper.PersonEventMapper
 import org.apache.spark.sql.streaming.{ OutputMode, ProcessingTime }
+import org.apache.spark.sql.functions._
 import org.scalatest.Ignore
 
 import scala.concurrent.duration._
@@ -35,8 +36,9 @@ class CurrentEventsByPersistenceIdQueryTest extends TestSpec {
   }
 
   it should "read events for pid" in withSparkSession { spark =>
-
+    import spark.implicits._
     withPersistentActor("person", schedule = true) { ref => tp =>
+
       tp.send(ref, "persist")
       tp.expectMsg("ack")
 

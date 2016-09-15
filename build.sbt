@@ -38,12 +38,13 @@ lazy val commonSettings = Seq(
 )
 
 lazy val deps = { 
-  val AkkaVersion = "2.4.9"
+  val AkkaVersion = "2.4.10"
   val SparkVersion = "2.0.0"
   val slickVersion = "3.1.1"
-  val hikariCPVersion = "2.4.7"
+  val hikariCPVersion = "2.5.0"
   Seq(
       "org.scala-lang" % "scala-reflect" % "2.11.8",
+      "org.scalaz" %% "scalaz-core" % "7.2.6",
       "org.apache.spark" %% "spark-core" % SparkVersion,
       "org.apache.spark" %% "spark-sql" % SparkVersion,
       "org.apache.spark" %% "spark-mllib" % SparkVersion,
@@ -53,19 +54,19 @@ lazy val deps = {
       "org.apache.spark" %% "spark-streaming-kafka-0-10" % SparkVersion,
       "org.apache.bahir" %% "spark-streaming-twitter" % SparkVersion,
       "org.apache.bahir" %% "spark-streaming-akka" % SparkVersion,
-      "com.datastax.spark" %% "spark-cassandra-connector" % "2.0.0-M1",
+      "com.datastax.spark" %% "spark-cassandra-connector" % "2.0.0-M3",
 //      "com.databricks" %% "spark-csv" % "1.4.0", // not necessary for spark v2.0.0
-      "com.databricks" %% "spark-xml" % "0.3.3",
+      "com.databricks" %% "spark-xml" % "0.4.0",
       "com.typesafe.akka" %% "akka-actor" % AkkaVersion,
       "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
       "com.typesafe.akka" %% "akka-http-spray-json-experimental" % AkkaVersion,
       "com.typesafe.akka" %% "akka-slf4j" % AkkaVersion,
       "ch.qos.logback" % "logback-classic" % "1.1.7",
-      "org.postgresql" % "postgresql" % "9.4.1209",
+      "org.postgresql" % "postgresql" % "9.4.1210",
       "com.h2database" % "h2" % "1.4.192",
-      "com.lihaoyi" %% "pprint" % "0.4.1",
+      "com.lihaoyi" %% "pprint" % "0.4.2",
       "com.github.dnvriend" %% "akka-stream-extensions" % "0.0.2",
-      "com.github.dnvriend" %% "akka-persistence-jdbc" % "2.6.6",
+      "com.github.dnvriend" %% "akka-persistence-jdbc" % "2.6.7",
       "com.typesafe.slick" %% "slick-extensions" % "3.1.0",
       "com.typesafe.slick" %% "slick-hikaricp" % slickVersion exclude("com.zaxxer", "HikariCP-java6"),
       "com.zaxxer" % "HikariCP" % hikariCPVersion,
