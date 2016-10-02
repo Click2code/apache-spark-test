@@ -24,11 +24,13 @@ import akka.stream.{ ActorMaterializer, Materializer }
 import akka.testkit.TestProbe
 import akka.util.Timeout
 import com.github.dnvriend.spark._
+import com.github.dnvriend.spark.util.DatabaseExtension
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.{ Dataset, SparkSession }
 import org.apache.spark.streaming.{ ClockWrapper, Seconds, StreamingContext }
 import org.scalatest.concurrent.{ Eventually, ScalaFutures }
 import org.scalatest.{ BeforeAndAfterAll, FlatSpec, Matchers }
+import slick.jdbc.JdbcBackend._
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
@@ -175,6 +177,9 @@ abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures with Be
       .option("mergeSchema", "false")
       .parquet(TestSpec.TreesParquet).as[Tree])
   }
+
+  def withDatabase[A](f: Database => A): A =
+    f(DatabaseExtension(system).db)
 
   // for twitter api
   val cfg = system.settings.config.getConfig("twitter")

@@ -28,6 +28,7 @@ import scala.collection.immutable._
 import scala.concurrent.duration.{ FiniteDuration, _ }
 import scala.concurrent.{ Await, Future }
 import scala.reflect.runtime.universe._
+import slick.driver.PostgresDriver.api._
 
 object SparkImplicits {
   implicit class DataSourceOps(dfr: DataFrameReader) {
@@ -74,6 +75,25 @@ object SparkImplicits {
       dfw.jdbc(jdbcOptions("url"), table, properties)
       // does not (yet) work see: https://issues.apache.org/jira/browse/SPARK-7646
       // dfw.format("jdbc").mode(SaveMode.Overwrite).options(jdbcOptions ++ Map("dbtable" -> table))
+    }
+  }
+
+  trait DataFrameQueryGenerator[A] {
+    def upsert: String
+  }
+
+  implicit class DatasetOps(df: DataFrame) {
+    def withSession[A](db: Database)(f: Session => A): A = {
+      val session = db.createSession()
+      try f(session) finally session.close()
+    }
+
+    def withStatement[A](db: Database)(f: java.sql.Statement => A): A =
+      withSession(db)(session ⇒ session.withStatement()(f))
+
+    def upsert[A](table: String)(implicit db: Database, dfq: DataFrameQueryGenerator[A]): DataFrame = withStatement(db) { stmt =>
+      stmt.executeUpdate(dfq.upsert)
+      df
     }
   }
 
