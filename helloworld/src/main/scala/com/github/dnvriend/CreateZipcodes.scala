@@ -24,11 +24,11 @@ import akka.actor.{ ActorSystem, Terminated }
 import akka.stream.scaladsl.{ FileIO, Source }
 import akka.stream.{ ActorMaterializer, Materializer }
 import akka.util.ByteString
-import spray.json.{ DefaultJsonProtocol, _ }
+import play.api.libs.json.Json
 
 import scala.concurrent.{ ExecutionContext, Future }
 
-object CreateZipcodes extends App with DefaultJsonProtocol {
+object CreateZipcodes extends App {
   implicit val system: ActorSystem = ActorSystem()
   implicit val mat: Materializer = ActorMaterializer()
   implicit val ec: ExecutionContext = system.dispatcher
@@ -37,9 +37,10 @@ object CreateZipcodes extends App with DefaultJsonProtocol {
     terminate
   }
 
+  object Zipcode {
+    implicit val format = Json.format[Zipcode]
+  }
   final case class Zipcode(value: String)
-
-  implicit val zipcodeJsonFormat = jsonFormat1(Zipcode)
 
   val numZips = 50000000
 
@@ -50,7 +51,7 @@ object CreateZipcodes extends App with DefaultJsonProtocol {
           Source(1 to 399).map(num => f"$district$l1$l2-$num%03d")
         }
       }
-    }.map(Zipcode).map(_.toJson.compactPrint).map(json => ByteString(json + "\n"))
+    }.map(Zipcode.apply).map(Json.toJson(_).toString).map(json => ByteString(json + "\n"))
 
   zips(1000 until 2000)
     .merge(zips(2000 until 3000))

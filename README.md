@@ -10,6 +10,7 @@ We will be using the Structured Query Language (SQL), for a tutorial see the fre
 
 # Spark pages
 - [Spark News](http://spark.apache.org/news/)
+- [Spark 2.1.0 Release Notes](http://spark.apache.org/releases/spark-release-2-1-0.html)
 - [Spark 2.0 Release Notes][sparkv200notes]
 - [Spark Issue Tracker](https://issues.apache.org/jira/browse/SPARK/?selectedTab=com.atlassian.jira.jira-projects-plugin:summary-panel)
 - [Spark Roadmap](https://issues.apache.org/jira/browse/SPARK/?selectedTab=com.atlassian.jira.jira-projects-plugin:roadmap-panel)

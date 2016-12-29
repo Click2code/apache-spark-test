@@ -20,11 +20,10 @@ import akka.actor.ActorSystem
 import akka.event.{ Logging, LoggingAdapter }
 import akka.stream.{ ActorMaterializer, Materializer }
 import org.apache.spark.sql.{ SaveMode, SparkSession }
-import spray.json.DefaultJsonProtocol
 
 import scala.concurrent.ExecutionContext
 
-object CreateZipcodesSpark extends App with DefaultJsonProtocol {
+object CreateZipcodesSpark extends App {
   implicit val system: ActorSystem = ActorSystem()
   implicit val mat: Materializer = ActorMaterializer()
   implicit val ec: ExecutionContext = system.dispatcher

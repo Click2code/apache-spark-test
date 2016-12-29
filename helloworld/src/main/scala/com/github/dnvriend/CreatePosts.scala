@@ -25,12 +25,12 @@ import akka.actor.{ ActorSystem, Terminated }
 import akka.stream.scaladsl.{ FileIO, Source }
 import akka.stream.{ ActorMaterializer, Materializer }
 import akka.util.ByteString
-import spray.json.{ DefaultJsonProtocol, _ }
+import play.api.libs.json.Json
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Random
 
-object CreatePosts extends App with DefaultJsonProtocol {
+object CreatePosts extends App {
   implicit val system: ActorSystem = ActorSystem()
   implicit val mat: Materializer = ActorMaterializer()
   implicit val ec: ExecutionContext = system.dispatcher
@@ -42,7 +42,9 @@ object CreatePosts extends App with DefaultJsonProtocol {
     terminate
   }
 
-  implicit val postJsonFormat = jsonFormat13(Post)
+  object Post {
+    implicit val format = Json.format[Post]
+  }
 
   final case class Post(
     commentCount: Int,
@@ -68,7 +70,7 @@ object CreatePosts extends App with DefaultJsonProtocol {
   val title = " Ut id placerat sapien. Aliquam vel metus orci."
   Source.fromIterator(() => Iterator from 0).map { id =>
     Post(rng, now, rng, List.fill(Random.nextInt(5))(lorem).mkString("\n"), rng, now, rng, s"$rng - $title", title, rng, rng, rng, id)
-  }.map(_.toJson.compactPrint)
+  }.map(Json.toJson(_).toString)
     .map(json => ByteString(json + "\n"))
     .take(1000000)
     .via(LogProgress.flow())
