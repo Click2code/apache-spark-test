@@ -2091,12 +2091,43 @@ spark.sql.warehouse.dir=file:${system:user.dir}/spark-warehouse
 ## Apache Zeppelin
 [Apache Zeppelin][zeppelin] is a web-based notebook that enables interactive data analytics. You can make beautiful data-driven, interactive and collaborative documents with SQL, Scala and more.
 
-Download the [zeppelin-bin-all](http://www.apache.org/dyn/closer.cgi/zeppelin/zeppelin-0.6.0/zeppelin-0.6.0-bin-all.tgz) distribution, extract it to a dir. Launch your stand-alone Spark cluster
+Download the [zeppelin-bin-all](http://mirror.nl.webzilla.com/apache/zeppelin/zeppelin-0.6.2/zeppelin-0.6.2-bin-all.tgz) distribution, extract it to a dir. Launch your stand-alone Spark cluster
 
+- [Zeppelin Documentation](https://zeppelin.apache.org/docs/0.6.2/)
+- [Zeppelin Installation Guide](https://zeppelin.apache.org/docs/0.6.2/install/install.html)
+- [Zeppelin Overview - Youtube](https://www.youtube.com/watch?v=_PQbVH_aO5E)
 - [Zeppelin - Spark Interpreter Settings](https://zeppelin.apache.org/docs/latest/interpreter/spark.html)
 
+v0.6.2 should be compatibile with Spark 1.6/Scala 2.10 and Spark 2.0/Scala 2.11 without rebuild
 v0.6.1 should be Spark 2.0 compatible. v0.6.0 is Spark 1.6.1 compatible.
 
+
+### Installation Guide
+- [Download the full binary release]()
+- Unzip the archive
+
+```bash
+tar xvf zeppelin-0.6.2-bin-all.tgz
+```
+
+- Start zeppelin:
+
+```bash
+cd zeppelin-0.6.2-bin-all
+bin/zeppelin-daemon.sh start
+```
+
+After successful start, visit [http://localhost:8080] with your web browser.
+
+- Stopping Zeppelin:
+
+```bash
+bin/zeppelin-daemon.sh stop
+```
+
+
+
+### Building Zeppelin
 Building zeppelin:
 
 1. clone git repo: git@github.com:apache/zeppelin.git

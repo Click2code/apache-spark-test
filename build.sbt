@@ -17,28 +17,46 @@ resolvers += Resolver.typesafeRepo("releases")
 resolvers += Resolver.jcenterRepo
 
 lazy val jobs = (project in file("jobs"))
-  .settings(SbtHeaderConf.settings ++ ScalariformConf.settings ++ commonSettings)
+  .settings(commonSettings)
   .dependsOn(datasources)
   .enablePlugins(AutomateHeaderPlugin)
 
 lazy val datasources = (project in file("datasources"))
-  .settings(SbtHeaderConf.settings ++ ScalariformConf.settings ++ commonSettings)
+  .settings(commonSettings)
   .enablePlugins(AutomateHeaderPlugin)
 
 lazy val helloworld = (project in file("helloworld"))
-  .settings(SbtHeaderConf.settings ++ ScalariformConf.settings ++ commonSettings)
+  .settings(commonSettings)
   .dependsOn(jobs)
   .enablePlugins(AutomateHeaderPlugin)
 
 lazy val restpi = (project in file("restpi"))
-  .settings(SbtHeaderConf.settings ++ ScalariformConf.settings ++ commonSettings)
+  .settings(commonSettings)
   .dependsOn(jobs)
   .enablePlugins(AutomateHeaderPlugin)
 
+
+import de.heikoseeberger.sbtheader.license.Apache2_0
+import de.heikoseeberger.sbtheader.HeaderKey._
+import com.typesafe.sbt.SbtScalariform
+import scalariform.formatter.preferences.{AlignSingleLineCaseStatements, DoubleIndentClassDeclaration}
+
 lazy val commonSettings = Seq(
   parallelExecution in Test := false,
+
   fork in Test := true,
-  libraryDependencies ++= deps
+
+  libraryDependencies ++= deps,
+
+  headers := Map(
+    "scala" -> Apache2_0("2016", "Dennis Vriend"),
+    "conf" -> Apache2_0("2016", "Dennis Vriend", "#")
+  ),
+
+  SbtScalariform.autoImport.scalariformPreferences := SbtScalariform.autoImport.scalariformPreferences.value
+    .setPreference(AlignSingleLineCaseStatements, true)
+    .setPreference(AlignSingleLineCaseStatements.MaxArrowIndent, 100)
+    .setPreference(DoubleIndentClassDeclaration, true)
 )
 
 lazy val deps = { 
